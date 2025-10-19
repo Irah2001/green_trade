@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  email            String   @unique
+  passwordHash     String
+  firstName        String?
+  lastName         String?
+  profile          Json?
+  favoriteProducts String[]
+  rating           Float?
+  createdAt        DateTime @default(now())
+
+  // relations
+  products Product[] @relation("SellerProducts")
+  posts    Message[] @relation("UserMessages")
+  transactionsBought Transaction[] @relation("UserBuyerTransactions")
+  transactionsSold   Transaction[] @relation("UserSellerTransactions")
+}
+
+model Product {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  sellerId    String   @db.ObjectId
+  title       String
+  description String
+  price       Float
+  currency    String?
+  category    String
+  condition   String
+  images      String[]
+  location    Json?
+  status      String   @default("active")
+  tags        String[]
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // relations
+  seller       User?        @relation("SellerProducts", fields: [sellerId], references: [id])
+  conversations Conversation[]
+  transactions  Transaction[]
+  
+  @@index([sellerId])
+  @@index([category, status])
+  @@index([createdAt])
+}
+
+model Conversation {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  participantIds String[]
+  productId      String?  @db.ObjectId
+  lastActivityAt DateTime?
+  createdAt      DateTime @default(now())
+
+  // relations
+  product   Product?   @relation(fields: [productId], references: [id])
+  messages  Message[]  @relation("ConversationMessages")
+
+  @@index([participantIds])
+  @@index([productId])
+  @@index([lastActivityAt])
+}
+
+model Message {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  conversationId String   @db.ObjectId
+  senderId       String   @db.ObjectId
+  content        String
+  isRead         Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  // relations
+  conversation Conversation @relation("ConversationMessages", fields: [conversationId], references: [id])
+  sender       User         @relation("UserMessages", fields: [senderId], references: [id])
+
+  @@index([conversationId, createdAt])
+  @@index([senderId])
+}
+
+model Transaction {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  buyerId         String   @db.ObjectId
+  sellerId        String   @db.ObjectId
+  productId       String   @db.ObjectId
+  amount          Float
+  currency        String?
+  status          String
+  stripePaymentId String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // relations
+  buyer   User   @relation("UserBuyerTransactions", fields: [buyerId], references: [id])
+  seller  User   @relation("UserSellerTransactions", fields: [sellerId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([productId])
+  @@index([status])
+}

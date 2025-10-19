@@ -1,0 +1,24 @@
+{
+  "name": "green_trade",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "pnpm -w -r dev",
+    "build": "pnpm -w -r build",
+    "lint": "pnpm -w -r lint",
+    "bootstrap": "pnpm install",
+    "prisma:generate": "pnpm --filter @greentrade/backend run prisma:generate",
+    "prisma:generate:backend": "pnpm --filter @greentrade/backend run prisma:generate",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:restart": "docker-compose restart",
+    "docker:logs": "docker-compose logs -f",
+    "docker:mongo": "docker-compose up -d mongo",
+    "docker:clean": "docker-compose down -v",
+    "seed": "pnpm --filter @greentrade/backend run seed",
+    "db:push": "pnpm --filter @greentrade/backend prisma db push",
+    "db:studio": "pnpm --filter @greentrade/backend prisma studio"
+  }
+}
