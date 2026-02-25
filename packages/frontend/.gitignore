@@ -1,0 +1,38 @@
+# dependencies
+node_modules
+
+# output
+out
+dist
+*.tgz
+
+# code coverage
+coverage
+*.lcov
+
+# SonarQube files
+.scannerwork
+
+# logs
+logs
+_.log
+report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
+
+# environment variable files
+.env
+.env.development
+.env.test
+.env.production
+.env.local
+
+# caches
+.eslintcache
+.cache
+*.tsbuildinfo
+
+# Based IDEs
+.idea
+.vscode
+
+# Finder (MacOS) folder config
+.DS_Store
