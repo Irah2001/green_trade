@@ -21,6 +21,10 @@ export type Product = {
   location: { city: string; lat: number; lng: number; distance: number };
   tags: string[];
   availableQuantity: number;
+  organic?: boolean;
+  isSurplusOfDay?: boolean;
+  quantity?: number;
+  createdAt?: string;
 };
 
 export const MOCK_USERS: Record<string, User> = {

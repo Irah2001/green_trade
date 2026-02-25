@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { Product, User, CartItem, Order } from '@/data/mockData';
-import { mockUsers, mockProducts, mockOrders } from '@/data/mockData';
+
+import { Product, User, CartItem, Order, mockUsers, mockProducts, mockOrders } from '@/data/mockDatabase'; 
 
 interface AppState {
   // Auth

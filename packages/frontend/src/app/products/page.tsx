@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Filter, SlidersHorizontal, ChevronDown } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
-import { MOCK_PRODUCTS } from "@/lib/mockData";
+import { MOCK_PRODUCTS } from "@/lib/mockConstants";
 
 export default function ProductsPage() {
   const [showFilters, setShowFilters] = useState(false);

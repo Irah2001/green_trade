@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import ProductCard from '@/components/product/ProductCard';
 import ProductFilters from '@/components/product/ProductFilters';
 
-import { Product } from '@/data/mockData';
+import { Product } from '@/data/mockDatabase';
 import { useAppStore } from '@/store/useAppStore';
 
 export default function ProductsPage() {

@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 
 // Data
-import { Product, mockUsers } from '@/data/mockData';
+import { Product, mockUsers } from '@/data/mockDatabase';
 
 // Store
 import { useAppStore } from '@/store/useAppStore';

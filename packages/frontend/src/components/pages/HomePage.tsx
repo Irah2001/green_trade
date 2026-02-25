@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { mockProducts, mockUsers, Product } from '@/data/mockData';
+import { mockProducts, mockUsers, Product } from '@/data/mockDatabase';
 import { useAppStore } from '@/store/useAppStore';
 import { Button } from '@/components/ui/button';
 

@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useAppStore } from '@/store/useAppStore';
-import { mockProducts } from '@/data/mockData';
+
+// Components
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import HomePage from '@/components/pages/HomePage';
@@ -11,6 +11,9 @@ import CartPage from '@/components/pages/CartPage';
 import PublishPage from '@/components/pages/PublishPage';
 import AdminDashboard from '@/components/pages/AdminDashboard';
 import ProductDetail from '@/components/product/ProductDetail';
+
+import { useAppStore } from '@/store/useAppStore';
+import { mockProducts } from '@/data/mockDatabase';
 
 // Custom hook to handle hydration
 function useHydration() {

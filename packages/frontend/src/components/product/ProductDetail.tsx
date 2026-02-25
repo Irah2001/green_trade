@@ -22,7 +22,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
-import { Product, mockUsers, mockProducts } from '@/data/mockData';
+import { Product, mockUsers, mockProducts } from '@/data/mockDatabase';
 import { useAppStore } from '@/store/useAppStore';
 import { useToast } from '@/hooks/use-toast';
 import ProductCard from './ProductCard';

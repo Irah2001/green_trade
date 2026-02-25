@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MapPin, Heart, Share2, ShieldCheck, ChevronLeft, Minus, Plus, MessageCircle } from "lucide-react";
-import { MOCK_PRODUCTS, MOCK_USERS } from "@/lib/mockData";
+import { MOCK_PRODUCTS, MOCK_USERS } from "@/lib/mockConstants";
 import ProductCard from "@/components/ProductCard";
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {

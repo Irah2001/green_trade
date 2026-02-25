@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Trash2, ShieldCheck, CreditCard, Apple, ArrowRight } from "lucide-react";
-import { MOCK_PRODUCTS } from "@/lib/mockData";
+import { MOCK_PRODUCTS } from "@/lib/mockConstants";
 
 export default function CartPage() {
   // Mock cart items based on the data

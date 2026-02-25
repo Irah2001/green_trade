@@ -5,7 +5,7 @@ import Link from "next/link";
 import { MapPin, Heart, Share2, ShoppingBasket } from "lucide-react";
 import { useState } from "react";
 
-import type { Product } from "@/lib/mockData";
+import type { Product } from "@/lib/mockConstants";
 
 export default function ProductCard({ product }: Readonly<{ product: Product }>) {
   const [isFavorite, setIsFavorite] = useState(false);

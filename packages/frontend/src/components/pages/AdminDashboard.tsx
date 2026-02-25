@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 
 import { useAppStore } from '@/store/useAppStore';
-import { mockUsers, mockOrders, mockProducts } from '@/data/mockData';
+import { mockUsers, mockOrders, mockProducts } from '@/data/mockDatabase';
 
 
 export default function AdminDashboard() {

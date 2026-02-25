@@ -20,7 +20,7 @@ import {
 import { useAppStore } from '@/store/useAppStore';
 
 // Data
-import { mockProducts } from '@/data/mockData';
+import { mockProducts } from '@/data/mockDatabase';
 
 interface ProductFiltersProps {
   onFilterChange?: () => void;

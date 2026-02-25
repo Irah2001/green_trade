@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useAppStore } from '@/store/useAppStore';
-import { mockUsers } from '@/data/mockData';
+import { mockUsers } from '@/data/mockDatabase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
