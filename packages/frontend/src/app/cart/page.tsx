@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Trash2, ShieldCheck, CreditCard, Apple, ArrowRight } from "lucide-react";
-import { MOCK_PRODUCTS } from "@/lib/mockConstants";
+import { mockProducts as MOCK_PRODUCTS } from "@/data/mockDatabase";
 
 export default function CartPage() {
   // Mock cart items based on the data
@@ -100,7 +100,7 @@ export default function CartPage() {
               <div className="mb-8 p-4 bg-gray-50 rounded-2xl border border-gray-100 space-y-3">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input type="radio" name="delivery" className="w-4 h-4 text-olive focus:ring-olive border-gray-300 pointer-events-none" defaultChecked />
-                  <span className="text-sm font-semibold text-gray-900">Retrait chez le producteur <span className="text-gray-500 font-normal">({MOCK_PRODUCTS[0].location.distance}km)</span></span>
+                  <span className="text-sm font-semibold text-gray-900">Retrait chez le producteur <span className="text-gray-500 font-normal">({MOCK_PRODUCTS[0].location.distance || 2.5}km)</span></span>
                 </label>
                 <label className="flex items-center gap-3 cursor-pointer opacity-50">
                   <input type="radio" name="delivery" className="w-4 h-4 text-olive focus:ring-olive border-gray-300 pointer-events-none" disabled />

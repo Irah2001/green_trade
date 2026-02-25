@@ -5,7 +5,7 @@ import Link from "next/link";
 import { MapPin, Heart, Share2, ShoppingBasket } from "lucide-react";
 import { useState } from "react";
 
-import type { Product } from "@/lib/mockConstants";
+import type { Product } from "@/data/mockDatabase";
 
 export default function ProductCard({ product }: Readonly<{ product: Product }>) {
   const [isFavorite, setIsFavorite] = useState(false);
@@ -68,12 +68,12 @@ export default function ProductCard({ product }: Readonly<{ product: Product }>)
 
           <div className="flex items-center text-sm text-gray-500 mb-3 gap-1">
             <MapPin className="w-3.5 h-3.5 text-accent" />
-            <span className="line-clamp-1">{product.location.city} • <span className="opacity-75">{product.location.distance}km</span></span>
+            <span className="line-clamp-1">{product.location.city} • <span className="opacity-75">{product.location.distance || 2.5}km</span></span>
           </div>
 
           <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">
             <div className="text-xs font-medium text-olive bg-light-green/20 px-2.5 py-1 rounded-md">
-              Disponible {product.availableQuantity} {product.unit}
+              Disponible {product.quantity} {product.unit}
             </div>
           </div>
         </div>

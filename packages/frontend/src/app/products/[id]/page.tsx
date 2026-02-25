@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MapPin, Heart, Share2, ShieldCheck, ChevronLeft, Minus, Plus, MessageCircle } from "lucide-react";
-import { MOCK_PRODUCTS, MOCK_USERS } from "@/lib/mockConstants";
+import { mockProducts as MOCK_PRODUCTS, mockUsers } from "@/data/mockDatabase";
 import ProductCard from "@/components/ProductCard";
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -13,7 +13,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     notFound();
   }
 
-  const seller = MOCK_USERS[product.sellerId];
+  const seller = mockUsers.find(u => u.id === product.sellerId) || mockUsers[0];
   const suggestedProducts = MOCK_PRODUCTS.filter(p => p.id !== product.id).slice(0, 4);
 
   return (
@@ -87,7 +87,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                     <div>
                       <p className="font-bold text-gray-900 leading-tight">Vendu par {seller.firstName}</p>
                       <div className="flex items-center text-sm text-gray-500 mt-0.5 gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-accent" /> {product.location.city} ({product.location.distance}km)
+                        <MapPin className="w-3.5 h-3.5 text-accent" /> {product.location.city} ({product.location.distance || 2.5}km)
                       </div>
                     </div>
                   </div>
@@ -101,7 +101,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-sm font-medium text-gray-500">
-                    Quantité disponible : <span className="text-gray-900 font-bold">{product.availableQuantity} {product.unit}s</span>
+                    Quantité disponible : <span className="text-gray-900 font-bold">{product.quantity} {product.unit}s</span>
                   </span>
                   
                   {/* Quantity Counter */}

@@ -131,7 +131,7 @@ export default function LoginPage() {
               </p>
             </div>
 
-            <form action={handleSubmit} className="space-y-5">
+            <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input

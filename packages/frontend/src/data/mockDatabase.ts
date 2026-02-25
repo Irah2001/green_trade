@@ -36,6 +36,7 @@ export interface Product {
     city: string;
     postalCode: string;
     coordinates: [number, number];
+    distance?: number;
   };
   status: 'active' | 'sold' | 'reserved';
   quantity: number;
