@@ -106,7 +106,7 @@ export const mockUsers: User[] = [
       coordinates: [2.3522, 48.8566]
     },
     rating: 5.0,
-    createdAt: '2024-01-01T00:00:00Z'
+    createdAt: '2026-01-01T00:00:00Z'
   },
   {
     id: 'producer-1',
@@ -127,7 +127,7 @@ export const mockUsers: User[] = [
       coordinates: [-1.5536, 47.2184]
     },
     rating: 4.9,
-    createdAt: '2023-06-01T00:00:00Z'
+    createdAt: '2026-01-01T00:00:00Z'
   },
   {
     id: 'producer-2',
@@ -148,7 +148,7 @@ export const mockUsers: User[] = [
       coordinates: [-1.6325, 47.2132]
     },
     rating: 4.7,
-    createdAt: '2023-09-15T00:00:00Z'
+    createdAt: '2026-01-01T00:00:00Z'
   },
   {
     id: 'producer-3',
@@ -169,7 +169,7 @@ export const mockUsers: User[] = [
       coordinates: [-1.6808, 48.1173]
     },
     rating: 4.6,
-    createdAt: '2024-02-01T00:00:00Z'
+    createdAt: '2026-01-01T00:00:00Z'
   }
 ];
 
@@ -197,8 +197,8 @@ export const mockProducts: Product[] = [
     quantity: 15,
     tags: ['bio', 'pommes', 'fruits', 'local'],
     views: 142,
-    createdAt: '2024-06-10T08:00:00Z',
-    updatedAt: '2024-06-10T08:00:00Z',
+    createdAt: '2026-01-01T08:00:00Z',
+    updatedAt: '2026-01-01T08:00:00Z',
     isSurplusOfDay: true
   },
   {
@@ -223,8 +223,8 @@ export const mockProducts: Product[] = [
     quantity: 8,
     tags: ['bio', 'tomates', 'légumes', 'local'],
     views: 89,
-    createdAt: '2024-06-10T06:30:00Z',
-    updatedAt: '2024-06-10T06:30:00Z',
+    createdAt: '2026-01-01T06:30:00Z',
+    updatedAt: '2026-01-01T06:30:00Z',
     isSurplusOfDay: true
   },
   {
@@ -248,8 +248,8 @@ export const mockProducts: Product[] = [
     quantity: 12,
     tags: ['bio', 'courgettes', 'légumes', 'local'],
     views: 67,
-    createdAt: '2024-06-09T14:00:00Z',
-    updatedAt: '2024-06-09T14:00:00Z',
+    createdAt: '2026-01-01T14:00:00Z',
+    updatedAt: '2026-01-01T14:00:00Z',
     isSurplusOfDay: false
   },
   {
@@ -274,8 +274,8 @@ export const mockProducts: Product[] = [
     quantity: 5,
     tags: ['bio', 'fraises', 'fruits', 'local', 'saison'],
     views: 203,
-    createdAt: '2024-06-10T07:00:00Z',
-    updatedAt: '2024-06-10T07:00:00Z',
+    createdAt: '2026-01-01T07:00:00Z',
+    updatedAt: '2026-01-01T07:00:00Z',
     isSurplusOfDay: true
   },
   {
@@ -299,8 +299,8 @@ export const mockProducts: Product[] = [
     quantity: 20,
     tags: ['bio', 'carottes', 'légumes', 'local'],
     views: 45,
-    createdAt: '2024-06-08T10:00:00Z',
-    updatedAt: '2024-06-08T10:00:00Z',
+    createdAt: '2026-01-01T10:00:00Z',
+    updatedAt: '2026-01-01T10:00:00Z',
     isSurplusOfDay: false
   },
   {
@@ -325,8 +325,8 @@ export const mockProducts: Product[] = [
     quantity: 3,
     tags: ['bio', 'panier', 'légumes', 'saison', 'local'],
     views: 312,
-    createdAt: '2024-06-10T09:00:00Z',
-    updatedAt: '2024-06-10T09:00:00Z',
+    createdAt: '2026-01-01T09:00:00Z',
+    updatedAt: '2026-01-01T09:00:00Z',
     isSurplusOfDay: true
   },
   {
@@ -350,8 +350,8 @@ export const mockProducts: Product[] = [
     quantity: 10,
     tags: ['bio', 'poivrons', 'légumes', 'local'],
     views: 78,
-    createdAt: '2024-06-09T16:00:00Z',
-    updatedAt: '2024-06-09T16:00:00Z',
+    createdAt: '2026-01-01T16:00:00Z',
+    updatedAt: '2026-01-01T16:00:00Z',
     isSurplusOfDay: false
   },
   {
@@ -375,8 +375,8 @@ export const mockProducts: Product[] = [
     quantity: 7,
     tags: ['bio', 'aubergines', 'légumes', 'local'],
     views: 56,
-    createdAt: '2024-06-10T05:00:00Z',
-    updatedAt: '2024-06-10T05:00:00Z',
+    createdAt: '2026-01-01T05:00:00Z',
+    updatedAt: '2026-01-01T05:00:00Z',
     isSurplusOfDay: false
   },
   {
@@ -400,8 +400,8 @@ export const mockProducts: Product[] = [
     quantity: 10,
     tags: ['bio', 'poires', 'fruits', 'local'],
     views: 91,
-    createdAt: '2024-06-09T11:00:00Z',
-    updatedAt: '2024-06-09T11:00:00Z',
+    createdAt: '2026-01-01T11:00:00Z',
+    updatedAt: '2026-01-01T11:00:00Z',
     isSurplusOfDay: false
   },
   {
@@ -425,8 +425,8 @@ export const mockProducts: Product[] = [
     quantity: 4,
     tags: ['bio', 'panier', 'fruits', 'local'],
     views: 187,
-    createdAt: '2024-06-10T12:00:00Z',
-    updatedAt: '2024-06-10T12:00:00Z',
+    createdAt: '2026-01-01T12:00:00Z',
+    updatedAt: '2026-01-01T12:00:00Z',
     isSurplusOfDay: false
   },
   {
@@ -450,8 +450,8 @@ export const mockProducts: Product[] = [
     quantity: 15,
     tags: ['bio', 'radis', 'légumes', 'local'],
     views: 34,
-    createdAt: '2024-06-10T06:00:00Z',
-    updatedAt: '2024-06-10T06:00:00Z',
+    createdAt: '2026-01-01T06:00:00Z',
+    updatedAt: '2026-01-01T06:00:00Z',
     isSurplusOfDay: false
   },
   {
@@ -475,8 +475,8 @@ export const mockProducts: Product[] = [
     quantity: 25,
     tags: ['bio', 'salade', 'légumes', 'local'],
     views: 123,
-    createdAt: '2024-06-10T07:30:00Z',
-    updatedAt: '2024-06-10T07:30:00Z',
+    createdAt: '2026-01-01T07:30:00Z',
+    updatedAt: '2026-01-01T07:30:00Z',
     isSurplusOfDay: true
   }
 ];
@@ -491,8 +491,8 @@ export const mockOrders: Order[] = [
     quantity: 3,
     amount: 7.50,
     status: 'paid',
-    deliveryMethod: 'pickup',
-    createdAt: '2024-06-10T14:00:00Z'
+    deliveryMethod: 'pickup', 
+    createdAt: '2026-01-01T14:00:00Z'
   },
   {
     id: 'order-2',
@@ -503,7 +503,7 @@ export const mockOrders: Order[] = [
     amount: 4.50,
     status: 'delivered',
     deliveryMethod: 'pickup',
-    createdAt: '2024-06-08T10:00:00Z'
+    createdAt: '2026-01-01T10:00:00Z'
   },
   {
     id: 'order-3',
@@ -514,7 +514,7 @@ export const mockOrders: Order[] = [
     amount: 12.00,
     status: 'pending',
     deliveryMethod: 'delivery',
-    createdAt: '2024-06-10T16:00:00Z'
+    createdAt: '2026-01-01T16:00:00Z'
   }
 ];
 

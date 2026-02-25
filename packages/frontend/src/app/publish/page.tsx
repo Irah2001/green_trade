@@ -12,7 +12,7 @@ export default function PublishPage() {
           <p className="text-gray-500 text-lg">Publiez votre annonce en 2 minutes chrono. C'est simple, rapide et bon pour la planète !</p>
         </div>
 
-        <form className="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-gray-100" action={() => {}}>
+        <form className="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-gray-100" onSubmit={(event) => { event.preventDefault(); }}>
           
           {/* Section 1: Photos */}
           <div className="mb-10">

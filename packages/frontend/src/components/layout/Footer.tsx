@@ -39,7 +39,7 @@ export default function Footer() {
   const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
 
-  const handleSubscribe = () => {
+  const handleSubscribe = async () => {
     if (email) {
       setIsSubscribed(true);
       setEmail('');
@@ -141,7 +141,7 @@ export default function Footer() {
             <p className="text-white/80 text-sm mb-4">
               Inscrivez-vous pour recevoir nos offres et actualités
             </p>
-            <form action={handleSubscribe} className="space-y-3">
+            <form onSubmit={(e) => { e.preventDefault(); handleSubscribe(); }} className="space-y-3">
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
