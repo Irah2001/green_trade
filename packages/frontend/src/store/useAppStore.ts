@@ -47,6 +47,7 @@ export const useAppStore = create<AppState>()(
       isAuthenticated: false,
       
       login: (email: string, password: string) => {
+        // TODO: Replace with proper authentication in production
         // Mock authentication - accept any password for demo
         const user = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
         if (user) {

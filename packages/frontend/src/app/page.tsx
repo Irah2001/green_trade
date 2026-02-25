@@ -20,8 +20,6 @@ function useHydration() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    // This is intentional - we need to wait for hydration
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHydrated(true);
   }, []);
 

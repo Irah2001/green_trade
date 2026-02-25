@@ -68,7 +68,7 @@ export default function ProductCard({ product }: Readonly<{ product: Product }>)
 
           <div className="flex items-center text-sm text-gray-500 mb-3 gap-1">
             <MapPin className="w-3.5 h-3.5 text-accent" />
-            <span className="line-clamp-1">{product.location.city} • <span className="opacity-75">{product.location.distance}k</span></span>
+            <span className="line-clamp-1">{product.location.city} • <span className="opacity-75">{product.location.distance}km</span></span>
           </div>
 
           <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">
