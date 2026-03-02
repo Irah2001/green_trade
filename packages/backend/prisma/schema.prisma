@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/client"
 }
 
 datasource db {
@@ -19,8 +20,8 @@ model User {
   createdAt        DateTime @default(now())
 
   // relations
-  products Product[] @relation("SellerProducts")
-  posts    Message[] @relation("UserMessages")
+  products           Product[]     @relation("SellerProducts")
+  posts              Message[]     @relation("UserMessages")
   transactionsBought Transaction[] @relation("UserBuyerTransactions")
   transactionsSold   Transaction[] @relation("UserSellerTransactions")
 }
@@ -43,25 +44,25 @@ model Product {
   updatedAt   DateTime @updatedAt
 
   // relations
-  seller       User?        @relation("SellerProducts", fields: [sellerId], references: [id])
+  seller        User?          @relation("SellerProducts", fields: [sellerId], references: [id])
   conversations Conversation[]
   transactions  Transaction[]
-  
+
   @@index([sellerId])
   @@index([category, status])
   @@index([createdAt])
 }
 
 model Conversation {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
   participantIds String[]
-  productId      String?  @db.ObjectId
+  productId      String?   @db.ObjectId
   lastActivityAt DateTime?
-  createdAt      DateTime @default(now())
+  createdAt      DateTime  @default(now())
 
   // relations
-  product   Product?   @relation(fields: [productId], references: [id])
-  messages  Message[]  @relation("ConversationMessages")
+  product  Product?  @relation(fields: [productId], references: [id])
+  messages Message[] @relation("ConversationMessages")
 
   @@index([participantIds])
   @@index([productId])
@@ -97,8 +98,8 @@ model Transaction {
   updatedAt       DateTime @updatedAt
 
   // relations
-  buyer   User   @relation("UserBuyerTransactions", fields: [buyerId], references: [id])
-  seller  User   @relation("UserSellerTransactions", fields: [sellerId], references: [id])
+  buyer   User    @relation("UserBuyerTransactions", fields: [buyerId], references: [id])
+  seller  User    @relation("UserSellerTransactions", fields: [sellerId], references: [id])
   product Product @relation(fields: [productId], references: [id])
 
   @@index([buyerId])

@@ -49,7 +49,7 @@ RUN pnpm install --frozen-lockfile --prod
 
 # Copier les fichiers buildés depuis le stage builder
 COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/dist ./packages/backend/dist
-COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/node_modules/.prisma ./packages/backend/node_modules/.prisma
+COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/node_modules ./packages/backend/node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/prisma ./packages/backend/prisma
 
 # Changer vers l'utilisateur non-root

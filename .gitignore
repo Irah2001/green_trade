@@ -39,3 +39,4 @@ pnpm-debug.log*
 
 # Prisma
 /packages/backend/prisma/migrations
+/packages/backend/src/generated
