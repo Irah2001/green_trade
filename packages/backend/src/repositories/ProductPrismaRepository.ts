@@ -15,8 +15,8 @@ function toDomain(prismaProduct: any): Product {
     location: prismaProduct.location ?? undefined,
     status: prismaProduct.status,
     tags: prismaProduct.tags ?? [],
-    createdAt: prismaProduct.createdAt ? new Date(prismaProduct.createdAt) : undefined,
-    updatedAt: prismaProduct.updatedAt ? new Date(prismaProduct.updatedAt) : undefined,
+    createdAt: prismaProduct.createdAt ? new Date(prismaProduct.createdAt) : new Date(),
+    updatedAt: prismaProduct.updatedAt ? new Date(prismaProduct.updatedAt) : new Date(),
   };
 
   return new Product(props);
@@ -34,7 +34,7 @@ export class ProductPrismaRepository {
         category: product.category,
         condition: product.condition,
         images: product.images,
-        location: product.location,
+        location: product.location ? (product.location as any) : null,
         status: product.status,
         tags: product.toJSON().tags ?? [],
         views: (product as any).views ?? 0,
@@ -49,7 +49,7 @@ export class ProductPrismaRepository {
         category: product.category,
         condition: product.condition,
         images: product.images,
-        location: product.location,
+        location: product.location ? (product.location as any) : null,
         status: product.status,
         tags: product.toJSON().tags ?? [],
         views: (product as any).views ?? 0,
