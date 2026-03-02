@@ -1,4 +1,4 @@
-import prisma from '../prismaClient';
+import prisma from '../prismaClient.js';
 import { Product, ProductProps } from '../domain/entities/Product';
 
 function toDomain(prismaProduct: any): Product {

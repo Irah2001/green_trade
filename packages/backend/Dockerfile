@@ -47,10 +47,12 @@ COPY --chown=nodejs:nodejs packages/shared/package.json ./packages/shared/
 # Installer uniquement les dépendances de production
 RUN pnpm install --frozen-lockfile --prod
 
-# Copier les fichiers buildés depuis le stage builder
 COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/dist ./packages/backend/dist
-COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/node_modules ./packages/backend/node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/prisma ./packages/backend/prisma
+
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/node_modules ./packages/backend/node_modules
+
 
 # Changer vers l'utilisateur non-root
 USER nodejs
@@ -64,4 +66,4 @@ ENV PORT=4000
 
 # Démarrer l'application
 WORKDIR /app/packages/backend
-CMD ["node", "dist/index.js"]
+CMD ["sh", "-c", "npx prisma generate && node dist/index.js"]
