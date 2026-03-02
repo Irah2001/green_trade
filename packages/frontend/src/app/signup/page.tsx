@@ -59,21 +59,33 @@ export default function SignUpPage() {
     
     setIsLoading(true);
 
-    // Simulate loading
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      const signup = useAppStore.getState().signup;
+      const result = await signup(form);
 
-    // Mock registration - just log in
-    login(form.email, form.password);
-    toast({
-      title: 'Inscription réussie',
-      description: 'Votre compte a été créé avec succès !',
-    });
-
-    setIsLoading(false);
-    
-    // Redirect to home
-    useAppStore.getState().setCurrentPage('home');
-    router.push('/');
+      if (result.success) {
+        toast({
+          title: 'Inscription réussie',
+          description: 'Votre compte a été créé avec succès !',
+        });
+        useAppStore.getState().setCurrentPage('home');
+        router.push('/');
+      } else {
+        toast({
+          title: "Erreur d'inscription",
+          description: result.message || "Une erreur est survenue lors de la création du compte.",
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Erreur technique',
+        description: 'Le serveur ne répond pas.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

@@ -29,26 +29,32 @@ export default function LoginPage() {
   const handleSubmit = async () => {
     setIsLoading(true);
 
-    // Simulate loading
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      const result = await login(form.email, form.password);
 
-    const success = login(form.email, form.password);
-    if (success) {
+      if (result.success) {
+        toast({
+          title: 'Connexion réussie',
+          description: 'Bienvenue sur Green Trade !',
+        });
+        useAppStore.getState().setCurrentPage('home');
+        router.push('/');
+      } else {
+        toast({
+          title: 'Erreur de connexion',
+          description: result.message || 'Email ou mot de passe incorrect.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
       toast({
-        title: 'Connexion réussie',
-        description: 'Bienvenue sur Green Trade !',
-      });
-      useAppStore.getState().setCurrentPage('home');
-      router.push('/');
-    } else {
-      toast({
-        title: 'Erreur de connexion',
-        description: 'Email non trouvé. Essayez: john.doe@email.com ou admin@greentrade.fr',
+        title: 'Erreur technique',
+        description: 'Impossible de joindre le serveur.',
         variant: 'destructive',
       });
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (

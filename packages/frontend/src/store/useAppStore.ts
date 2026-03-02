@@ -3,11 +3,14 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 
 import { Product, User, CartItem, Order, mockUsers, mockProducts, mockOrders } from '@/data/mockDatabase'; 
 
+import { authService } from '@/services/auth.service';
+
 interface AppState {
   // Auth
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => boolean;
+  login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
+  signup: (userData: any) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   
   // Cart
@@ -45,22 +48,44 @@ export const useAppStore = create<AppState>()(
       // Auth State
       user: null,
       isAuthenticated: false,
-      
-      login: (email: string, password: string) => {
-        // TODO: Replace with proper authentication in production
-        // Mock authentication - accept any password for demo
-        const user = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
-        if (user) {
-          set({ user, isAuthenticated: true });
-          return true;
+
+      login: async (email, password) => {
+        try {
+          const { user, token } = await authService.login({ email, password });
+
+          localStorage.setItem('gt_token', token);
+          
+          set({ 
+            user, 
+            isAuthenticated: true,
+          });
+          return { success: true };
+        } catch (error: any) {
+          return { success: false, message: error.message };
         }
-        return false;
       },
-      
+
+      signup: async (userData) => {
+        try {
+          const { user, token } = await authService.signup(userData);
+
+          localStorage.setItem('gt_token', token);
+
+          set({ 
+            user, 
+            isAuthenticated: true,
+          });
+          return { success: true };
+        } catch (error: any) {
+          return { success: false, message: error.message };
+        }
+      },
+
       logout: () => {
-        set({ user: null, isAuthenticated: false });
+        localStorage.removeItem('gt_token');
+        set({ user: null, isAuthenticated: false, cart: [] });
       },
-      
+
       // Cart State
       cart: [],
       
