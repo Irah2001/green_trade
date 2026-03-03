@@ -1,6 +1,8 @@
 ﻿import express from "express";
 import cors from "cors";
+import swaggerUi from "swagger-ui-express";
 import authRoutes from "./routes/auth.routes.js";
+import { swaggerDocument } from "./swagger.js";
 
 const allowedOrigins = process.env.CORS_ORIGIN 
   ? process.env.CORS_ORIGIN.split(',') 
@@ -24,6 +26,9 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 // Routes
 app.use("/api/auth", authRoutes);
 
@@ -40,7 +45,9 @@ app.get("/", (_req, res) => {
 });
 
 const port = process.env.PORT ?? 4000;
+const serverUrl = process.env.API_URL || `http://localhost:${port || 4000}`;
 app.listen(Number(port), '0.0.0.0', () => {
   // eslint-disable-next-line no-console
   console.log(`Backend listening on port ${port}`);
+  console.log(`Swagger docs available at ${serverUrl}/api-docs`);
 });
