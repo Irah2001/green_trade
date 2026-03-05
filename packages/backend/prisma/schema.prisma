@@ -29,6 +29,7 @@ model User {
   posts              Message[]     @relation("UserMessages")
   transactionsBought Transaction[] @relation("UserBuyerTransactions")
   transactionsSold   Transaction[] @relation("UserSellerTransactions")
+  cart               Cart?
 }
 
 model Product {
@@ -52,6 +53,7 @@ model Product {
   seller        User?          @relation("SellerProducts", fields: [sellerId], references: [id])
   conversations Conversation[]
   transactions  Transaction[]
+  cartItems     CartItem[]
 
   @@index([sellerId])
   @@index([category, status])
@@ -111,4 +113,31 @@ model Transaction {
   @@index([sellerId])
   @@index([productId])
   @@index([status])
+}
+
+model Cart {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @unique @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relations
+  user  User       @relation(fields: [userId], references: [id])
+  items CartItem[]
+}
+
+model CartItem {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  cartId            String  @db.ObjectId
+  productId         String  @db.ObjectId
+  quantity          Int
+  unitPriceSnapshot Float
+
+  // relations
+  cart    Cart    @relation(fields: [cartId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([cartId])
+  @@index([productId])
+  @@unique([cartId, productId])
 }
