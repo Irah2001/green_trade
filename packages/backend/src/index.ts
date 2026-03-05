@@ -2,6 +2,7 @@
 import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import authRoutes from "./routes/auth.routes.js";
+import cartRoutes from "./routes/cart.routes.js";
 import { swaggerDocument } from "./swagger.js";
 
 const allowedOrigins = process.env.CORS_ORIGIN 
@@ -31,6 +32,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/cart", cartRoutes);
 
 app.get("/health", (_req, res) => {
   res.json({ 
