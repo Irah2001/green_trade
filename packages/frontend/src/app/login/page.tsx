@@ -47,6 +47,7 @@ export default function LoginPage() {
         });
       }
     } catch (error) {
+      console.error("Login attempt failed", error);
       toast({
         title: 'Erreur technique',
         description: 'Impossible de joindre le serveur.',
@@ -154,7 +155,7 @@ export default function LoginPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Mot de passe</Label>
-                  <a href="#" className="text-sm text-[#4A7C59] hover:underline">
+                  <a href="/forgot-password" className="text-sm text-[#4A7C59] hover:underline">
                     Mot de passe oublié ?
                   </a>
                 </div>
