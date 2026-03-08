@@ -156,7 +156,7 @@ export default function Navbar() {
                         Tableau de bord Admin
                       </DropdownMenuItem>
                     )}
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push('/settings/profile')}>
                       <Settings className="h-4 w-4 mr-2" />
                       Paramètres
                     </DropdownMenuItem>
@@ -271,6 +271,14 @@ export default function Navbar() {
                             Tableau de bord Admin
                           </Button>
                         )}
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start"
+                          onClick={() => router.push('/settings/profile')}
+                        >
+                          <Settings className="h-4 w-4 mr-2" />
+                          Paramètres
+                        </Button>
                         <Button
                           variant="ghost"
                           className="w-full justify-start text-red-600"
