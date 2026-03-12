@@ -1,10 +1,11 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-import { Product, User, CartItem, Order, mockUsers, mockProducts, mockOrders } from '@/data/mockDatabase';
+import { Product, User, CartItem, Order, mockProducts, mockOrders } from '@/data/mockDatabase';
 
 import { authService } from '@/services/auth.service';
 import { cartService } from '@/services/cart.service';
+import { productService, ProductPayload, SearchParams } from '@/services/product.service';
 
 const FALLBACK_IMAGE = '/images/green_trade.webp';
 
@@ -70,6 +71,11 @@ interface AppState {
   // Products
   products: Product[];
   filteredProducts: Product[];
+  productsLoading: boolean;
+  loadProducts: (params?: SearchParams) => Promise<void>;
+  createProduct: (data: ProductPayload) => Promise<{ success: boolean; message?: string }>;
+  updateProduct: (id: string, data: Partial<ProductPayload>) => Promise<{ success: boolean; message?: string }>;
+  deleteProduct: (id: string) => Promise<{ success: boolean; message?: string }>;
   setFilteredProducts: (products: Product[]) => void;
   searchProducts: (query: string) => void;
   filterByCategory: (category: string | null) => void;
@@ -244,6 +250,58 @@ export const useAppStore = create<AppState>()(
       // Products State
       products: mockProducts.filter(p => p.status === 'active'),
       filteredProducts: mockProducts.filter(p => p.status === 'active'),
+      productsLoading: false,
+
+      loadProducts: async (params?) => {
+        set({ productsLoading: true });
+        try {
+          const { items } = await productService.getProducts(params);
+          const mapped = items.map(toFrontendProduct);
+          set({ products: mapped, filteredProducts: mapped });
+        } catch {
+          // Fallback sur mock data si l'API est indisponible
+        } finally {
+          set({ productsLoading: false });
+        }
+      },
+
+      createProduct: async (data) => {
+        try {
+          const created = await productService.createProduct(data);
+          const product = toFrontendProduct(created);
+          set(state => ({ products: [product, ...state.products], filteredProducts: [product, ...state.filteredProducts] }));
+          return { success: true };
+        } catch (error: any) {
+          return { success: false, message: error.message };
+        }
+      },
+
+      updateProduct: async (id, data) => {
+        try {
+          const updated = await productService.updateProduct(id, data);
+          const product = toFrontendProduct(updated);
+          set(state => ({
+            products: state.products.map(p => p.id === id ? product : p),
+            filteredProducts: state.filteredProducts.map(p => p.id === id ? product : p),
+          }));
+          return { success: true };
+        } catch (error: any) {
+          return { success: false, message: error.message };
+        }
+      },
+
+      deleteProduct: async (id) => {
+        try {
+          await productService.deleteProduct(id);
+          set(state => ({
+            products: state.products.filter(p => p.id !== id),
+            filteredProducts: state.filteredProducts.filter(p => p.id !== id),
+          }));
+          return { success: true };
+        } catch (error: any) {
+          return { success: false, message: error.message };
+        }
+      },
 
       setFilteredProducts: (products: Product[]) => set({ filteredProducts: products }),
 

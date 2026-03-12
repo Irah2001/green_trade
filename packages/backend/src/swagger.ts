@@ -150,6 +150,142 @@ export const swaggerDocument = {
         }
       }
     },
+    '/api/products': {
+      get: {
+        summary: 'Lister et rechercher les produits',
+        tags: ['Produits'],
+        parameters: [
+          { name: 'text', in: 'query', schema: { type: 'string' }, description: 'Recherche textuelle (titre, description)' },
+          { name: 'category', in: 'query', schema: { type: 'string', enum: ['fruits', 'vegetables', 'baskets'] } },
+          { name: 'minPrice', in: 'query', schema: { type: 'number' } },
+          { name: 'maxPrice', in: 'query', schema: { type: 'number' } },
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+          { name: 'limit', in: 'query', schema: { type: 'integer', default: 20 } }
+        ],
+        responses: {
+          200: { description: 'Liste des produits ({ items, total })' },
+          500: { description: 'Erreur serveur' }
+        }
+      },
+      post: {
+        summary: 'Créer un produit',
+        tags: ['Produits'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['title', 'description', 'price', 'category'],
+                properties: {
+                  title: { type: 'string', example: 'Pommes bio du verger' },
+                  description: { type: 'string', example: 'Pommes non traitées, récoltées hier.' },
+                  price: { type: 'number', example: 2.5 },
+                  category: { type: 'string', enum: ['fruits', 'vegetables', 'baskets'], example: 'fruits' },
+                  condition: { type: 'string', enum: ['neuf', 'excellent', 'bon', 'acceptable'], example: 'bon' },
+                  images: { type: 'array', items: { type: 'string' } },
+                  tags: { type: 'array', items: { type: 'string' }, example: ['bio', 'surplus'] },
+                  status: { type: 'string', enum: ['active', 'sold', 'reserved', 'archived'], example: 'active' },
+                  location: {
+                    type: 'object',
+                    properties: {
+                      type: { type: 'string', example: 'Point' },
+                      coordinates: { type: 'array', items: { type: 'number' }, example: [-1.5536, 47.2184] },
+                      city: { type: 'string', example: 'Nantes' },
+                      postalCode: { type: 'string', example: '44000' }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          201: { description: 'Produit créé' },
+          400: { description: 'Données invalides' },
+          401: { description: 'Non autorisé' }
+        }
+      }
+    },
+    '/api/products/seller/{sellerId}': {
+      get: {
+        summary: 'Lister les produits d\'un vendeur',
+        tags: ['Produits'],
+        parameters: [
+          { name: 'sellerId', in: 'path', required: true, schema: { type: 'string' }, description: 'ID du vendeur' },
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+          { name: 'limit', in: 'query', schema: { type: 'integer', default: 20 } }
+        ],
+        responses: {
+          200: { description: 'Liste des produits du vendeur ({ items, total })' },
+          500: { description: 'Erreur serveur' }
+        }
+      }
+    },
+    '/api/products/{id}': {
+      get: {
+        summary: 'Récupérer un produit par ID',
+        tags: ['Produits'],
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'string' } }
+        ],
+        responses: {
+          200: { description: 'Produit trouvé' },
+          404: { description: 'Produit non trouvé' },
+          500: { description: 'Erreur serveur' }
+        }
+      },
+      put: {
+        summary: 'Mettre à jour un produit',
+        tags: ['Produits'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'string' } }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  title: { type: 'string' },
+                  description: { type: 'string' },
+                  price: { type: 'number' },
+                  category: { type: 'string', enum: ['fruits', 'vegetables', 'baskets'] },
+                  condition: { type: 'string', enum: ['neuf', 'excellent', 'bon', 'acceptable'] },
+                  status: { type: 'string', enum: ['active', 'sold', 'reserved', 'archived'] },
+                  images: { type: 'array', items: { type: 'string' } },
+                  tags: { type: 'array', items: { type: 'string' } }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          200: { description: 'Produit mis à jour' },
+          400: { description: 'Données invalides' },
+          401: { description: 'Non autorisé' },
+          403: { description: 'Accès interdit (pas propriétaire)' },
+          404: { description: 'Produit non trouvé' }
+        }
+      },
+      delete: {
+        summary: 'Supprimer un produit',
+        tags: ['Produits'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'string' } }
+        ],
+        responses: {
+          204: { description: 'Produit supprimé' },
+          401: { description: 'Non autorisé' },
+          403: { description: 'Accès interdit (pas propriétaire)' },
+          404: { description: 'Produit non trouvé' }
+        }
+      }
+    },
     '/api/cart/items/{productId}': {
       put: {
         summary: 'Mettre à jour la quantité d\'un produit',
