@@ -549,6 +549,51 @@ export const swaggerDocument = {
           500: { description: 'Erreur serveur' }
         }
       }
+    },
+    '/api/checkout/create-session': {
+      post: {
+        summary: 'Créer une session de paiement Stripe',
+        description: 'Génère un lien de paiement Stripe Checkout basé sur le panier actuel de l\'utilisateur connecté.',
+        tags: ['Paiement'],
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: { 
+            description: 'Session créée avec succès. Retourne l\'URL vers laquelle rediriger l\'utilisateur.',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    url: { 
+                      type: 'string', 
+                      example: 'https://checkout.stripe.com/c/pay/cs_test_a1b2c3d4e5f6g7h8i9j0...' 
+                    }
+                  }
+                }
+              }
+            }
+          },
+          400: { 
+            description: 'Panier vide',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    message: { type: 'string', example: 'Votre panier est vide.' }
+                  }
+                }
+              }
+            }
+          },
+          401: { 
+            description: 'Non autorisé (Token manquant ou invalide)' 
+          },
+          500: { 
+            description: 'Erreur serveur lors de la communication avec Stripe' 
+          }
+        }
+      }
     }
   }
 };
