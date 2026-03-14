@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvelle commande reçue</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            color: #22c55e;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .content {
+            color: #333333;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        .content p {
+            margin: 15px 0;
+        }
+        .order-details {
+            background-color: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        .order-details table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .order-details td {
+            padding: 10px 0;
+            border-bottom: 1px solid #d1fae5;
+        }
+        .order-details td:last-child {
+            text-align: right;
+            font-weight: bold;
+        }
+        .order-details tr:last-child td {
+            border-bottom: none;
+        }
+        .cta-button {
+            display: inline-block;
+            margin: 30px 0;
+            padding: 12px 30px;
+            background-color: #22c55e;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eeeeee;
+            text-align: center;
+            color: #999999;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>GreenTrade</h1>
+        </div>
+        <div class="content">
+            <p>Bonjour [ProducteurNom],</p>
+            <p>Bonne nouvelle ! Vous avez reçu une nouvelle commande sur GreenTrade.</p>
+            <div class="order-details">
+                <h3 style="margin-top: 0;">Détails de la commande</h3>
+                <table>
+                    <tr>
+                        <td>Produit :</td>
+                        <td>[ProductName]</td>
+                    </tr>
+                    <tr>
+                        <td>Quantité :</td>
+                        <td>[Quantity]</td>
+                    </tr>
+                    <tr>
+                        <td>Acheteur :</td>
+                        <td>[BuyerName]</td>
+                    </tr>
+                </table>
+            </div>
+            <p>Veuillez contacter l'acheteur pour organiser la livraison ou le retrait du produit.</p>
+            <center>
+                <a href="[OrderUrl]" class="cta-button">Voir mes commandes</a>
+            </center>
+            <p>Merci de faire partie de la communauté GreenTrade !</p>
+            <p>Cordialement,<br>L'équipe GreenTrade</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 GreenTrade. Tous droits réservés.</p>
+        </div>
+    </div>
+</body>
+</html>

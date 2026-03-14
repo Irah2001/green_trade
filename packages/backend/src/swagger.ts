@@ -99,6 +99,56 @@ export const swaggerDocument = {
         }
       }
     },
+    '/api/auth/forgot-password': {
+      post: {
+        summary: 'Demander la réinitialisation du mot de passe',
+        tags: ['Authentification'],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['email'],
+                properties: {
+                  email: { type: 'string', example: 'jean.dupont@email.com' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          200: { description: 'Email de réinitialisation envoyé (si l\'email existe)' },
+          500: { description: 'Erreur lors de l\'envoi de l\'email' }
+        }
+      }
+    },
+    '/api/auth/reset-password': {
+      post: {
+        summary: 'Réinitialiser le mot de passe avec le token',
+        tags: ['Authentification'],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['token', 'newPassword'],
+                properties: {
+                  token: { type: 'string', example: 'abc123def456...' },
+                  newPassword: { type: 'string', example: 'NouveauMotDePasse123!' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          200: { description: 'Mot de passe réinitialisé avec succès' },
+          400: { description: 'Token invalide ou expiré / Mot de passe non conforme' },
+          500: { description: 'Erreur lors de la réinitialisation' }
+        }
+      }
+    },
     '/api/cart': {
       get: {
         summary: 'Récupérer le panier de l\'utilisateur connecté',
@@ -200,6 +250,302 @@ export const swaggerDocument = {
           200: { description: 'Produit supprimé' },
           400: { description: 'Requête invalide' },
           401: { description: 'Non autorisé' },
+          500: { description: 'Erreur serveur' }
+        }
+      }
+    },
+    '/api/orders': {
+      post: {
+        summary: 'Créer une nouvelle commande',
+        tags: ['Commandes'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['productId', 'quantity'],
+                properties: {
+                  productId: { type: 'string', example: '507f1f77bcf86cd799439011' },
+                  quantity: { type: 'integer', example: 2 }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          201: { description: 'Commande créée avec succès, emails envoyés' },
+          400: { description: 'Données invalides ou produit indisponible' },
+          401: { description: 'Non authentifié' },
+          404: { description: 'Produit non trouvé' },
+          500: { description: 'Erreur lors de la création de la commande' }
+        }
+      },
+      get: {
+        summary: 'Récupérer toutes mes commandes',
+        tags: ['Commandes'],
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: { description: 'Liste des commandes (achetées et vendues)' },
+          401: { description: 'Non authentifié' },
+          500: { description: 'Erreur serveur' }
+        }
+      }
+    },
+    '/api/orders/{id}': {
+      get: {
+        summary: 'Récupérer une commande spécifique',
+        tags: ['Commandes'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string' }
+          }
+        ],
+        responses: {
+          200: { description: 'Détails de la commande' },
+          400: { description: 'ID invalide' },
+          401: { description: 'Non authentifié' },
+          403: { description: 'Accès non autorisé' },
+          404: { description: 'Commande non trouvée' },
+          500: { description: 'Erreur serveur' }
+        }
+      }
+    },
+    '/api/orders/{id}/status': {
+      patch: {
+        summary: 'Mettre à jour le statut d\'une commande (vendeur uniquement)',
+        tags: ['Commandes'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string' }
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['status'],
+                properties: {
+                  status: { 
+                    type: 'string', 
+                    enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'],
+                    example: 'confirmed' 
+                  }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          200: { description: 'Statut mis à jour avec succès' },
+          400: { description: 'Statut invalide' },
+          401: { description: 'Non authentifié' },
+          403: { description: 'Seul le vendeur peut mettre à jour le statut' },
+          404: { description: 'Commande non trouvée' },
+          500: { description: 'Erreur serveur' }
+        }
+      }
+    },
+    '/api/orders/{id}/ship': {
+      post: {
+        summary: 'Marquer une commande comme expédiée (vendeur uniquement)',
+        tags: ['Commandes'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string' }
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['trackingNumber'],
+                properties: {
+                  trackingNumber: { 
+                    type: 'string', 
+                    example: 'FR123456789' 
+                  },
+                  carrier: { 
+                    type: 'string', 
+                    example: 'Colissimo' 
+                  },
+                  trackingUrl: { 
+                    type: 'string', 
+                    example: 'https://tracking.colissimo.fr/FR123456789' 
+                  }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          200: { description: 'Commande expédiée, email envoyé à l\'acheteur' },
+          400: { description: 'Numéro de suivi manquant' },
+          401: { description: 'Non authentifié' },
+          403: { description: 'Seul le vendeur peut expédier' },
+          404: { description: 'Commande non trouvée' },
+          500: { description: 'Erreur serveur' }
+        }
+      }
+    },
+    '/api/users/me': {
+      get: {
+        summary: 'Récupérer son profil utilisateur',
+        tags: ['Utilisateurs'],
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: { 
+            description: 'Profil utilisateur récupéré',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    id: { type: 'string', example: '507f1f77bcf86cd799439011' },
+                    email: { type: 'string', example: 'user@example.com' },
+                    firstName: { type: 'string', example: 'Marie' },
+                    lastName: { type: 'string', example: 'Dupont' },
+                    role: { type: 'string', example: 'buyer' },
+                    phone: { type: 'string', example: '+33612345678' },
+                    city: { type: 'string', example: 'Paris' },
+                    postalCode: { type: 'string', example: '75001' },
+                    profile: { type: 'object' },
+                    rating: { type: 'number', example: 4.5 },
+                    createdAt: { type: 'string', format: 'date-time' }
+                  }
+                }
+              }
+            }
+          },
+          401: { description: 'Non authentifié' },
+          404: { description: 'Utilisateur non trouvé' },
+          500: { description: 'Erreur serveur' }
+        }
+      },
+      patch: {
+        summary: 'Modifier son profil utilisateur',
+        tags: ['Utilisateurs'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  firstName: { type: 'string', example: 'Marie' },
+                  lastName: { type: 'string', example: 'Dupont' },
+                  phone: { type: 'string', example: '+33612345678' },
+                  city: { type: 'string', example: 'Paris' },
+                  postalCode: { type: 'string', example: '75001' },
+                  profile: { 
+                    type: 'object',
+                    description: 'Données JSON personnalisées (bio, préférences, etc.)'
+                  }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          200: { description: 'Profil mis à jour avec succès' },
+          400: { description: 'Aucune donnée fournie' },
+          401: { description: 'Non authentifié' },
+          500: { description: 'Erreur serveur' }
+        }
+      },
+      delete: {
+        summary: 'Supprimer son compte utilisateur',
+        tags: ['Utilisateurs'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['password'],
+                properties: {
+                  password: { 
+                    type: 'string', 
+                    example: 'Test1234!',
+                    description: 'Mot de passe actuel pour confirmer la suppression'
+                  }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          200: { description: 'Compte supprimé avec succès' },
+          400: { description: 'Mot de passe manquant' },
+          401: { description: 'Non authentifié ou mot de passe incorrect' },
+          404: { description: 'Utilisateur non trouvé' },
+          500: { description: 'Erreur serveur' }
+        }
+      }
+    },
+    '/api/users/{id}': {
+      get: {
+        summary: 'Récupérer le profil public d\'un utilisateur (vendeur)',
+        tags: ['Utilisateurs'],
+        parameters: [
+          {
+            in: 'path',
+            name: 'id',
+            required: true,
+            schema: { type: 'string' },
+            description: 'ID de l\'utilisateur',
+            example: '507f1f77bcf86cd799439011'
+          }
+        ],
+        responses: {
+          200: { 
+            description: 'Profil public récupéré',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    id: { type: 'string' },
+                    firstName: { type: 'string' },
+                    lastName: { type: 'string' },
+                    role: { type: 'string' },
+                    city: { type: 'string' },
+                    rating: { type: 'number' },
+                    createdAt: { type: 'string', format: 'date-time' },
+                    stats: {
+                      type: 'object',
+                      properties: {
+                        activeProducts: { type: 'number', example: 12 },
+                        completedSales: { type: 'number', example: 45 }
+                      },
+                      description: 'Statistiques (si vendeur)'
+                    }
+                  }
+                }
+              }
+            }
+          },
+          400: { description: 'ID manquant' },
+          404: { description: 'Utilisateur non trouvé' },
           500: { description: 'Erreur serveur' }
         }
       }

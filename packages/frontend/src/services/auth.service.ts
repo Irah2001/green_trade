@@ -25,5 +25,31 @@ export const authService = {
       throw new Error(error.message || "Erreur lors de l'inscription");
     }
     return response.json();
+  },
+
+  async forgotPassword(email: string) {
+    const response = await fetch(`${API_URL}/api/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Erreur lors de l'envoi de l'email");
+    }
+    return response.json();
+  },
+
+  async resetPassword(token: string, newPassword: string) {
+    const response = await fetch(`${API_URL}/api/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, newPassword }),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Erreur lors de la réinitialisation");
+    }
+    return response.json();
   }
 };
