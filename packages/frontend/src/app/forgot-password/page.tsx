@@ -4,17 +4,16 @@ import Image from 'next/image';
 import { Leaf, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-
-// Components
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
-// Images
+import { useToast } from '@/hooks/use-toast';
+import { authService } from '@/services/auth.service';
 import greenTradeImg from '../../../public/images/green_trade.webp';
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
+  const { toast } = useToast();
 
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -26,11 +25,18 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      // Simulation of a backend request
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await authService.forgotPassword(email);
       setIsSuccess(true);
-    } catch (error) {
-      console.error("Erreur lors de l'envoi de l'email de réinitialisation", error);
+      toast({
+        title: 'Email envoyé',
+        description: 'Si cet email existe, vous recevrez un lien de réinitialisation.',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Erreur',
+        description: error.message || "Une erreur est survenue.",
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -68,9 +74,12 @@ export default function ForgotPasswordPage() {
         </div>
 
         <div className="mt-auto relative z-10">
-          <div className="bg-white/10 rounded-2xl p-6 backdrop-blur-md border border-white/20 flex items-center">
-            <p className="text-white/95 font-medium m-0 text-left">
-              🌱 Astuce : Pensez à vérifier vos courriers indésirables ou spams.
+          <div className="bg-white/10 rounded-2xl p-6 backdrop-blur-md border border-white/20">
+            <p className="text-white/95 mb-4 font-medium">
+              Le lien de réinitialisation sera valide pendant 15 minutes.
+            </p>
+            <p className="text-white/70 text-sm">
+              Assurez-vous de vérifier vos spams si vous ne recevez pas l'email
             </p>
           </div>
         </div>

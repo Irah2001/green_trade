@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🌱 Seed: démarrage...\n");
+  console.log("[SEED] Démarrage...\n");
 
   const sellerPassword = await bcrypt.hash("password+123", 10);
   const buyerPassword = await bcrypt.hash("password+123", 10);
