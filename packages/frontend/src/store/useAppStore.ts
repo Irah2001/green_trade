@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-import { Product, User, CartItem, Order, mockProducts, mockOrders } from '@/data/mockDatabase';
+import { Product, User, CartItem, Order, mockOrders } from '@/data/mockDatabase';
 
 import { authService } from '@/services/auth.service';
 import { cartService } from '@/services/cart.service';
@@ -73,7 +73,7 @@ interface AppState {
   filteredProducts: Product[];
   productsLoading: boolean;
   loadProducts: (params?: SearchParams) => Promise<void>;
-  createProduct: (data: ProductPayload) => Promise<{ success: boolean; message?: string }>;
+  createProduct: (data: ProductPayload) => Promise<{ success: boolean; id?: string; message?: string }>;
   updateProduct: (id: string, data: Partial<ProductPayload>) => Promise<{ success: boolean; message?: string }>;
   deleteProduct: (id: string) => Promise<{ success: boolean; message?: string }>;
   setFilteredProducts: (products: Product[]) => void;
@@ -248,8 +248,8 @@ export const useAppStore = create<AppState>()(
       },
 
       // Products State
-      products: mockProducts.filter(p => p.status === 'active'),
-      filteredProducts: mockProducts.filter(p => p.status === 'active'),
+      products: [],
+      filteredProducts: [],
       productsLoading: false,
 
       loadProducts: async (params?) => {
@@ -270,7 +270,7 @@ export const useAppStore = create<AppState>()(
           const created = await productService.createProduct(data);
           const product = toFrontendProduct(created);
           set(state => ({ products: [product, ...state.products], filteredProducts: [product, ...state.filteredProducts] }));
-          return { success: true };
+          return { success: true, id: created.id };
         } catch (error: any) {
           return { success: false, message: error.message };
         }

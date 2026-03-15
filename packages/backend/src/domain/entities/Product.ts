@@ -17,6 +17,8 @@ export type ProductProps = {
   };
   status?: 'active' | 'sold' | 'reserved' | 'archived';
   tags?: string[];
+  quantity?: number;
+  unit?: string;
   views?: number;
   createdAt?: Date;
   updatedAt?: Date;
@@ -83,6 +85,14 @@ export class Product {
 
   get status() {
     return this.props.status!;
+  }
+
+  get quantity() {
+    return this.props.quantity ?? 0;
+  }
+
+  get unit() {
+    return this.props.unit ?? 'unité';
   }
 
   get views() {

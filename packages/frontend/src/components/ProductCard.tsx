@@ -1,14 +1,22 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { MapPin, Heart, Share2, ShoppingBasket } from "lucide-react";
 import { useState } from "react";
 
 import type { Product } from "@/data/mockDatabase";
+import { useAppStore } from "@/store/useAppStore";
 
 export default function ProductCard({ product }: Readonly<{ product: Product }>) {
   const [isFavorite, setIsFavorite] = useState(false);
+  const addToCart = useAppStore((state) => state.addToCart);
+  const setSelectedProduct = useAppStore((state) => state.setSelectedProduct);
+  const setCurrentPage = useAppStore((state) => state.setCurrentPage);
+
+  const handleCardClick = () => {
+    setSelectedProduct(product.id);
+    setCurrentPage('product-detail');
+  };
 
   return (
     <div className="relative flex flex-col bg-white rounded-2xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.08)] hover-scale group overflow-hidden border border-gray-100/50">
@@ -26,16 +34,16 @@ export default function ProductCard({ product }: Readonly<{ product: Product }>)
             </span>
           )}
         </div>
-        
+
         <div className="flex flex-col gap-2">
-          <button 
-            onClick={(e) => { e.preventDefault(); setIsFavorite(!isFavorite); }} 
+          <button
+            onClick={(e) => { e.stopPropagation(); setIsFavorite(!isFavorite); }}
             className="p-1.5 bg-white/80 backdrop-blur-md text-gray-700 rounded-full hover:bg-white transition-all shadow-sm"
           >
             <Heart className={`w-4 h-4 ${isFavorite ? "fill-accent text-accent" : ""}`} />
           </button>
-          <button 
-            onClick={(e) => { e.preventDefault(); /* Share Action */ }} 
+          <button
+            onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(`${window.location.origin}/?product=${product.id}`); }}
             className="p-1.5 bg-white/80 backdrop-blur-md text-gray-700 rounded-full hover:bg-white transition-all shadow-sm opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0"
           >
             <Share2 className="w-4 h-4" />
@@ -43,7 +51,7 @@ export default function ProductCard({ product }: Readonly<{ product: Product }>)
         </div>
       </div>
 
-      <Link href={`/products/${product.id}`} className="flex-1 flex flex-col">
+      <button onClick={handleCardClick} className="flex-1 flex flex-col text-left">
         {/* Image wrapper */}
         <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-50">
           <Image
@@ -77,10 +85,13 @@ export default function ProductCard({ product }: Readonly<{ product: Product }>)
             </div>
           </div>
         </div>
-      </Link>
-      
+      </button>
+
       <div className="px-4 pb-4">
-        <button className="w-full flex items-center justify-center gap-2 bg-olive text-white font-medium py-2.5 rounded-xl hover:bg-olive/90 transition-colors shadow-sm focus:ring-4 focus:ring-olive/20 outline-none">
+        <button
+          onClick={(e) => { e.stopPropagation(); addToCart(product, 1); }}
+          className="w-full flex items-center justify-center gap-2 bg-olive text-white font-medium py-2.5 rounded-xl hover:bg-olive/90 transition-colors shadow-sm focus:ring-4 focus:ring-olive/20 outline-none"
+        >
           <ShoppingBasket className="w-4 h-4" />
           Ajouter
         </button>

@@ -14,6 +14,8 @@ function toDomain(prismaProduct: any): Product {
     images: prismaProduct.images ?? [],
     location: prismaProduct.location ?? undefined,
     status: prismaProduct.status,
+    quantity: prismaProduct.quantity ?? 0,
+    unit: prismaProduct.unit ?? 'unité',
     tags: prismaProduct.tags ?? [],
     createdAt: prismaProduct.createdAt ? new Date(prismaProduct.createdAt) : new Date(),
     updatedAt: prismaProduct.updatedAt ? new Date(prismaProduct.updatedAt) : new Date(),
@@ -24,37 +26,33 @@ function toDomain(prismaProduct: any): Product {
 
 export class ProductPrismaRepository {
   async save(product: Product): Promise<Product> {
-    const p = await prisma.product.upsert({
-      where: { id: product.id ?? '' },
-      update: {
-        title: product.title,
-        description: product.description,
-        price: product.price,
-        currency: (product as any).currency,
-        category: product.category,
-        condition: product.condition,
-        images: product.images,
-        location: product.location ? (product.location as any) : null,
-        status: product.status,
-        tags: product.toJSON().tags ?? [],
-        views: (product as any).views ?? 0,
-        updatedAt: new Date(),
-      },
-      create: {
-        sellerId: product.sellerId,
-        title: product.title,
-        description: product.description,
-        price: product.price,
-        currency: (product as any).currency,
-        category: product.category,
-        condition: product.condition,
-        images: product.images,
-        location: product.location ? (product.location as any) : null,
-        status: product.status,
-        tags: product.toJSON().tags ?? [],
-        views: (product as any).views ?? 0,
-      },
-    });
+    const data = {
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      currency: (product as any).currency,
+      category: product.category,
+      condition: product.condition,
+      images: product.images,
+      location: product.location ? (product.location as any) : null,
+      status: product.status,
+      quantity: product.quantity,
+      unit: product.unit,
+      tags: product.toJSON().tags ?? [],
+      views: (product as any).views ?? 0,
+    };
+
+    let p;
+    if (product.id) {
+      p = await prisma.product.update({
+        where: { id: product.id },
+        data: { ...data, updatedAt: new Date() },
+      });
+    } else {
+      p = await prisma.product.create({
+        data: { ...data, sellerId: product.sellerId },
+      });
+    }
 
     return toDomain(p);
   }
