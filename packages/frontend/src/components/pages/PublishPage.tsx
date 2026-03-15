@@ -24,8 +24,9 @@ import {
 import { useToast } from '@/hooks/use-toast';
 
 export default function PublishPage() {
-  const { isAuthenticated, user } = useAppStore();
+  const { isAuthenticated, user, createProduct } = useAppStore();
   const { toast } = useToast();
+  const [createdId, setCreatedId] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -104,16 +105,35 @@ export default function PublishPage() {
 
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    const { success, id, message } = await createProduct({
+      title: formData.title,
+      description: formData.description,
+      price: Number(formData.price),
+      category: formData.category,
+      images,
+      quantity: Number(formData.quantity),
+      unit: formData.unit,
+      location: formData.city
+        ? { type: 'Point', coordinates: [0, 0], city: formData.city, postalCode: formData.postalCode }
+        : undefined,
+    });
 
     setIsSubmitting(false);
-    setIsSuccess(true);
 
-    toast({
-      title: 'Annonce publiée !',
-      description: 'Votre annonce a été publiée avec succès',
-    });
+    if (success) {
+      setCreatedId(id ?? null);
+      setIsSuccess(true);
+      toast({
+        title: 'Annonce publiée !',
+        description: 'Votre annonce a été publiée avec succès',
+      });
+    } else {
+      toast({
+        title: 'Erreur',
+        description: message || 'Une erreur est survenue',
+        variant: 'destructive',
+      });
+    }
   };
 
   if (isSuccess) {
@@ -129,11 +149,30 @@ export default function PublishPage() {
           Votre produit est maintenant visible par les acheteurs de votre région.
           Vous serez notifié dès qu'un acheteur sera intéressé.
         </p>
-        <div className="flex gap-4 justify-center">
+        <div className="flex flex-col gap-3">
+          {createdId && (
+            <Button
+              onClick={() => {
+                useAppStore.getState().setSelectedProduct(createdId);
+                useAppStore.getState().setCurrentPage('product-detail');
+              }}
+              className="bg-[#4A7C59] hover:bg-[#3a6349] text-white"
+            >
+              Voir mon annonce
+            </Button>
+          )}
           <Button
             variant="outline"
+            onClick={() => useAppStore.getState().setCurrentPage('products')}
+            className="border-[#4A7C59] text-[#4A7C59]"
+          >
+            Voir tous les produits
+          </Button>
+          <Button
+            variant="ghost"
             onClick={() => {
               setIsSuccess(false);
+              setCreatedId(null);
               setFormData({
                 title: '',
                 description: '',
@@ -147,15 +186,9 @@ export default function PublishPage() {
               });
               setImages([]);
             }}
-            className="border-[#4A7C59] text-[#4A7C59]"
+            className="text-gray-500"
           >
             Publier une autre annonce
-          </Button>
-          <Button
-            onClick={() => useAppStore.getState().setCurrentPage('home')}
-            className="bg-[#4A7C59] hover:bg-[#3a6349] text-white"
-          >
-            Retour à l'accueil
           </Button>
         </div>
       </div>

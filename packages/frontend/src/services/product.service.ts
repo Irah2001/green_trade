@@ -21,6 +21,8 @@ export type ProductPayload = {
   };
   tags?: string[];
   status?: 'active' | 'sold' | 'reserved' | 'archived';
+  quantity?: number;
+  unit?: string;
 };
 
 export type SearchParams = {

@@ -1,4 +1,4 @@
-﻿import express from "express";
+import express from "express";
 import cors from "cors";
 import swaggerUi from "swagger-ui-express";
 import authRoutes from "./routes/auth.routes.js";
@@ -10,8 +10,8 @@ import checkoutRoutes from "./routes/checkout.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import { swaggerDocument } from "./swagger.js";
 
-const allowedOrigins = process.env.CORS_ORIGIN 
-  ? process.env.CORS_ORIGIN.split(',') 
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',')
   : ["http://localhost:5001"];
 
 const app = express();
@@ -45,7 +45,7 @@ app.use("/api/checkout", checkoutRoutes);
 app.use("/api/products", productRoutes);
 
 app.get("/health", (_req, res) => {
-  res.json({ 
+  res.json({
     status: "ok",
     timestamp: new Date().toISOString(),
     env: process.env.NODE_ENV || 'development'

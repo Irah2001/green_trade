@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { ShoppingCart, Heart, Share2, MapPin, Star, Check } from 'lucide-react';
+import { ShoppingCart, Heart, Share2, MapPin, Check } from 'lucide-react';
 
 // Components
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 
 // Data
-import { Product, mockUsers } from '@/data/mockDatabase';
+import { Product } from '@/data/mockDatabase';
 
 // Store
 import { useAppStore } from '@/store/useAppStore';
@@ -28,8 +28,6 @@ export default function ProductCard({ product, onProductClick }: Readonly<Produc
   const { toast } = useToast();
   const [isLiked, setIsLiked] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
-
-  const seller = mockUsers.find((u) => u.id === product.sellerId);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -126,25 +124,10 @@ export default function ProductCard({ product, onProductClick }: Readonly<Produc
       <CardContent className="p-4">
         {/* Seller info */}
         <div className="flex items-center gap-2 mb-2">
-          {seller?.profile?.avatar && (
-            <div className="w-6 h-6 rounded-full overflow-hidden bg-[#A8D5BA]">
-              <Image
-                src={seller.profile.avatar}
-                alt={`${seller.firstName} ${seller.lastName}`}
-                width={24}
-                height={24}
-                className="object-cover"
-              />
-            </div>
-          )}
-          <span className="text-xs text-gray-600">
-            {seller?.firstName} • {seller?.rating && (
-              <span className="flex items-center gap-1 inline-flex">
-                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                {seller.rating.toFixed(1)}
-              </span>
-            )}
-          </span>
+          <div className="w-6 h-6 rounded-full bg-[#A8D5BA] flex items-center justify-center text-[#4A7C59] font-bold text-xs">
+            {product.sellerId?.charAt(0)?.toUpperCase() ?? 'V'}
+          </div>
+          <span className="text-xs text-gray-600">Producteur local</span>
         </div>
 
         {/* Title */}

@@ -36,7 +36,7 @@ export const getProductById = async (req: Request, res: Response) => {
 
 export const createProduct = async (req: AuthRequest, res: Response) => {
   try {
-    const { title, description, price, category, condition, images, location, tags, status } = req.body;
+    const { title, description, price, category, condition, images, location, tags, status, quantity, unit } = req.body;
     const product = new Product({
       sellerId: req.userId!,
       title,
@@ -48,6 +48,8 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
       location,
       tags: tags ?? [],
       status: status ?? 'active',
+      quantity: quantity !== undefined ? Number(quantity) : 0,
+      unit: unit ?? 'unité',
     });
     const saved = await productRepository.save(product);
     return res.status(201).json(saved.toJSON());
@@ -65,7 +67,7 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ message: 'Non autorisé.' });
     }
 
-    const { title, description, price, category, condition, images, location, tags, status } = req.body;
+    const { title, description, price, category, condition, images, location, tags, status, quantity, unit } = req.body;
     const updated = new Product({
       id,
       sellerId: existing.sellerId,
@@ -78,6 +80,8 @@ export const updateProduct = async (req: AuthRequest, res: Response) => {
       location: location ?? existing.location,
       tags: tags ?? existing.toJSON().tags,
       status: status ?? existing.status,
+      quantity: quantity !== undefined ? Number(quantity) : existing.quantity,
+      unit: unit ?? existing.unit,
       views: existing.views,
       ...(existing.toJSON().createdAt ? { createdAt: existing.toJSON().createdAt } : {}),
     });

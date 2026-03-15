@@ -1,6 +1,12 @@
 ﻿/** @type {import("next").NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  async rewrites() {
+    return [
+      { source: '/products', destination: '/' },
+      { source: '/products/:id', destination: '/' },
+    ];
+  },
   images: {
     dangerouslyAllowSVG: true,
     remotePatterns: [
@@ -15,6 +21,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'api.dicebear.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**',
       },
     ],
   },

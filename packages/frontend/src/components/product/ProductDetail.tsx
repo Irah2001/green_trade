@@ -22,7 +22,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
-import { Product, mockUsers, mockProducts } from '@/data/mockDatabase';
+import { Product } from '@/data/mockDatabase';
 import { useAppStore } from '@/store/useAppStore';
 import { useToast } from '@/hooks/use-toast';
 import ProductCard from './ProductCard';
@@ -33,17 +33,15 @@ interface ProductDetailProps {
 }
 
 export default function ProductDetail({ product, onBack }: Readonly<ProductDetailProps>) {
-  const { addToCart } = useAppStore();
+  const { addToCart, products: storeProducts } = useAppStore();
   const { toast } = useToast();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isLiked, setIsLiked] = useState(false);
   const [deliveryMethod, setDeliveryMethod] = useState<'pickup' | 'delivery'>('pickup');
 
-  const seller = mockUsers.find((u) => u.id === product.sellerId);
-  
-  // Get suggested products (same category, different product)
-  const suggestedProducts = mockProducts
+  // Get suggested products from the real store
+  const suggestedProducts = storeProducts
     .filter((p) => p.category === product.category && p.id !== product.id && p.status === 'active')
     .slice(0, 4);
 
@@ -166,32 +164,18 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
         {/* Product Info */}
         <div className="space-y-6">
           {/* Seller */}
-          {seller && (
-            <div className="flex items-center gap-3">
-              {seller.profile?.avatar && (
-                <div className="w-12 h-12 rounded-full overflow-hidden bg-[#A8D5BA]">
-                  <Image
-                    src={seller.profile.avatar}
-                    alt={`${seller.firstName} ${seller.lastName}`}
-                    width={48}
-                    height={48}
-                    className="object-cover"
-                  />
-                </div>
-              )}
-              <div>
-                <p className="font-medium">
-                  {seller.firstName} {seller.lastName}
-                </p>
-                <div className="flex items-center gap-1 text-sm text-gray-500">
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  <span>{seller.rating?.toFixed(1)}</span>
-                  <span className="mx-1">•</span>
-                  <span>Producteur vérifié</span>
-                </div>
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-[#A8D5BA] flex items-center justify-center text-[#4A7C59] font-bold text-xl">
+              {product.sellerId?.charAt(0)?.toUpperCase() ?? 'V'}
+            </div>
+            <div>
+              <p className="font-medium">Producteur</p>
+              <div className="flex items-center gap-1 text-sm text-gray-500">
+                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                <span>Producteur vérifié</span>
               </div>
             </div>
-          )}
+          </div>
 
           {/* Title */}
           <h1 className="text-3xl font-bold text-gray-900">{product.title}</h1>
@@ -350,8 +334,9 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
               <ProductCard
                 key={p.id}
                 product={p}
-                onProductClick={() => {
+                onProductClick={(_p: Product) => {
                   useAppStore.getState().setSelectedProduct(p.id);
+                  useAppStore.getState().setCurrentPage('product-detail');
                 }}
               />
             ))}
