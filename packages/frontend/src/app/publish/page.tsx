@@ -1,12 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { UploadCloud, MapPin, CheckCircle, Info } from "lucide-react";
+import { UploadCloud, MapPin, CheckCircle, Info, ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { useAppStore } from "@/store/useAppStore";
 
 export default function PublishPage() {
-  const router = useRouter();
   const { createProduct, isAuthenticated } = useAppStore();
 
   const [title, setTitle] = useState('');
@@ -19,6 +18,13 @@ export default function PublishPage() {
   const [isFree, setIsFree] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [createdId, setCreatedId] = useState<string | null>(null);
+
+  const resetForm = () => {
+    setTitle(''); setCategory(''); setDescription(''); setPrice('');
+    setCondition('bon'); setCity(''); setPostalCode(''); setIsFree(false);
+    setCreatedId(null); setError('');
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +36,7 @@ export default function PublishPage() {
     }
 
     setLoading(true);
-    const { success, message } = await createProduct({
+    const { success, id, message } = await createProduct({
       title,
       category,
       description,
@@ -42,12 +48,51 @@ export default function PublishPage() {
     });
     setLoading(false);
 
-    if (success) {
-      router.push('/products');
+    if (success && id) {
+      setCreatedId(id);
     } else {
       setError(message || 'Une erreur est survenue.');
     }
   };
+
+  // Écran de succès
+  if (createdId !== null) {
+    return (
+      <div className="bg-off-white min-h-screen py-12 flex items-center justify-center">
+        <div className="max-w-md mx-auto px-4 text-center">
+          <div className="bg-white rounded-3xl p-10 shadow-sm border border-gray-100">
+            <div className="w-20 h-20 bg-light-green/30 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-10 h-10 text-olive" />
+            </div>
+            <h1 className="text-2xl font-extrabold text-gray-900 mb-3">Annonce publiée !</h1>
+            <p className="text-gray-500 mb-8 leading-relaxed">
+              Votre annonce est en ligne et visible par tous les acheteurs de la plateforme.
+            </p>
+            <div className="flex flex-col gap-3">
+              <Link
+                href={`/products/${createdId}`}
+                className="w-full bg-olive hover:bg-olive/90 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2"
+              >
+                Voir mon annonce <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link
+                href="/products"
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-4 rounded-2xl transition-all text-center"
+              >
+                Voir tous les produits
+              </Link>
+              <button
+                onClick={resetForm}
+                className="text-sm text-gray-400 hover:text-gray-600 transition-colors mt-2"
+              >
+                Publier une autre annonce
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-off-white min-h-screen py-12">
