@@ -9,7 +9,7 @@ import {
   deleteProduct,
 } from '../controllers/productController.js';
 
-const router = Router();
+const router: Router = Router();
 
 router.get('/', getProducts);
 router.get('/seller/:sellerId', getProductsBySeller);
