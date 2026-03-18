@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useCallback } from "react"
 import { toast } from "sonner"
 
 // Components
@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator"
 import { AvatarUploadDialog } from "@/components/ui/avatar-upload-dialog"
 
 import { useAppStore } from "@/store/useAppStore"
+import { useIsClient } from "@/hooks/use-is-client"
 import {
   type BackendUser,
   getUserPhone,
@@ -23,18 +24,14 @@ import {
 
 export default function ProfileSettingsPage() {
   const user = useAppStore((state) => state.user) as BackendUser | null
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
+  const isMounted = useIsClient()
 
   /** Persists a single field update to the API. */
   const handleSave = useCallback(async (field: string, newValue: string) => {
     try {
       // TODO: Replace with real API call via Server Action
       await new Promise<void>((resolve) => setTimeout(resolve, 500))
-      toast.success(`Mise à jour de ${field} réussie`)
+      toast.success(`Mise à jour de ${field} avec la valeur ${newValue} réussie`)
     } catch (error) {
       toast.error(`Erreur lors de l'enregistrement de ${field}`)
     }

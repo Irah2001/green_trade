@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect, useSyncExternalStore } from 'react';
 
 // Components
 import Navbar from '@/components/layout/Navbar';
@@ -9,7 +9,6 @@ import HomePage from '@/components/pages/HomePage';
 import ProductsPage from '@/components/pages/ProductsPage';
 import CartPage from '@/components/pages/CartPage';
 import PublishPage from '@/components/pages/PublishPage';
-import AdminDashboard from '@/components/pages/AdminDashboard';
 import ProductDetail from '@/components/product/ProductDetail';
 
 import { useAppStore } from '@/store/useAppStore';
@@ -42,13 +41,11 @@ function toProduct(raw: any): Product {
 
 // Custom hook to handle hydration
 function useHydration() {
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
-
-  return hydrated;
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 }
 
 export default function Home() {
@@ -142,8 +139,6 @@ export default function Home() {
         return <CartPage />;
       case 'publish':
         return <PublishPage />;
-      case 'admin':
-        return <AdminDashboard />;
       default:
         return <HomePage />;
     }

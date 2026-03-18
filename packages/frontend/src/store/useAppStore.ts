@@ -8,6 +8,18 @@ import { cartService } from '@/services/cart.service';
 import { productService, ProductPayload, SearchParams } from '@/services/product.service';
 
 const FALLBACK_IMAGE = '/images/green_trade.webp';
+const AUTH_TOKEN_COOKIE = 'gt_token';
+const AUTH_TOKEN_MAX_AGE = 60 * 60 * 24 * 7;
+
+const persistAuthToken = (token: string) => {
+  localStorage.setItem(AUTH_TOKEN_COOKIE, token);
+  document.cookie = `${AUTH_TOKEN_COOKIE}=${encodeURIComponent(token)}; path=/; max-age=${AUTH_TOKEN_MAX_AGE}; samesite=lax`;
+};
+
+const clearAuthToken = () => {
+  localStorage.removeItem(AUTH_TOKEN_COOKIE);
+  document.cookie = `${AUTH_TOKEN_COOKIE}=; path=/; max-age=0; samesite=lax`;
+};
 
 const toFrontendProduct = (product: any): Product => ({
   id: product?.id ?? '',
@@ -88,9 +100,9 @@ interface AppState {
   createOrder: (order: Omit<Order, 'id' | 'createdAt'>) => void;
 
   // UI State
-  currentPage: 'home' | 'products' | 'product-detail' | 'cart' | 'publish' | 'admin';
+  currentPage: 'home' | 'products' | 'product-detail' | 'cart' | 'publish';
   selectedProductId: string | null;
-  setCurrentPage: (page: 'home' | 'products' | 'product-detail' | 'cart' | 'publish' | 'admin') => void;
+  setCurrentPage: (page: 'home' | 'products' | 'product-detail' | 'cart' | 'publish') => void;
   setSelectedProduct: (productId: string | null) => void;
 }
 
@@ -105,7 +117,7 @@ export const useAppStore = create<AppState>()(
         try {
           const { user, token } = await authService.login({ email, password });
 
-          localStorage.setItem('gt_token', token);
+          persistAuthToken(token);
 
           set({
             user,
@@ -122,7 +134,7 @@ export const useAppStore = create<AppState>()(
         try {
           const { user, token } = await authService.signup(userData);
 
-          localStorage.setItem('gt_token', token);
+          persistAuthToken(token);
 
           set({
             user,
@@ -136,7 +148,7 @@ export const useAppStore = create<AppState>()(
       },
 
       logout: () => {
-        localStorage.removeItem('gt_token');
+        clearAuthToken();
         set({ user: null, isAuthenticated: false, cart: [] });
       },
 
@@ -149,7 +161,6 @@ export const useAppStore = create<AppState>()(
           const cart = await cartService.getCart();
           set({ cart: mapCartItems(cart) });
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.error(error);
         }
       },
@@ -179,7 +190,6 @@ export const useAppStore = create<AppState>()(
           const cart = await cartService.addItem({ productId: product.id, quantity });
           set({ cart: mapCartItems(cart) });
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.error(error);
         }
       },
@@ -194,7 +204,6 @@ export const useAppStore = create<AppState>()(
           const cart = await cartService.removeItem(productId);
           set({ cart: mapCartItems(cart) });
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.error(error);
         }
       },
@@ -217,7 +226,6 @@ export const useAppStore = create<AppState>()(
           const cart = await cartService.updateItem(productId, quantity);
           set({ cart: mapCartItems(cart) });
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.error(error);
         }
       },
@@ -232,7 +240,6 @@ export const useAppStore = create<AppState>()(
           const cart = await cartService.clearCart();
           set({ cart: mapCartItems(cart) });
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.error(error);
         }
       },

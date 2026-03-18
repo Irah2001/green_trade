@@ -221,7 +221,7 @@ export default function HomePage() {
                 Ne ratez pas ces offres !
               </h2>
               <p className="text-gray-600 mt-1">
-                Produits frais à prix réduits, disponibles aujourd'hui uniquement
+                Produits frais à prix réduits, disponibles aujourd&apos;hui uniquement
               </p>
             </div>
             <Button
@@ -343,7 +343,7 @@ export default function HomePage() {
               </h2>
               <p className="text-white/90 text-lg max-w-xl">
                 Vendez vos surplus et atteignez des milliers de clients locaux. 
-                Inscrivez-vous gratuitement et commencez à vendre dès aujourd'hui !
+                Inscrivez-vous gratuitement et commencez à vendre dès aujourd&apos;hui !
               </p>
             </div>
             <Button

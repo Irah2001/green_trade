@@ -155,7 +155,36 @@ export const swaggerDocument = {
         tags: ['Panier'],
         security: [{ bearerAuth: [] }],
         responses: {
-          200: { description: 'Panier récupéré' },
+          200: {
+            description: 'Panier récupéré',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    id: { type: 'string', example: '507f1f77bcf86cd799439011' },
+                    userId: { type: 'string', example: '507f1f77bcf86cd799439012' },
+                    createdAt: { type: 'string', format: 'date-time' },
+                    updatedAt: { type: 'string', format: 'date-time' },
+                    items: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          id: { type: 'string' },
+                          cartId: { type: 'string' },
+                          productId: { type: 'string' },
+                          quantity: { type: 'integer', example: 2 },
+                          unitPriceSnapshot: { type: 'number', example: 12.5 },
+                          product: { type: 'object' }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
           401: { description: 'Non autorisé' },
           500: { description: 'Erreur serveur' }
         }
@@ -338,7 +367,7 @@ export const swaggerDocument = {
     },
     '/api/cart/items/{productId}': {
       put: {
-        summary: 'Mettre à jour la quantité d\'un produit',
+        summary: 'Mettre à jour la quantité d\'un produit dans le panier',
         tags: ['Panier'],
         security: [{ bearerAuth: [] }],
         parameters: [
@@ -346,7 +375,8 @@ export const swaggerDocument = {
             name: 'productId',
             in: 'path',
             required: true,
-            schema: { type: 'string' }
+            schema: { type: 'string' },
+            example: '507f1f77bcf86cd799439011'
           }
         ],
         requestBody: {
@@ -357,7 +387,7 @@ export const swaggerDocument = {
                 type: 'object',
                 required: ['quantity'],
                 properties: {
-                  quantity: { type: 'integer', example: 1 }
+                  quantity: { type: 'integer', example: 3 }
                 }
               }
             }
@@ -367,6 +397,7 @@ export const swaggerDocument = {
           200: { description: 'Quantité mise à jour' },
           400: { description: 'Requête invalide' },
           401: { description: 'Non autorisé' },
+          404: { description: 'Produit introuvable dans le panier' },
           500: { description: 'Erreur serveur' }
         }
       },
@@ -379,13 +410,15 @@ export const swaggerDocument = {
             name: 'productId',
             in: 'path',
             required: true,
-            schema: { type: 'string' }
+            schema: { type: 'string' },
+            example: '507f1f77bcf86cd799439011'
           }
         ],
         responses: {
           200: { description: 'Produit supprimé' },
           400: { description: 'Requête invalide' },
           401: { description: 'Non autorisé' },
+          404: { description: 'Produit introuvable dans le panier' },
           500: { description: 'Erreur serveur' }
         }
       }
@@ -423,7 +456,36 @@ export const swaggerDocument = {
         tags: ['Commandes'],
         security: [{ bearerAuth: [] }],
         responses: {
-          200: { description: 'Liste des commandes (achetées et vendues)' },
+          200: {
+            description: 'Liste des commandes (achetées et vendues)',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    orders: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          id: { type: 'string' },
+                          buyerId: { type: 'string' },
+                          sellerId: { type: 'string' },
+                          productId: { type: 'string' },
+                          amount: { type: 'number', example: 25 },
+                          quantity: { type: 'integer', example: 2 },
+                          currency: { type: 'string', example: 'EUR' },
+                          status: { type: 'string', example: 'pending' },
+                          createdAt: { type: 'string', format: 'date-time' },
+                          updatedAt: { type: 'string', format: 'date-time' }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
           401: { description: 'Non authentifié' },
           500: { description: 'Erreur serveur' }
         }
@@ -638,6 +700,44 @@ export const swaggerDocument = {
         }
       }
     },
+    '/api/users': {
+      get: {
+        summary: 'Récupérer tous les utilisateurs (admin uniquement)',
+        tags: ['Utilisateurs', 'Administration'],
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: 'Liste des utilisateurs récupérée',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string', example: '507f1f77bcf86cd799439011' },
+                      email: { type: 'string', example: 'user@example.com' },
+                      firstName: { type: 'string', example: 'Marie' },
+                      lastName: { type: 'string', example: 'Dupont' },
+                      role: { type: 'string', example: 'seller' },
+                      phone: { type: 'string', example: '+33612345678' },
+                      city: { type: 'string', example: 'Paris' },
+                      postalCode: { type: 'string', example: '75001' },
+                      profile: { type: 'object' },
+                      rating: { type: 'number', example: 4.5 },
+                      createdAt: { type: 'string', format: 'date-time' }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          401: { description: 'Non authentifié' },
+          403: { description: 'Accès réservé aux administrateurs' },
+          500: { description: 'Erreur serveur' }
+        }
+      }
+    },
     '/api/users/{id}': {
       get: {
         summary: 'Récupérer le profil public d\'un utilisateur (vendeur)',
@@ -682,6 +782,50 @@ export const swaggerDocument = {
           },
           400: { description: 'ID manquant' },
           404: { description: 'Utilisateur non trouvé' },
+          500: { description: 'Erreur serveur' }
+        }
+      }
+    },
+    '/api/admin/rgpd/cleanup': {
+      post: {
+        summary: 'Nettoyer les comptes anonymisés expirés',
+        tags: ['Administration'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: false,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  daysToKeep: {
+                    type: 'integer',
+                    example: 30,
+                    description: 'Nombre de jours avant suppression des comptes anonymisés'
+                  }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          200: {
+            description: 'Nettoyage RGPD terminé',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    message: { type: 'string', example: 'Nettoyage RGPD terminé.' },
+                    deletedCount: { type: 'integer', example: 12 },
+                    daysToKeep: { type: 'integer', example: 30 }
+                  }
+                }
+              }
+            }
+          },
+          401: { description: 'Non authentifié' },
+          403: { description: 'Accès refusé. Admin requis' },
           500: { description: 'Erreur serveur' }
         }
       }
