@@ -830,6 +830,96 @@ export const swaggerDocument = {
         }
       }
     },
+    '/api/admin/users/{id}': {
+      patch: {
+        summary: 'Admin: modifier un utilisateur',
+        tags: ['Administration'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string' },
+            example: '507f1f77bcf86cd799439011'
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  firstName: { type: 'string', example: 'Marie' },
+                  lastName: { type: 'string', example: 'Dupont' },
+                  role: { type: 'string', enum: ['buyer', 'seller', 'farmer', 'admin'], example: 'seller' },
+                  phone: { type: 'string', example: '+33612345678' },
+                  city: { type: 'string', example: 'Paris' },
+                  postalCode: { type: 'string', example: '75001' },
+                  profile: { type: 'object', description: 'Données JSON personnalisées' }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          200: {
+            description: 'Utilisateur mis à jour',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    message: { type: 'string', example: 'Utilisateur mis à jour.' },
+                    user: { type: 'object' }
+                  }
+                }
+              }
+            }
+          },
+          400: { description: 'Aucune donnée fournie ou rôle invalide' },
+          401: { description: 'Non authentifié' },
+          403: { description: 'Accès réservé aux administrateurs' },
+          404: { description: 'Utilisateur non trouvé' },
+          500: { description: 'Erreur serveur' }
+        }
+      },
+      delete: {
+        summary: 'Admin: supprimer un utilisateur (RGPD)',
+        tags: ['Administration'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string' },
+            example: '507f1f77bcf86cd799439011'
+          }
+        ],
+        responses: {
+          200: {
+            description: 'Utilisateur supprimé (anonymisé RGPD)',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    message: { type: 'string', example: 'Utilisateur supprimé (anonymisé RGPD).' }
+                  }
+                }
+              }
+            }
+          },
+          400: { description: 'ID manquant ou tentative de suppression de son propre compte' },
+          401: { description: 'Non authentifié' },
+          403: { description: 'Accès réservé aux administrateurs' },
+          404: { description: 'Utilisateur non trouvé' },
+          500: { description: 'Erreur serveur' }
+        }
+      }
+    },
     '/api/checkout/create-session': {
       post: {
         summary: 'Créer une session de paiement Stripe',
