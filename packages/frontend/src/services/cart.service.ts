@@ -1,80 +1,58 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+// src/services/cart.service.ts
+import { apiFetch } from "./api";
 
 type CartItemPayload = {
   productId: string;
   quantity: number;
 };
 
-const getAuthHeaders = (): Record<string, string> => {
-  const token = localStorage.getItem('gt_token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
-
+/**
+ * Service gérant le panier utilisateur.
+ * Toutes les requêtes sont automatiquement authentifiées par apiFetch.
+ */
 export const cartService = {
+  /**
+   * Récupère le contenu du panier actuel.
+   */
   async getCart() {
-    const response = await fetch(`${API_URL}/api/cart`, {
-      headers: { ...getAuthHeaders() },
-    });
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || 'Erreur lors du chargement du panier');
-    }
-    return response.json();
+    return apiFetch<any>('/api/cart');
   },
 
+  /**
+   * Ajoute un produit au panier.
+   */
   async addItem(payload: CartItemPayload) {
-    const response = await fetch(`${API_URL}/api/cart/items`, {
+    return apiFetch<any>('/api/cart/items', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeaders(),
-      },
       body: JSON.stringify(payload),
     });
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || 'Erreur lors de l\'ajout au panier');
-    }
-    return response.json();
   },
 
+  /**
+   * Met à jour la quantité d'un produit spécifique.
+   */
   async updateItem(productId: string, quantity: number) {
-    const response = await fetch(`${API_URL}/api/cart/items/${productId}`, {
+    return apiFetch<any>(`/api/cart/items/${productId}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeaders(),
-      },
       body: JSON.stringify({ quantity }),
     });
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || 'Erreur lors de la mise à jour du panier');
-    }
-    return response.json();
   },
 
+  /**
+   * Supprime un produit du panier.
+   */
   async removeItem(productId: string) {
-    const response = await fetch(`${API_URL}/api/cart/items/${productId}`, {
+    return apiFetch<any>(`/api/cart/items/${productId}`, {
       method: 'DELETE',
-      headers: { ...getAuthHeaders() },
     });
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || 'Erreur lors de la suppression du produit');
-    }
-    return response.json();
   },
 
+  /**
+   * Vide l'intégralité du panier.
+   */
   async clearCart() {
-    const response = await fetch(`${API_URL}/api/cart`, {
+    return apiFetch<any>('/api/cart', {
       method: 'DELETE',
-      headers: { ...getAuthHeaders() },
     });
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || 'Erreur lors du vidage du panier');
-    }
-    return response.json();
   },
 };
