@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { Product } from '@/data/mockDatabase';
+import { Product, mockUsers, mockProducts } from '@/data/mockDatabase';
 import { useAppStore } from '@/store/useAppStore';
 import { Button } from '@/components/ui/button';
 
@@ -329,6 +329,64 @@ export default function HomePage() {
                 onProductClick={handleProductClick}
               />
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Producers */}
+      <section className="py-12 bg-[#F8F9FA]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">
+            Nos producteurs vedettes
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {mockUsers
+              .filter((u) => u.role === 'producer')
+              .slice(0, 3)
+              .map((producer) => (
+                <div
+                  key={producer.id}
+                  className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-center gap-4 mb-4">
+                    {producer.profile?.avatar && (
+                      <div className="w-16 h-16 rounded-full overflow-hidden bg-[#A8D5BA]">
+                        <Image
+                          src={producer.profile.avatar}
+                          alt={`${producer.firstName} ${producer.lastName}`}
+                          width={64}
+                          height={64}
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <h3 className="font-semibold text-lg">
+                        {producer.firstName} {producer.lastName}
+                      </h3>
+                      <p className="text-gray-500 text-sm flex items-center gap-1">
+                        <MapPin className="h-3 w-3" />
+                        {producer.location?.city}
+                      </p>
+                    </div>
+                  </div>
+                  {producer.profile?.bio && (
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                      {producer.profile.bio}
+                    </p>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      <span className="text-yellow-500">★</span>
+                      <span className="font-medium">{producer.rating?.toFixed(1)}</span>
+                    </div>
+                    <Badge className="bg-[#A8D5BA]/30 text-[#4A7C59]">
+                      {mockProducts.filter((p) => p.sellerId === producer.id).length} produits
+                    </Badge>
+                  </div>
+                </div>
+              ))}
           </div>
         </div>
       </section>
