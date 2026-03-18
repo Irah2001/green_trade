@@ -11,16 +11,17 @@ import ProductCard from '@/components/product/ProductCard';
 import { Search, Leaf, Users, MapPin, ArrowRight, Package } from 'lucide-react';
 
 export default function HomePage() {
-  const { setCurrentPage, setSelectedProduct, searchProducts } = useAppStore();
+  const { setCurrentPage, setSelectedProduct, searchProducts, products } = useAppStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchCity, setSearchCity] = useState('');
 
-  // Get featured products (surplus of the day)
-  const surplusProducts = mockProducts.filter((p) => p.isSurplusOfDay && p.status === 'active').slice(0, 4);
-  
-  // Get latest products
-  const latestProducts = [...mockProducts]
-    .filter((p) => p.status === 'active')
+  const activeProducts = products.filter((p) => p.status === 'active');
+
+  // Products tagged "surplus"
+  const surplusProducts = activeProducts.filter((p) => p.tags.includes('surplus')).slice(0, 4);
+
+  // Latest products
+  const latestProducts = [...activeProducts]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 8);
 

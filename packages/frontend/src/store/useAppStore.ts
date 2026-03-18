@@ -76,6 +76,7 @@ interface AppState {
   createProduct: (data: ProductPayload) => Promise<{ success: boolean; id?: string; message?: string }>;
   updateProduct: (id: string, data: Partial<ProductPayload>) => Promise<{ success: boolean; message?: string }>;
   deleteProduct: (id: string) => Promise<{ success: boolean; message?: string }>;
+  selectedCategory: string | null;
   setFilteredProducts: (products: Product[]) => void;
   searchProducts: (query: string) => void;
   filterByCategory: (category: string | null) => void;
@@ -317,13 +318,16 @@ export const useAppStore = create<AppState>()(
         set({ filteredProducts: filtered });
       },
 
+      selectedCategory: null,
+
       filterByCategory: (category: string | null) => {
         if (!category) {
-          set({ filteredProducts: get().products });
+          set({ filteredProducts: get().products, selectedCategory: null });
           return;
         }
         set({
           filteredProducts: get().products.filter(p => p.category === category),
+          selectedCategory: category,
         });
       },
 
