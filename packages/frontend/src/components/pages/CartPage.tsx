@@ -18,6 +18,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { checkoutService } from '@/services/checkout.service';
 
 export default function CartPage() {
   const {
@@ -51,7 +52,7 @@ export default function CartPage() {
     });
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!isAuthenticated) {
       toast({
         title: 'Connexion requise',
@@ -72,29 +73,24 @@ export default function CartPage() {
 
     setIsProcessing(true);
 
-    // Simulate order processing
-    setTimeout(() => {
-      cart.forEach((item) => {
-        createOrder({
-          buyerId: user!.id,
-          sellerId: item.product.sellerId,
-          productId: item.productId,
-          quantity: item.quantity,
-          amount: item.product.price * item.quantity,
-          status: 'pending',
-          deliveryMethod,
-        });
-      });
+    try {
+      const data = await checkoutService.createCheckoutSession();
 
-      clearCart();
-      setIsProcessing(false);
-      setOrderSuccess(true);
-
+      if (data && data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('URL de paiement non reçue.');
+      }
+    } catch (error: any) {
+      console.error('Erreur Checkout:', error);
       toast({
-        title: 'Commande confirmée !',
-        description: 'Vous recevrez une confirmation par email',
+        title: 'Erreur de paiement',
+        description: error.message || 'Impossible d\'initier le paiement.',
+        variant: 'destructive',
       });
-    }, 2000);
+      setIsProcessing(false);
+      return;
+    }
   };
 
   if (orderSuccess) {

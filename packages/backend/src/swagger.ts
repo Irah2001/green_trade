@@ -964,6 +964,48 @@ export const swaggerDocument = {
           }
         }
       }
+    },
+    '/api/checkout/confirm-session': {
+      post: {
+        summary: 'Confirmer le paiement et créer la commande',
+        description: 'Vérifie le statut du paiement auprès de Stripe, crée les transactions correspondantes pour chaque article du panier, et vide le panier de l\'utilisateur.',
+        tags: ['Paiement'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['sessionId'],
+                properties: {
+                  sessionId: { 
+                    type: 'string', 
+                    example: 'cs_test_a1b2c3d4e5f6g7h8i9j0...'
+                  }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          201: { 
+            description: 'Paiement validé, transactions créées et panier vidé.'
+          },
+          200: { 
+            description: 'Commande déjà validée précédemment (Filtre anti-doublon).'
+          },
+          400: { 
+            description: 'Session ID manquant, paiement non finalisé, ou panier vide.'
+          },
+          401: { 
+            description: 'Non autorisé (Token manquant ou invalide).'
+          },
+          500: { 
+            description: 'Erreur serveur.'
+          }
+        }
+      }
     }
   }
 };

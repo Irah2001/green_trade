@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import Stripe from 'stripe';
+import prisma from '../prismaClient.js';
 import { CartPrismaRepository } from '../repositories/CartPrismaRepository.js';
 import { AuthRequest } from '../middlewares/auth.middleware.js';
 
@@ -45,5 +46,67 @@ export const createCheckoutSession = async (req: AuthRequest, res: Response) => 
     // eslint-disable-next-line no-console
     console.error("Erreur Stripe :", error);
     return res.status(500).json({ message: 'Erreur lors de la création de la session de paiement.' });
+  }
+};
+
+export const confirmCheckoutSession = async (req: AuthRequest, res: Response) => {
+  try {
+    const { sessionId } = req.body;
+    const userId = getUserId(req);
+
+    if (!sessionId) {
+      return res.status(400).json({ message: "Session ID manquant." });
+    }
+
+    const existingTransaction = await prisma.transaction.findFirst({
+      where: { stripeSessionId: sessionId }
+    });
+
+    if (existingTransaction) {
+      return res.status(200).json({ message: "Commande déjà validée." });
+    }
+
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+    if (session.payment_status !== 'paid') {
+      return res.status(400).json({ message: "Le paiement n'a pas été finalisé." });
+    }
+
+    const cart = await prisma.cart.findUnique({
+      where: { userId },
+      include: { 
+        items: { 
+          include: { product: true } 
+        } 
+      }
+    });
+
+    if (!cart || cart.items.length === 0) {
+      return res.status(400).json({ message: "Le panier est vide ou introuvable." });
+    }
+
+    const transactionsData = cart.items.map((item) => ({
+      buyerId: userId,
+      sellerId: item.product.sellerId,
+      productId: item.productId,
+      quantity: item.quantity,
+      amount: item.product.price * item.quantity,
+      currency: item.product.currency || 'EUR',
+      status: 'confirmed',
+      stripeSessionId: sessionId,
+      stripePaymentId: session.payment_intent as string | undefined,
+    }));
+
+    await prisma.transaction.createMany({
+      data: transactionsData,
+    });
+
+    await cartRepository.clearCart(userId);
+
+    return res.status(201).json({ message: "Paiement validé et commande créée avec succès." });
+
+  } catch (error) {
+    console.error("Erreur lors de la confirmation du paiement:", error);
+    return res.status(500).json({ message: "Erreur serveur lors de la finalisation de la commande." });
   }
 };
