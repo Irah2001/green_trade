@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useAppStore } from '@/store/useAppStore';
-import { mockUsers } from '@/data/mockDatabase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -168,29 +167,18 @@ export default function CartPage() {
         {/* Cart Items */}
         <div className="lg:col-span-2 space-y-6">
           {Object.entries(itemsBySeller).map(([sellerId, items]) => {
-            const seller = mockUsers.find((u) => u.id === sellerId);
             return (
               <Card key={sellerId} className="overflow-hidden">
                 <CardHeader className="bg-[#F8F9FA] py-4">
                   <div className="flex items-center gap-3">
-                    {seller?.profile?.avatar && (
-                      <div className="w-10 h-10 rounded-full overflow-hidden bg-[#A8D5BA]">
-                        <Image
-                          src={seller.profile.avatar}
-                          alt={seller.firstName}
-                          width={40}
-                          height={40}
-                          className="object-cover"
-                        />
-                      </div>
-                    )}
+                    <div className="w-10 h-10 rounded-full bg-[#A8D5BA] flex items-center justify-center text-white font-bold text-sm">
+                      {sellerId.charAt(0).toUpperCase()}
+                    </div>
                     <div>
-                      <p className="font-semibold">
-                        {seller?.firstName} {seller?.lastName}
-                      </p>
+                      <p className="font-semibold">Producteur local</p>
                       <p className="text-sm text-gray-500 flex items-center gap-1">
                         <MapPin className="h-3 w-3" />
-                        {seller?.location?.city}
+                        {(items[0]?.product?.location?.city) || 'France'}
                       </p>
                     </div>
                   </div>
