@@ -25,7 +25,6 @@ import {
 import {
   Search,
   ShoppingCart,
-  User as UserIcon,
   Menu,
   Leaf,
   Apple,
@@ -45,7 +44,7 @@ const categories = [
 
 export default function Navbar() {
   const router = useRouter();
-  const { cart, getCartCount, user, isAuthenticated, logout, searchProducts, setCurrentPage } = useAppStore();
+  const { getCartCount, user, isAuthenticated, logout, searchProducts, setCurrentPage } = useAppStore();
   const [searchQuery, setSearchQuery] = useState('');
   const cartCount = getCartCount();
 
@@ -151,7 +150,7 @@ export default function Navbar() {
                     <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     {user.role === 'admin' && (
-                      <DropdownMenuItem onClick={() => setCurrentPage('admin')}>
+                      <DropdownMenuItem onClick={() => router.push('/admin/orders')}>
                         <LayoutDashboard className="h-4 w-4 mr-2" />
                         Tableau de bord Admin
                       </DropdownMenuItem>
@@ -265,7 +264,7 @@ export default function Navbar() {
                           <Button
                             variant="ghost"
                             className="w-full justify-start"
-                            onClick={() => setCurrentPage('admin')}
+                            onClick={() => router.push('/admin/orders')}
                           >
                             <LayoutDashboard className="h-4 w-4 mr-2" />
                             Tableau de bord Admin

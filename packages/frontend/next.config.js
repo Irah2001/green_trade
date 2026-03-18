@@ -1,4 +1,6 @@
 ﻿/** @type {import("next").NextConfig} */
+const path = require('node:path')
+
 const nextConfig = {
   reactStrictMode: true,
   async rewrites() {
@@ -31,7 +33,7 @@ const nextConfig = {
   // Use Turbopack configuration (migrated from deprecated experimental.turbo)
   turbopack: {
     // root should point to the workspace root to avoid lockfile inference warnings
-    root: '../../'
+    root: path.join(__dirname, '..', '..'),
   }
 };
 

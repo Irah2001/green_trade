@@ -77,7 +77,7 @@ export default function LoginPage() {
 
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-8">
-            <Leaf className="h-8 w-8 text-[#A8D5BA]" />
+            <Leaf className="h-8 w-8 text-light-green" />
             <span className="text-xl font-bold">Green Trade</span>
           </div>
           
@@ -104,12 +104,12 @@ export default function LoginPage() {
       {/* Right side - Form */}
       <div className="w-full lg:w-1/2 flex flex-col">
         {/* Mobile header */}
-        <div className="lg:hidden bg-[#4A7C59] text-white p-4 flex items-center gap-4">
+        <div className="lg:hidden bg-olive text-white p-4 flex items-center gap-4">
           <button onClick={() => router.push('/')} className="p-2 hover:bg-white/10 rounded-lg">
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div className="flex items-center gap-2">
-            <Leaf className="h-6 w-6 text-[#A8D5BA]" />
+            <Leaf className="h-6 w-6 text-light-green" />
             <span className="font-bold">Green Trade</span>
           </div>
         </div>
@@ -123,13 +123,13 @@ export default function LoginPage() {
               className="hidden lg:flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-8"
             >
               <ArrowLeft className="h-4 w-4" />
-              Retour à l'accueil
+              Retour à l&apos;accueil
             </button>
 
             <div className="mb-8">
               <div className="flex items-center justify-center lg:justify-start mb-6">
-                <div className="w-14 h-14 rounded-full bg-[#A8D5BA] flex items-center justify-center">
-                  <Leaf className="h-7 w-7 text-[#4A7C59]" />
+                <div className="w-14 h-14 rounded-full bg-light-green flex items-center justify-center">
+                  <Leaf className="h-7 w-7 text-olive" />
                 </div>
               </div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Connexion</h2>
@@ -155,7 +155,7 @@ export default function LoginPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Mot de passe</Label>
-                  <a href="/forgot-password" className="text-sm text-[#4A7C59] hover:underline">
+                  <a href="/forgot-password" className="text-sm text-olive hover:underline">
                     Mot de passe oublié ?
                   </a>
                 </div>
@@ -172,7 +172,7 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-[#4A7C59] hover:bg-[#3a6349] text-white py-6 text-lg rounded-xl"
+                className="w-full bg-olive hover:bg-olive-dark text-white py-6 text-lg rounded-xl"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -191,7 +191,7 @@ export default function LoginPage() {
                   <div className="w-full border-t border-gray-200"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-[#F8F9FA] text-gray-500">ou</span>
+                  <span className="px-4 bg-off-white text-gray-500">ou</span>
                 </div>
               </div>
 
@@ -199,7 +199,7 @@ export default function LoginPage() {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full py-6 text-lg rounded-xl border-[#4A7C59] text-[#4A7C59] hover:bg-[#A8D5BA]/20 hover:text-[#3a6349] transition-colors"
+                className="w-full py-6 text-lg rounded-xl border-olive text-olive hover:bg-green/20 hover:text-olive transition-colors"
                 onClick={() => router.push('/signup')}
               >
                 Créer un compte
@@ -214,7 +214,7 @@ export default function LoginPage() {
                 <p>• <span className="font-medium">admin@greentrade.fr</span> (admin)</p>
                 <p>• <span className="font-medium">jean.dupont@email.com</span> (producteur)</p>
               </div>
-              <p className="text-xs text-gray-500 mt-2">Mot de passe : n'importe lequel</p>
+              <p className="text-xs text-gray-500 mt-2">Mot de passe : n&apos;importe lequel</p>
             </div>
           </div>
         </div>

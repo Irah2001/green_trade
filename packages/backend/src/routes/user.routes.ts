@@ -1,8 +1,15 @@
 import { Router } from 'express';
-import { getProfile, updateProfile, deleteAccount, getUserById } from '../controllers/userController.js';
+import { getAllUsers, getProfile, updateProfile, deleteAccount, getUserById } from '../controllers/userController.js';
 import { authenticate } from '../middlewares/auth.middleware.js';
 
 const router: Router = Router();
+
+/**
+ * @route GET /api/users
+ * @desc Récupérer tous les utilisateurs (admin uniquement)
+ * @access Privé (admin requis)
+ */
+router.get('/', authenticate, getAllUsers);
 
 /**
  * @route GET /api/users/me

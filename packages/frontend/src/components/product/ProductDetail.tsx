@@ -17,6 +17,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 
+// UI components
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -100,12 +101,12 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
             {/* Badges */}
             <div className="absolute top-4 left-4 flex flex-col gap-2">
               {product.isSurplusOfDay && (
-                <Badge className="bg-[#E88D67] text-white text-sm px-3 py-1">
+                <Badge className="bg-earth-orange text-white text-sm px-3 py-1">
                   🔥 Surplus du jour
                 </Badge>
               )}
               {product.organic && (
-                <Badge className="bg-[#4A7C59] text-white text-sm px-3 py-1">
+                <Badge className="bg-olive text-white text-sm px-3 py-1">
                   <Check className="h-4 w-4 mr-1" />
                   Bio
                 </Badge>
@@ -146,7 +147,7 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
                   key={index}
                   onClick={() => setSelectedImage(index)}
                   className={`relative w-20 h-20 rounded-lg overflow-hidden shrink-0 border-2 transition-all ${
-                    selectedImage === index ? 'border-[#4A7C59]' : 'border-transparent'
+                    selectedImage === index ? 'border-olive' : 'border-transparent'
                   }`}
                 >
                   <Image
@@ -288,7 +289,7 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
             <Button
               variant="outline"
               onClick={handleAddToCart}
-              className="flex-1 border-[#4A7C59] text-[#4A7C59] hover:bg-[#A8D5BA]/20"
+              className="flex-1 border-olive text-[#4A7C59] hover:bg-[#A8D5BA]/20"
             >
               <ShoppingCart className="h-5 w-5 mr-2" />
               Ajouter au panier
@@ -302,7 +303,7 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
           </div>
 
           {/* Contact Producer */}
-          <Button variant="ghost" className="w-full text-[#4A7C59]">
+          <Button variant="ghost" className="w-full text-olive">
             <MessageCircle className="h-5 w-5 mr-2" />
             Contacter le producteur
           </Button>
@@ -316,7 +317,7 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
             {/* Placeholder for map */}
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#A8D5BA]/30 to-[#4A7C59]/10">
               <div className="text-center">
-                <MapPin className="h-12 w-12 text-[#4A7C59] mx-auto mb-2" />
+                <MapPin className="h-12 w-12 text-olive mx-auto mb-2" />
                 <p className="font-medium text-gray-700">{product.location.city}</p>
                 <p className="text-sm text-gray-500">{product.location.postalCode}</p>
               </div>

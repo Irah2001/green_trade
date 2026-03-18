@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { UploadCloud, MapPin, CheckCircle, Info, ArrowRight } from "lucide-react";
 import Link from "next/link";
+
 import { useAppStore } from "@/store/useAppStore";
 
 export default function PublishPage() {
@@ -26,8 +27,7 @@ export default function PublishPage() {
     setCreatedId(null); setError('');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setError('');
 
     if (!isAuthenticated) {
@@ -100,10 +100,10 @@ export default function PublishPage() {
 
         <div className="text-center mb-10">
           <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight mb-3">Vendre ou donner son surplus</h1>
-          <p className="text-gray-500 text-lg">Publiez votre annonce en 2 minutes chrono. C'est simple, rapide et bon pour la planète !</p>
+          <p className="text-gray-500 text-lg">Publiez votre annonce en 2 minutes chrono. C&apos;est simple, rapide et bon pour la planète !</p>
         </div>
 
-        <form className="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-gray-100" onSubmit={handleSubmit}>
+        <form className="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-gray-100" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
 
           {/* Section 1: Photos */}
           <div className="mb-10">
@@ -123,9 +123,10 @@ export default function PublishPage() {
 
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">Titre de l'annonce <span className="text-red-500">*</span></label>
+                <label htmlFor="title" className="block text-sm font-semibold text-gray-900 mb-2">Titre de l&apos;annonce <span className="text-red-500">*</span></label>
                 <input
                   type="text"
+                  id="title"
                   required
                   value={title}
                   onChange={e => setTitle(e.target.value)}
@@ -136,8 +137,9 @@ export default function PublishPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">Catégorie <span className="text-red-500">*</span></label>
+                  <label htmlFor="category" className="block text-sm font-semibold text-gray-900 mb-2">Catégorie <span className="text-red-500">*</span></label>
                   <select
+                    id="category"
                     required
                     value={category}
                     onChange={e => setCategory(e.target.value)}
@@ -151,8 +153,9 @@ export default function PublishPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">État <span className="text-red-500">*</span></label>
+                  <label htmlFor="condition" className="block text-sm font-semibold text-gray-900 mb-2">État <span className="text-red-500">*</span></label>
                   <select
+                    id="condition"
                     value={condition}
                     onChange={e => setCondition(e.target.value as any)}
                     className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-olive/50 focus:border-olive focus:bg-white transition-all font-medium appearance-none"
@@ -166,8 +169,9 @@ export default function PublishPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">Description <span className="text-red-500">*</span></label>
+                <label htmlFor="description" className="block text-sm font-semibold text-gray-900 mb-2">Description <span className="text-red-500">*</span></label>
                 <textarea
+                  id="description"
                   rows={4}
                   required
                   value={description}
@@ -184,8 +188,8 @@ export default function PublishPage() {
             <h2 className="text-xl font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100">3. Prix ou don</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
-              <div className={`bg-gray-50 p-6 rounded-2xl border shadow-sm relative overflow-hidden ${!isFree ? 'border-olive/30' : 'border-gray-200'}`}>
-                {!isFree && <div className="absolute top-0 right-0 w-2 h-full bg-olive" />}
+              <div className={`bg-gray-50 p-6 rounded-2xl border shadow-sm relative overflow-hidden ${isFree ? 'border-gray-200' : 'border-olive/30'}`}>
+                {isFree ? null : <div className="absolute top-0 right-0 w-2 h-full bg-olive" />}
                 <div className="flex gap-3 mb-4">
                   <input type="radio" name="price_type" id="price_sell" className="w-5 h-5 text-olive focus:ring-olive mt-0.5" checked={!isFree} onChange={() => setIsFree(false)} />
                   <div>
@@ -208,9 +212,11 @@ export default function PublishPage() {
                 </div>
               </div>
 
-              <div
-                className={`bg-gray-50 p-6 rounded-2xl border border-dashed cursor-pointer transition-colors relative overflow-hidden group ${isFree ? 'border-accent/60' : 'border-gray-200 hover:border-accent/40'}`}
+              <button
+                type="button"
+                className={`bg-gray-50 p-6 rounded-2xl border border-dashed cursor-pointer transition-colors relative overflow-hidden group text-left w-full ${isFree ? 'border-accent/60' : 'border-gray-200 hover:border-accent/40'}`}
                 onClick={() => setIsFree(true)}
+                aria-label="Sélectionner l'option donner gratuitement"
               >
                 <div className="flex gap-3 items-start">
                   <input type="radio" name="price_type" id="price_give" className="w-5 h-5 text-accent focus:ring-accent mt-0.5" checked={isFree} onChange={() => setIsFree(true)} />
@@ -219,7 +225,7 @@ export default function PublishPage() {
                     <p className="text-sm text-gray-500">Idéal pour le surplus non vendable et lutter contre le gaspillage total.</p>
                   </div>
                 </div>
-              </div>
+              </button>
             </div>
           </div>
 
@@ -229,25 +235,31 @@ export default function PublishPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div className="relative">
+                <label htmlFor="city" className="sr-only">Ville</label>
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <MapPin className="h-5 w-5 text-accent" />
                 </div>
                 <input
                   type="text"
+                  id="city"
                   value={city}
                   onChange={e => setCity(e.target.value)}
                   placeholder="Ville"
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-12 pr-4 py-3 text-gray-900 font-semibold focus:outline-none focus:ring-2 focus:ring-olive/50 focus:border-olive focus:bg-white transition-all shadow-sm"
                 />
               </div>
-              <input
-                type="text"
-                value={postalCode}
-                onChange={e => setPostalCode(e.target.value)}
-                placeholder="Code postal"
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 font-semibold focus:outline-none focus:ring-2 focus:ring-olive/50 focus:border-olive focus:bg-white transition-all shadow-sm"
+              <div>
+                <label htmlFor="postalCode" className="sr-only">Code postal</label>
+                <input
+                  type="text"
+                  id="postalCode"
+                  value={postalCode}
+                  onChange={e => setPostalCode(e.target.value)}
+                  placeholder="Code postal"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900 font-semibold focus:outline-none focus:ring-2 focus:ring-olive/50 focus:border-olive focus:bg-white transition-all shadow-sm"
               />
             </div>
+          </div>
           </div>
 
           {/* Tips / Info */}

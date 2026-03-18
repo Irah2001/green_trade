@@ -3,6 +3,50 @@ import bcrypt from 'bcryptjs';
 import prisma from '../prismaClient.js';
 
 /**
+ * Récupérer tous les utilisateurs (admin uniquement)
+ */
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).userId;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Non authentifié." });
+    }
+
+    const requester = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+
+    if (requester?.role !== 'admin') {
+      return res.status(403).json({ message: "Accès réservé aux administrateurs." });
+    }
+
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        phone: true,
+        city: true,
+        postalCode: true,
+        profile: true,
+        rating: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error('[ERREUR] Erreur lors de la récupération des utilisateurs:', error);
+    res.status(500).json({ message: "Erreur lors de la récupération des utilisateurs." });
+  }
+};
+
+/**
  * Récupérer le profil de l'utilisateur connecté
  */
 export const getProfile = async (req: Request, res: Response) => {

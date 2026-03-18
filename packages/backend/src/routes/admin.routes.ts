@@ -1,8 +1,16 @@
 import { Router } from 'express';
 import { deleteExpiredAnonymizedAccounts } from '../utils/rgpd.utils.js';
-import { authenticate } from '../middlewares/auth.middleware.js';
+import { authenticate, isAdmin } from '../middlewares/auth.middleware.js';
+import { getAllOrders } from '../controllers/orderController.js';
 
 const router: Router = Router();
+
+/**
+ * @route GET /api/admin/orders
+ * @desc Récupérer toutes les commandes (admin uniquement)
+ * @access Admin seulement
+ */
+router.get('/orders', authenticate, isAdmin, getAllOrders);
 
 /**
  * @route POST /api/admin/rgpd/cleanup

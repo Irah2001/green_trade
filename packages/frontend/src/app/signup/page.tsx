@@ -41,7 +41,7 @@ const initialForm: SignUpFormData = {
 
 export default function SignUpPage() {
   const router = useRouter();
-  const { login } = useAppStore();
+  const store = useAppStore();
   const { toast } = useToast();
 
   const [form, setForm] = useState<SignUpFormData>(initialForm);
@@ -59,33 +59,33 @@ export default function SignUpPage() {
     
     setIsLoading(true);
 
-    try {
-      const signup = useAppStore.getState().signup;
-      const result = await signup(form);
+     try {
+       const signup = store.signup;
+       const result = await signup(form);
 
-      if (result.success) {
-        toast({
-          title: 'Inscription réussie',
-          description: 'Votre compte a été créé avec succès !',
-        });
-        useAppStore.getState().setCurrentPage('home');
-        router.push('/');
-      } else {
-        toast({
-          title: "Erreur d'inscription",
-          description: result.message || "Une erreur est survenue lors de la création du compte.",
-          variant: 'destructive',
-        });
-      }
-    } catch (error) {
-      toast({
-        title: 'Erreur technique',
-        description: 'Le serveur ne répond pas.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
+       if (result.success) {
+         toast({
+           title: 'Inscription réussie',
+           description: 'Votre compte a été créé avec succès !',
+         });
+         store.setCurrentPage('home');
+         router.push('/');
+       } else {
+         toast({
+           title: "Erreur d'inscription",
+           description: result.message || "Une erreur est survenue lors de la création du compte.",
+           variant: 'destructive',
+         });
+       }
+     } catch (error) {
+       toast({
+         title: 'Erreur technique',
+         description: 'Le serveur ne répond pas.',
+         variant: 'destructive',
+       });
+     } finally {
+       setIsLoading(false);
+     }
   };
 
   return (
@@ -153,7 +153,7 @@ export default function SignUpPage() {
 
         <div className="mt-8 pt-6 border-t border-white/20 relative z-10">
           <p className="text-white/90 italic">
-            "Grâce à Green Trade, je peux vendre mes surplus et éviter le gaspillage. Une vraie révolution pour les petits producteurs comme moi !"
+            &quot;Grâce à Green Trade, je peux vendre mes surplus et éviter le gaspillage. Une vraie révolution pour les petits producteurs comme moi !&quot;
           </p>
           <p className="text-sm font-medium mt-2 text-[#A8D5BA]">— Jean Dupont, producteur à Nantes</p>
         </div>
@@ -180,7 +180,7 @@ export default function SignUpPage() {
             className="hidden lg:flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-8"
           >
             <ArrowLeft className="h-4 w-4" />
-            Retour à l'accueil
+            Retour à l&apos;accueil
           </button>
 
           <div className="max-w-md mx-auto">
@@ -342,7 +342,7 @@ export default function SignUpPage() {
                     className="mt-0.5 data-[state=checked]:bg-[#4A7C59] data-[state=checked]:border-[#4A7C59]"
                   />
                   <Label htmlFor="newsletter" className="text-sm font-normal leading-tight cursor-pointer">
-                    J'accepte de recevoir la newsletter Green Trade et les offres spéciales par email.
+                    J&apos;accepte de recevoir la newsletter Green Trade et les offres spéciales par email.
                   </Label>
                 </div>
               </div>

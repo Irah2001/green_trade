@@ -180,6 +180,50 @@ export const getMyOrders = async (req: Request, res: Response) => {
 };
 
 /**
+ * Récupérer toutes les commandes (admin uniquement)
+ */
+export const getAllOrders = async (req: Request, res: Response) => {
+  try {
+    const transactions = await prisma.transaction.findMany({
+      include: {
+        buyer: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+        seller: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+        product: {
+          select: {
+            id: true,
+            title: true,
+            price: true,
+            images: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    res.status(200).json({ orders: transactions });
+  } catch (error) {
+    console.error('Erreur dans getAllOrders:', error);
+    res.status(500).json({ message: "Erreur lors de la récupération des commandes." });
+  }
+};
+
+/**
  * Récupérer une commande spécifique
  */
 export const getOrderById = async (req: Request, res: Response) => {

@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { Trash2, ShieldCheck, CreditCard, Apple, ArrowRight } from "lucide-react";
 import { mockProducts as MOCK_PRODUCTS } from "@/data/mockDatabase";
 
@@ -69,7 +68,7 @@ export default function CartPage() {
             <div className="bg-light-green/20 rounded-2xl p-6 border border-olive/20 flex gap-4 items-start">
               <Apple className="w-6 h-6 text-olive shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-bold text-olive mb-1">C'est bon pour la planète !</h4>
+                <h4 className="font-bold text-olive mb-1">C&apos;est bon pour la planète !</h4>
                 <p className="text-sm text-gray-600 leading-relaxed">En commandant ces produits en circuit ultra-court, vous sauvez {subtotal.toFixed(0)}kg de nourriture et soutenez les agriculteurs de votre région.</p>
               </div>
             </div>

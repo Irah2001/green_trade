@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useIsClient } from "@/hooks/use-is-client"
 import { z } from "zod"
 import { useForm } from "@tanstack/react-form"
 import { ShieldAlert, Mail, Lock } from "lucide-react"
@@ -49,11 +49,7 @@ const passwordUpdateSchema = z
 export default function SecuritySettingsPage() {
   const user = useAppStore((state) => state.user) as BackendUser | null
   const { toast } = useToast()
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
+  const isMounted = useIsClient()
 
   /* ── TanStack Forms ────────────────────────────────────────── */
 
@@ -68,7 +64,7 @@ export default function SecuritySettingsPage() {
         return result.success ? undefined : result.error.issues.map(i => i.message).join(", ")
       },
     },
-    onSubmit: async ({ value }) => {
+    onSubmit: async ({ value: _value }) => {
       try {
         // TODO: Replace with real API call
         await new Promise((resolve) => setTimeout(resolve, 800))
@@ -98,7 +94,7 @@ export default function SecuritySettingsPage() {
         return result.success ? undefined : result.error.issues.map(i => i.message).join(", ")
       },
     },
-    onSubmit: async ({ value }) => {
+    onSubmit: async ({ value: _value }) => {
       try {
         // TODO: Replace with real API call
         await new Promise((resolve) => setTimeout(resolve, 800))

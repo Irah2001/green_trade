@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, createContext, useContext, useEffect } from "react"
+import { useState, useCallback, createContext, useContext, useEffect, startTransition } from "react"
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react"
@@ -95,7 +95,7 @@ function Carousel({
 
   useEffect(() => {
     if (!api) return
-    onSelect(api)
+    startTransition(() => onSelect(api))
     api.on("reInit", onSelect)
     api.on("select", onSelect)
 

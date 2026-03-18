@@ -26,7 +26,7 @@ export const createCheckoutSession = async (req: AuthRequest, res: Response) => 
         product_data: {
           name: item.product?.title || item.product?.name || "Produit GreenTrade",
         },
-        unit_amount: Math.round(Number(item.price || item.product?.price) * 100),
+        unit_amount: Math.round(Number(item.unitPriceSnapshot || item.product?.price) * 100),
       },
       quantity: item.quantity,
     }));
