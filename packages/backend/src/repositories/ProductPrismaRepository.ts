@@ -1,5 +1,5 @@
 import prisma from '../prismaClient.js';
-import { Product, ProductProps } from '../domain/entities/Product';
+import { Product, ProductProps } from '../domain/entities/Product.js';
 
 function toDomain(prismaProduct: any): Product {
   const props: ProductProps = {
