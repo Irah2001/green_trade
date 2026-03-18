@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import prisma from '../prismaClient.js';
+import { anonymizeUser } from '../utils/rgpd.utils.js';
 
 /**
  * Récupérer tous les utilisateurs (admin uniquement)
@@ -176,42 +177,7 @@ export const deleteAccount = async (req: Request, res: Response) => {
 
     // RGPD: Anonymiser l'utilisateur au lieu de le supprimer complètement
     // On garde les transactions pour l'historique mais on anonymise les données personnelles
-    await prisma.$transaction(async (tx) => {
-      // 1. Anonymiser les données personnelles de l'utilisateur
-      const anonymizedEmail = `deleted-${userId}@anonymized.local`;
-      await tx.user.update({
-        where: { id: userId },
-        data: {
-          email: anonymizedEmail,
-          passwordHash: '', // Vider le mot de passe
-          firstName: 'Utilisateur',
-          lastName: 'Supprimé',
-          phone: null,
-          city: null,
-          postalCode: null,
-          profile: { deleted: true, deletedAt: new Date().toISOString() },
-          resetToken: null,
-          resetTokenExpiry: null,
-        }
-      });
-      
-      // 2. Supprimer les données non essentielles
-      // Supprimer le panier (données temporaires)
-      await tx.cart.deleteMany({ where: { userId } });
-      
-      // Supprimer les produits actifs du vendeur (ou les désactiver)
-      await tx.product.updateMany({ 
-        where: { sellerId: userId, status: 'active' },
-        data: { status: 'deleted' }
-      });
-      
-      // Supprimer les messages (contenu privé)
-      await tx.message.deleteMany({ where: { senderId: userId } });
-      
-      // 3. Les transactions sont CONSERVÉES pour l'historique comptable
-      // mais les données personnelles sont déjà anonymisées via l'update du User
-      // Les transactions pointent vers un utilisateur "Utilisateur Supprimé"
-    });
+    await anonymizeUser(userId);
 
     console.log(`[OK] Compte anonymisé (RGPD) pour l'utilisateur: ${user.email}`);
     res.status(200).json({ 

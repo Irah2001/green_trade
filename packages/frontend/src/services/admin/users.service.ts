@@ -83,3 +83,64 @@ export async function getAdminUser(id: string): Promise<AdminQueryResult<AdminUs
     }
   }
 }
+
+export interface AdminUserUpdatePayload {
+  firstName?: string
+  lastName?: string
+  role?: 'buyer' | 'seller' | 'farmer' | 'admin'
+  phone?: string | null
+  city?: string | null
+  postalCode?: string | null
+  profile?: Record<string, unknown>
+}
+
+export async function updateAdminUser(
+  id: string,
+  data: AdminUserUpdatePayload,
+): Promise<AdminQueryResult<AdminUserRow | null>> {
+  try {
+    const response = await apiFetch<{ message: string; user: {
+      id: string
+      firstName?: string | null
+      lastName?: string | null
+      email: string
+      role: string
+      city?: string | null
+      rating?: number | null
+      createdAt: string
+    } }>(`/api/admin/users/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+    return {
+      data: toAdminUserRow(response.user),
+      source: 'api',
+    }
+  } catch (error) {
+    return {
+      data: null,
+      source: 'unsupported',
+      capabilityMessage: error instanceof Error ? error.message : "Impossible de mettre à jour l'utilisateur.",
+    }
+  }
+}
+
+export async function deleteAdminUser(
+  id: string,
+): Promise<AdminQueryResult<null>> {
+  try {
+    await apiFetch<{ message: string }>(`/api/admin/users/${id}`, {
+      method: 'DELETE',
+    })
+    return {
+      data: null,
+      source: 'api',
+    }
+  } catch (error) {
+    return {
+      data: null,
+      source: 'unsupported',
+      capabilityMessage: error instanceof Error ? error.message : "Impossible de supprimer l'utilisateur.",
+    }
+  }
+}

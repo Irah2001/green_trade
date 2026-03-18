@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { deleteExpiredAnonymizedAccounts } from '../utils/rgpd.utils.js';
 import { authenticate, isAdmin } from '../middlewares/auth.middleware.js';
 import { getAllOrders } from '../controllers/orderController.js';
+import { adminUpdateUser, adminDeleteUser } from '../controllers/adminController.js';
 
 const router: Router = Router();
 
@@ -14,23 +15,11 @@ router.get('/orders', authenticate, isAdmin, getAllOrders);
 
 /**
  * @route POST /api/admin/rgpd/cleanup
- * @desc Supprimer les comptes anonymisés expirés (cron job)
- * @access Admin seulement
+ * @desc Delete expired anonymized accounts (cron job)
+ * @access Admin only
  */
-router.post('/rgpd/cleanup', authenticate, async (req, res) => {
+router.post('/rgpd/cleanup', authenticate, isAdmin, async (req, res) => {
   try {
-    const userId = (req as any).userId;
-    
-    // Vérifier que l'utilisateur est admin
-    const user = await (await import('../prismaClient.js')).default.user.findUnique({
-      where: { id: userId },
-      select: { role: true }
-    });
-
-    if (!user || user.role !== 'admin') {
-      return res.status(403).json({ message: "Accès refusé. Admin requis." });
-    }
-
     const daysToKeep = Number(req.body.daysToKeep) || 30;
     const deletedCount = await deleteExpiredAnonymizedAccounts(daysToKeep);
 
@@ -44,5 +33,19 @@ router.post('/rgpd/cleanup', authenticate, async (req, res) => {
     res.status(500).json({ message: "Erreur lors du nettoyage RGPD." });
   }
 });
+
+/**
+ * @route PATCH /api/admin/users/:id
+ * @desc Admin: update any user
+ * @access Admin only
+ */
+router.patch('/users/:id', authenticate, isAdmin, adminUpdateUser);
+
+/**
+ * @route DELETE /api/admin/users/:id
+ * @desc Admin: delete a user (GDPR anonymization)
+ * @access Admin only
+ */
+router.delete('/users/:id', authenticate, isAdmin, adminDeleteUser);
 
 export default router;
