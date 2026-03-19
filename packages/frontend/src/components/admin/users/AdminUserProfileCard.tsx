@@ -1,4 +1,10 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+
 import type { AdminUserRow } from '@/services/admin/users.service'
+import { deleteAdminUser } from '@/services/admin/users.service'
 import type { AdminDataSource } from '@/services/admin/admin-capabilities'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -13,9 +19,37 @@ const ROLE_LABEL: Record<string, string> = {
 interface Props {
   user: AdminUserRow
   source: AdminDataSource
+  onDelete?: () => void
 }
 
-export default function AdminUserProfileCard({ user, source }: Props) {
+export default function AdminUserProfileCard({ user, source, onDelete }: Readonly<Props>) {
+  const router = useRouter()
+  const [isDeleting, setIsDeleting] = useState(false)
+  const canModify = source === 'api'
+
+  const handleDelete = async () => {
+    if (!globalThis.confirm(`Supprimer le compte de ${user.firstName} ${user.lastName} ? Cette action est irréversible.`)) {
+      return
+    }
+
+    setIsDeleting(true)
+    const result = await deleteAdminUser(user.id)
+
+    if (result.source === 'api') {
+      onDelete?.()
+      router.push('/admin/users')
+      router.refresh()
+    } else {
+      alert(result.capabilityMessage ?? 'Impossible de supprimer cet utilisateur.')
+    }
+    setIsDeleting(false)
+  }
+
+  const handleEdit = () => {
+    // TODO: Implement edit page at /admin/users/${user.id}/edit
+    alert("La page d'édition n'est pas encore implémentée.")
+  }
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -32,11 +66,24 @@ export default function AdminUserProfileCard({ user, source }: Props) {
         </div>
 
         <div className="flex gap-2 border-t pt-4">
-          <Button variant="outline" size="sm" disabled title="Endpoint backend non disponible">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={!canModify || isDeleting}
+            onClick={handleEdit}
+            title={canModify ? 'Modifier cet utilisateur' : 'Modification indisponible pour les données de démonstration'}
+          >
             Modifier
           </Button>
-          <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700" disabled title="Endpoint backend non disponible">
-            Supprimer
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-red-600 hover:text-red-700"
+            disabled={!canModify || isDeleting}
+            onClick={handleDelete}
+            title={canModify ? 'Supprimer cet utilisateur' : 'Suppression indisponible pour les données de démonstration'}
+          >
+            {isDeleting ? 'Suppression…' : 'Supprimer'}
           </Button>
         </div>
       </CardContent>
@@ -44,7 +91,7 @@ export default function AdminUserProfileCard({ user, source }: Props) {
   )
 }
 
-function Detail({ label, value }: { label: string; value: string }) {
+function Detail({ label, value }: Readonly<{ label: string; value: string }>) {
   return (
     <div>
       <p className="text-xs font-medium uppercase text-muted-foreground">{label}</p>

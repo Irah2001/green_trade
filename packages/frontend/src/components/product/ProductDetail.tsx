@@ -89,7 +89,7 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
         {/* Image Gallery */}
         <div className="space-y-4">
           {/* Main Image */}
-          <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100 shadow-lg">
+          <div className="relative aspect-4/3 rounded-2xl overflow-hidden bg-gray-100 shadow-lg">
             <Image
               src={product.images[selectedImage]}
               alt={product.title}

@@ -1,4 +1,4 @@
-import prisma from '../prismaClient.js';
+
 
 export interface AuditLogEntry {
   adminId: string;

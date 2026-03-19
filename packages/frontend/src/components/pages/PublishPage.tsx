@@ -246,7 +246,9 @@ export default function PublishPage() {
                   <Image
                     src={img}
                     alt={`Product ${index + 1}`}
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="(max-width: 640px) 33vw, 20vw"
+                    className="object-cover"
                   />
                   <button
                     type="button"

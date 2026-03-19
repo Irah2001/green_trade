@@ -23,6 +23,7 @@ export default async function AdminProductDetailPage({ params }: Props) {
     <div className="space-y-6">
       <AdminPageHeader
         title={result.data.title}
+        description={result.data.description}
         actions={
           <div className="flex gap-2">
             <Button asChild variant="outline" size="sm">
