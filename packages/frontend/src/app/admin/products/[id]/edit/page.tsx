@@ -1,16 +1,17 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { ArrowLeft } from 'lucide-react'
+
 import { getAdminProduct } from '@/services/admin/products.service'
 import AdminPageHeader from '@/components/admin/AdminPageHeader'
 import AdminProductForm from '@/components/admin/products/AdminProductForm'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft } from 'lucide-react'
 
 interface Props {
   params: Promise<{ id: string }>
 }
 
-export default async function AdminProductEditPage({ params }: Props) {
+export default async function AdminProductEditPage({ params }: Readonly<Props>) {
   const { id } = await params
   const result = await getAdminProduct(id)
 
@@ -36,8 +37,8 @@ export default async function AdminProductEditPage({ params }: Props) {
         productId={id}
         initialValues={{
           title: result.data.title,
-          description: '',
-          category: result.data.category,
+          description: result.data.description,
+          category: result.data.category as any,
           price: result.data.price,
           quantity: result.data.quantity,
           unit: result.data.unit,

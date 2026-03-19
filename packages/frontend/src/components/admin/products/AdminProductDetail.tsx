@@ -9,7 +9,7 @@ interface Props {
   source: AdminDataSource
 }
 
-export default function AdminProductDetail({ product, source }: Props) {
+export default function AdminProductDetail({ product, source }: Readonly<Props>) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -17,6 +17,12 @@ export default function AdminProductDetail({ product, source }: Props) {
         <SourceBadge source={source} />
       </CardHeader>
       <CardContent className="space-y-4">
+        {product.description && (
+          <div className="rounded-lg bg-muted/50 p-3">
+            <p className="text-xs font-medium uppercase text-muted-foreground mb-1">Description</p>
+            <p className="text-sm whitespace-pre-wrap">{product.description}</p>
+          </div>
+        )}
         <div className="grid gap-4 sm:grid-cols-2">
           <Detail label="Catégorie" value={PRODUCT_CATEGORY_LABELS[product.category] ?? product.category} />
           <Detail label="Prix" value={`${product.price.toFixed(2)} € / ${product.unit}`} />

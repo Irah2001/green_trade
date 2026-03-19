@@ -24,6 +24,7 @@ interface BackendProduct {
 export interface AdminProductRow {
   id: string
   title: string
+  description: string
   category: string
   price: number
   quantity: number
@@ -38,12 +39,13 @@ function toAdminProductRow(product: BackendProduct): AdminProductRow {
   return {
     id: product.id,
     title: product.title,
+    description: product.description,
     category: product.category,
     price: product.price,
     quantity: product.quantity ?? 0,
     unit: product.unit ?? 'unité',
     status: product.status,
-    organic: false,
+    organic: false, // Default as it's not in BackendProduct yet
     city: product.location?.city ?? '',
     createdAt: product.createdAt ?? '',
   }
