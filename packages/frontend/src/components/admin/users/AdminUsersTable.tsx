@@ -13,10 +13,13 @@ import {
 } from '@/components/ui/table'
 
 const ROLE_LABEL: Record<string, string> = {
-  user: 'Utilisateur',
+  buyer: 'Acheteur',
+  seller: 'Vendeur',
+  farmer: 'Agriculteur',
   admin: 'Admin',
+  user: 'Utilisateur',
   producer: 'Producteur',
-}
+};
 
 interface Props {
   users: AdminUserRow[]

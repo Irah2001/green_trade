@@ -303,7 +303,7 @@ export default function PublishPage() {
                 placeholder="Décrivez votre produit : variété, goût, conseils de préparation..."
                 value={formData.description}
                 onChange={(e) => handleChange('description', e.target.value)}
-                className="rounded-lg min-h-25"
+                className="rounded-lg min-h-24"
               />
             </div>
 

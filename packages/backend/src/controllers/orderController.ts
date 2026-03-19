@@ -239,6 +239,11 @@ export const getOrderById = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "ID de commande invalide." });
     }
 
+    const currentUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true }
+    });
+
     const transaction = await prisma.transaction.findUnique({
       where: { id },
       include: {
@@ -266,8 +271,10 @@ export const getOrderById = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Commande non trouvée." });
     }
 
+    const isAdmin = currentUser?.role === 'admin';
+
     // Vérifier que l'utilisateur a le droit de voir cette commande
-    if (transaction.buyerId !== userId && transaction.sellerId !== userId) {
+    if (!isAdmin && transaction.buyerId !== userId && transaction.sellerId !== userId) {
       return res.status(403).json({ message: "Accès non autorisé." });
     }
 
