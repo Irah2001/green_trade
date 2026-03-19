@@ -11,10 +11,13 @@ import { Button } from '@/components/ui/button'
 import SourceBadge from '@/components/admin/shared/SourceBadge'
 
 const ROLE_LABEL: Record<string, string> = {
-  user: 'Utilisateur',
+  buyer: 'Acheteur',
+  seller: 'Vendeur',
+  farmer: 'Agriculteur',
   admin: 'Admin',
+  user: 'Utilisateur',
   producer: 'Producteur',
-}
+};
 
 interface Props {
   user: AdminUserRow

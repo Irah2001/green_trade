@@ -315,7 +315,7 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
         <CardContent className="p-0">
           <div className="relative h-64 bg-gray-100">
             {/* Placeholder for map */}
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#A8D5BA]/30 to-[#4A7C59]/10">
+            <div className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-[#A8D5BA]/30 to-[#4A7C59]/10">
               <div className="text-center">
                 <MapPin className="h-12 w-12 text-olive mx-auto mb-2" />
                 <p className="font-medium text-gray-700">{product.location.city}</p>

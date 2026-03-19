@@ -13,7 +13,8 @@ const AUTH_TOKEN_MAX_AGE = 60 * 60 * 24 * 7;
 
 const persistAuthToken = (token: string) => {
   localStorage.setItem(AUTH_TOKEN_COOKIE, token);
-  document.cookie = `${AUTH_TOKEN_COOKIE}=${encodeURIComponent(token)}; path=/; max-age=${AUTH_TOKEN_MAX_AGE}; samesite=lax`;
+  const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'Secure;' : '';
+  document.cookie = `${AUTH_TOKEN_COOKIE}=${encodeURIComponent(token)}; path=/; max-age=${AUTH_TOKEN_MAX_AGE}; samesite=lax; ${isSecure}`;
 };
 
 const clearAuthToken = () => {

@@ -7,7 +7,7 @@
  * - PATCH /api/admin/users/:id — admin update user ✅
  * - DELETE /api/admin/users/:id — admin delete user (RGPD) ✅
  * - GET /api/admin/orders — all orders (admin) ✅
- * - GET /api/orders/:id — order detail ✅
+ * - GET /api/orders/:id — order detail (admin role bypasses owner check) ✅
  * - GET/POST/PUT/DELETE /api/products — full CRUD (admin role bypasses owner check) ✅
  */
 
