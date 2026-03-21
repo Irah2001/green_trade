@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import type { AdminProductRow } from '@/services/admin/products.service'
 import type { AdminDataSource } from '@/services/admin/admin-capabilities'
-import { Button } from '@/components/ui/button'
 import SourceBadge from '@/components/admin/shared/SourceBadge'
-import { PRODUCT_CATEGORY_LABELS } from './admin-product-form.schema'
+import { PRODUCT_CATEGORY_LABELS } from '@/components/admin/products/admin-product-form.schema'
+import { Button } from '@/components/ui/button'
 import {
   Table,
   TableBody,
@@ -18,7 +18,7 @@ interface Props {
   source: AdminDataSource
 }
 
-export default function AdminProductsTable({ products, source }: Props) {
+export default function AdminProductsTable({ products, source }: Readonly<Props>) {
   if (products.length === 0) {
     return (
       <div className="rounded-lg border bg-card p-8 text-center text-sm text-muted-foreground">

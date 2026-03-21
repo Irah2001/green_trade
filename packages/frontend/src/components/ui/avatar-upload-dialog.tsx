@@ -1,6 +1,6 @@
 "use client"
 
-import * as React from "react"
+import { useState, useRef, useCallback, useEffect } from "react"
 import { UploadCloud, FileImage, CheckCircle2, Trash2, Camera } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -24,15 +24,15 @@ interface AvatarUploadDialogProps {
 type UploadState = "idle" | "uploading" | "success"
 
 export function AvatarUploadDialog({ onUploadSuccess }: Readonly<AvatarUploadDialogProps>) {
-  const [open, setOpen] = React.useState(false)
-  const [state, setState] = React.useState<UploadState>("idle")
-  const [progress, setProgress] = React.useState(0)
-  const [file, setFile] = React.useState<File | null>(null)
+  const [open, setOpen] = useState(false)
+  const [state, setState] = useState<UploadState>("idle")
+  const [progress, setProgress] = useState(0)
+  const [file, setFile] = useState<File | null>(null)
 
-  const uploadIntervalRef = React.useRef<NodeJS.Timeout | null>(null)
-  const fileInputRef = React.useRef<HTMLInputElement>(null)
+  const uploadIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const clearUploadInterval = React.useCallback(() => {
+  const clearUploadInterval = useCallback(() => {
     if (uploadIntervalRef.current) {
       clearInterval(uploadIntervalRef.current)
       uploadIntervalRef.current = null
@@ -110,7 +110,7 @@ export function AvatarUploadDialog({ onUploadSuccess }: Readonly<AvatarUploadDia
     setOpen(false)
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     return () => clearUploadInterval()
   }, [clearUploadInterval])
 

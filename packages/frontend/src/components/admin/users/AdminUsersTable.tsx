@@ -1,6 +1,8 @@
 import Link from 'next/link'
+
 import type { AdminUserRow } from '@/services/admin/users.service'
 import type { AdminDataSource } from '@/services/admin/admin-capabilities'
+// UI Components
 import { Button } from '@/components/ui/button'
 import SourceBadge from '@/components/admin/shared/SourceBadge'
 import {
@@ -26,7 +28,7 @@ interface Props {
   source: AdminDataSource
 }
 
-export default function AdminUsersTable({ users, source }: Props) {
+export default function AdminUsersTable({ users, source }: Readonly<Props>) {
   if (users.length === 0) {
     return (
       <div className="rounded-lg border bg-card p-8 text-center text-sm text-muted-foreground">

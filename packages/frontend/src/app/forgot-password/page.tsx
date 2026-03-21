@@ -4,11 +4,15 @@ import Image from 'next/image';
 import { Leaf, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+// UI Components
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+// Services
 import { authService } from '@/services/auth.service';
+// Hooks
+import { useToast } from '@/hooks/use-toast';
+// Assets
 import greenTradeImg from '../../../public/images/green_trade.webp';
 
 export default function ForgotPasswordPage() {

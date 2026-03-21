@@ -2,21 +2,9 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { type LucideIcon, UserCircle, Shield } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-
-/** Represents a single navigation item in the settings sidebar. */
-interface NavItem {
-  title: string
-  href: string
-  icon: LucideIcon
-}
-
-const NAV_ITEMS: NavItem[] = [
-  { title: "Profil", href: "/settings/profile", icon: UserCircle },
-  { title: "Sécurité", href: "/settings/security", icon: Shield },
-]
+import { NAV_ITEMS } from '@/components/layout/settings-nav'
 
 export default function SettingsSidebar() {
   const pathname = usePathname()

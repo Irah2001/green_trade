@@ -1,4 +1,5 @@
 import { AlertTriangle, Info } from 'lucide-react'
+
 import { getAdminCapabilityLabel, type AdminAction, type AdminDataSource } from '@/services/admin/admin-capabilities'
 import type { AdminResourceKey } from '@/features/admin/config/admin-resources'
 
@@ -8,7 +9,7 @@ interface AdminCapabilityBannerProps {
   source: AdminDataSource
 }
 
-export default function AdminCapabilityBanner({ resource, action, source }: AdminCapabilityBannerProps) {
+export default function AdminCapabilityBanner({ resource, action, source }: Readonly<AdminCapabilityBannerProps>) {
   const label = getAdminCapabilityLabel(resource, action)
   const isUnsupported = source === 'unsupported'
 

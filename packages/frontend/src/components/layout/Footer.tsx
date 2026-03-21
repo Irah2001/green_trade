@@ -22,7 +22,7 @@ function XIcon({ className }: { className?: string }) {
 }
 
 // TikTok icon component
-function TikTokIcon({ className }: { className?: string }) {
+function TikTokIcon({ className }: Readonly<{ className?: string }>) {
   return (
     <svg
       viewBox="0 0 24 24"

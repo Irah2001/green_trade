@@ -11,7 +11,7 @@ function getBrowserCookie(name: string): string | null {
 }
 
 async function getAuthToken(): Promise<string | null> {
-  if (typeof window !== 'undefined') {
+  if (typeof localStorage !== 'undefined') {
     return localStorage.getItem('gt_token') ?? getBrowserCookie('gt_token')
   }
 

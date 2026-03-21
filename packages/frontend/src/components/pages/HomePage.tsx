@@ -2,13 +2,15 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { Search, Leaf, Users, MapPin, ArrowRight, Package } from 'lucide-react';
+
+// UI Components
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+
+import ProductCard from '@/components/product/ProductCard';
 import { mockProducts, mockUsers, Product } from '@/data/mockDatabase';
 import { useAppStore } from '@/store/useAppStore';
-import { Button } from '@/components/ui/button';
-
-import { Badge } from '@/components/ui/badge';
-import ProductCard from '@/components/product/ProductCard';
-import { Search, Leaf, Users, MapPin, ArrowRight, Package } from 'lucide-react';
 
 export default function HomePage() {
   const { setCurrentPage, setSelectedProduct, searchProducts, products } = useAppStore();

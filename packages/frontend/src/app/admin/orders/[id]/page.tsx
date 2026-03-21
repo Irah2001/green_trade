@@ -1,17 +1,23 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { ArrowLeft } from 'lucide-react'
+
+// UI Components
+import { Button } from '@/components/ui/button'
+
+// Services
 import { getAdminOrder } from '@/services/admin/orders.service'
+
+// Components
 import AdminPageHeader from '@/components/admin/AdminPageHeader'
 import AdminCapabilityBanner from '@/components/admin/AdminCapabilityBanner'
 import AdminOrderDetail from '@/components/admin/orders/AdminOrderDetail'
-import { Button } from '@/components/ui/button'
-import { ArrowLeft } from 'lucide-react'
 
 interface Props {
   params: Promise<{ id: string }>
 }
 
-export default async function AdminOrderDetailPage({ params }: Props) {
+export default async function AdminOrderDetailPage({ params }: Readonly<Props>) {
   const { id } = await params
   const result = await getAdminOrder(id)
 

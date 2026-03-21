@@ -150,7 +150,7 @@ function FilterContent ({
   );
 }
 
-export default function ProductFilters({ onFilterChange }: ProductFiltersProps) {
+export default function ProductFilters({ onFilterChange }: Readonly<ProductFiltersProps>) {
   const { setFilteredProducts, products } = useAppStore();
   
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);

@@ -1,17 +1,21 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getAdminUser } from '@/services/admin/users.service'
+import { ArrowLeft } from 'lucide-react'
+
+import { Button } from '@/components/ui/button'
+
+// Components
 import AdminPageHeader from '@/components/admin/AdminPageHeader'
 import AdminCapabilityBanner from '@/components/admin/AdminCapabilityBanner'
 import AdminUserProfileCard from '@/components/admin/users/AdminUserProfileCard'
-import { Button } from '@/components/ui/button'
-import { ArrowLeft } from 'lucide-react'
+
+import { getAdminUser } from '@/services/admin/users.service'
 
 interface Props {
   params: Promise<{ id: string }>
 }
 
-export default async function AdminUserDetailPage({ params }: Props) {
+export default async function AdminUserDetailPage({ params }: Readonly<Props>) {
   const { id } = await params
   const result = await getAdminUser(id)
 
