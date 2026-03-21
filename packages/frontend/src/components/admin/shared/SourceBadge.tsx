@@ -4,7 +4,7 @@ interface SourceBadgeProps {
   source: AdminDataSource
 }
 
-export default function SourceBadge({ source }: SourceBadgeProps) {
+export default function SourceBadge({ source }: Readonly<SourceBadgeProps>) {
   if (source === 'api') return null
 
   const label = source === 'mock' ? 'Données de démonstration' : 'Non supporté'

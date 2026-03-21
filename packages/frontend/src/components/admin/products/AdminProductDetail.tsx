@@ -1,7 +1,7 @@
 import type { AdminProductRow } from '@/services/admin/products.service'
 import type { AdminDataSource } from '@/services/admin/admin-capabilities'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { PRODUCT_CATEGORY_LABELS } from './admin-product-form.schema'
+import { PRODUCT_CATEGORY_LABELS } from '@/components/admin/products/admin-product-form.schema'
 import SourceBadge from '@/components/admin/shared/SourceBadge'
 
 interface Props {

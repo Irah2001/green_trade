@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { ShoppingCart, Users, Package } from 'lucide-react'
+
 import { cn } from '@/lib/utils'
 import { ADMIN_RESOURCES, type AdminResourceKey } from '@/features/admin/config/admin-resources'
-import { ShoppingCart, Users, Package } from 'lucide-react'
 
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   ShoppingCart,

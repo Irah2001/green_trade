@@ -58,11 +58,11 @@ export default function Home() {
   const isHydrated = useHydration();
   const [fetchedProduct, setFetchedProduct] = useState<Product | null>(null);
 
-  // Charger les produits + restaurer la page depuis l'URL à l'hydratation
+  // Load products + restore page from URL on hydration
   useEffect(() => {
     if (!isHydrated) return;
     loadProducts();
-    const path = window.location.pathname;
+    const path = globalThis.location.pathname;
     if (path.startsWith('/products/')) {
       const id = path.split('/products/')[1];
       if (id) {
@@ -72,39 +72,43 @@ export default function Home() {
     } else if (path === '/products') {
       useAppStore.getState().setCurrentPage('products');
     }
-  }, [isHydrated]);
+  }, [isHydrated, loadProducts]);
 
-  // Synchroniser l'URL avec la navigation SPA
+  // Synchronize URL with SPA navigation
   useEffect(() => {
     if (!isHydrated) return;
     if (currentPage === 'products') {
-      window.history.pushState(null, '', '/products');
+      globalThis.history.pushState(null, '', '/products');
     } else if (currentPage === 'product-detail' && selectedProductId) {
-      window.history.pushState(null, '', `/products/${selectedProductId}`);
+      globalThis.history.pushState(null, '', `/products/${selectedProductId}`);
     } else if (currentPage === 'home') {
-      window.history.pushState(null, '', '/');
+      globalThis.history.pushState(null, '', '/');
     }
   }, [currentPage, selectedProductId, isHydrated]);
 
   // Get selected product from store, or fall back to directly fetched one
   const selectedProduct = selectedProductId
-    ? (products.find(p => p.id === selectedProductId) ?? fetchedProduct)
+    ? (products.find(p => p.id === selectedProductId) ?? (fetchedProduct?.id === selectedProductId ? fetchedProduct : null))
     : null;
 
   // When product not found in store and not loading, fetch it directly from API
   useEffect(() => {
-    if (currentPage !== 'product-detail' || !selectedProductId) {
-      setFetchedProduct(null);
-      return;
-    }
-    if (products.find(p => p.id === selectedProductId)) {
-      setFetchedProduct(null);
-      return;
-    }
+    if (currentPage !== 'product-detail' || !selectedProductId) return;
+    if (products.some(p => p.id === selectedProductId)) return;
     if (productsLoading) return;
+
+    let active = true;
     productService.getProductById(selectedProductId)
-      .then(raw => setFetchedProduct(toProduct(raw)))
-      .catch(() => setFetchedProduct(null));
+      .then(raw => {
+        if (active) setFetchedProduct(toProduct(raw));
+      })
+      .catch(() => {
+        if (active) setFetchedProduct(null);
+      });
+
+    return () => {
+      active = false;
+    };
   }, [selectedProductId, currentPage, products, productsLoading]);
 
   // Render current page

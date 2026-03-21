@@ -12,14 +12,24 @@ const AUTH_TOKEN_COOKIE = 'gt_token';
 const AUTH_TOKEN_MAX_AGE = 60 * 60 * 24 * 7;
 
 const persistAuthToken = (token: string) => {
-  localStorage.setItem(AUTH_TOKEN_COOKIE, token);
-  const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'Secure;' : '';
-  document.cookie = `${AUTH_TOKEN_COOKIE}=${encodeURIComponent(token)}; path=/; max-age=${AUTH_TOKEN_MAX_AGE}; samesite=lax; ${isSecure}`;
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem(AUTH_TOKEN_COOKIE, token);
+  }
+
+  if (typeof document !== 'undefined') {
+    const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'Secure;' : '';
+    document.cookie = `${AUTH_TOKEN_COOKIE}=${encodeURIComponent(token)}; path=/; max-age=${AUTH_TOKEN_MAX_AGE}; samesite=lax; ${isSecure}`;
+  }
 };
 
 const clearAuthToken = () => {
-  localStorage.removeItem(AUTH_TOKEN_COOKIE);
-  document.cookie = `${AUTH_TOKEN_COOKIE}=; path=/; max-age=0; samesite=lax`;
+  if (typeof localStorage !== 'undefined') {
+    localStorage.removeItem(AUTH_TOKEN_COOKIE);
+  }
+
+  if (typeof document !== 'undefined') {
+    document.cookie = `${AUTH_TOKEN_COOKIE}=; path=/; max-age=0; samesite=lax`;
+  }
 };
 
 const toFrontendProduct = (product: any): Product => ({

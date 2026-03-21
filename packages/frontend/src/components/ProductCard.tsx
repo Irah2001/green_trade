@@ -43,7 +43,7 @@ export default function ProductCard({ product }: Readonly<{ product: Product }>)
             <Heart className={`w-4 h-4 ${isFavorite ? "fill-accent text-accent" : ""}`} />
           </button>
           <button
-            onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(`${window.location.origin}/?product=${product.id}`); }}
+            onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(`${globalThis.location.origin}/?product=${product.id}`); }}
             className="p-1.5 bg-white/80 backdrop-blur-md text-gray-700 rounded-full hover:bg-white transition-all shadow-sm opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0"
           >
             <Share2 className="w-4 h-4" />

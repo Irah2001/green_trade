@@ -27,14 +27,11 @@ export default function CartPage() {
     updateCartQuantity,
     removeFromCart,
     clearCart,
-    createOrder,
-    user,
     isAuthenticated,
   } = useAppStore();
   const { toast } = useToast();
   const [deliveryMethod, setDeliveryMethod] = useState<'pickup' | 'delivery'>('pickup');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [orderSuccess, setOrderSuccess] = useState(false);
 
   const total = getCartTotal();
   const deliveryFee = deliveryMethod === 'delivery' ? 2.5 : 0;
@@ -76,8 +73,8 @@ export default function CartPage() {
     try {
       const data = await checkoutService.createCheckoutSession();
 
-      if (data && data.url) {
-        window.location.href = data.url;
+      if (data?.url) {
+        globalThis.location.href = data.url;
       } else {
         throw new Error('URL de paiement non reçue.');
       }
@@ -92,36 +89,6 @@ export default function CartPage() {
       return;
     }
   };
-
-  if (orderSuccess) {
-    return (
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-        <div className="w-20 h-20 rounded-full bg-[#A8D5BA] flex items-center justify-center mx-auto mb-6">
-          <CheckCircle className="h-10 w-10 text-[#4A7C59]" />
-        </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          Commande confirmée !
-        </h1>
-        <p className="text-gray-600 mb-8">
-          Merci pour votre commande. Vous recevrez un email de confirmation avec les détails de retrait.
-        </p>
-        <div className="bg-white rounded-xl p-6 shadow-sm mb-8">
-          <h3 className="font-semibold mb-4">Récapitulatif</h3>
-          <div className="space-y-2 text-sm text-gray-600">
-            <p>• Votre commande a été transmise aux producteurs</p>
-            <p>• Vous serez notifié quand elle sera prête</p>
-            <p>• N&apos;oubliez pas d&apos;apporter vos sacs réutilisables !</p>
-          </div>
-        </div>
-        <Button
-          onClick={() => useAppStore.getState().setCurrentPage('home')}
-          className="bg-[#4A7C59] hover:bg-[#3a6349] text-white px-8"
-        >
-          Retour à l&apos;accueil
-        </Button>
-      </div>
-    );
-  }
 
   if (cart.length === 0) {
     return (

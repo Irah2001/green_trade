@@ -3,7 +3,7 @@ import { getAdminCapabilityLabel, ADMIN_CAPABILITIES } from './admin-capabilitie
 
 describe('getAdminCapabilityLabel', () => {
   it('returns an explicit message for unsupported destructive actions', () => {
-    expect(getAdminCapabilityLabel('users', 'delete')).toMatch(/indisponible/i)
+    expect(getAdminCapabilityLabel('orders', 'delete')).toMatch(/indisponible/i)
   })
 
   it('returns an explicit message for unsupported create action', () => {

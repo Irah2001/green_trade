@@ -2,10 +2,11 @@
 
 import { useEffect, useState, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { CheckCircle, Loader2, XCircle } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
 import { useAppStore } from '@/store/useAppStore';
 import { checkoutService } from '@/services/checkout.service';
-import { CheckCircle, Loader2, XCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 function SuccessContent() {
   const router = useRouter();
@@ -93,7 +94,7 @@ function SuccessContent() {
         Paiement réussi !
       </h1>
       <p className="text-gray-600 mb-10 text-lg">
-        Merci pour votre commande. Les producteurs ont été notifiés et préparent vos produits. Vous allez recevoir un e-mail de confirmation d'ici quelques minutes.
+        Merci pour votre commande. Les producteurs ont été notifiés et préparent vos produits. Vous allez recevoir un e-mail de confirmation d&apos;ici quelques minutes.
       </p>
       
       <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
@@ -108,7 +109,7 @@ function SuccessContent() {
           onClick={() => router.push('/')}
           className="bg-[#4A7C59] hover:bg-[#3a6349] text-white px-8 py-6 text-lg rounded-xl w-full sm:w-auto shadow-md"
         >
-          Retour à l'accueil
+          Retour à l&apos;accueil
         </Button>
       </div>
     </div>
