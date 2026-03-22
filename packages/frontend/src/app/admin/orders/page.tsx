@@ -3,6 +3,8 @@ import AdminPageHeader from '@/components/admin/AdminPageHeader'
 import AdminCapabilityBanner from '@/components/admin/AdminCapabilityBanner'
 import AdminOrdersTable from '@/components/admin/orders/AdminOrdersTable'
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminOrdersPage() {
   const result = await listAdminOrders()
 

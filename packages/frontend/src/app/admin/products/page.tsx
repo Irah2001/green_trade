@@ -12,6 +12,7 @@ import AdminPageHeader from '@/components/admin/AdminPageHeader'
 import AdminCapabilityBanner from '@/components/admin/AdminCapabilityBanner'
 import AdminProductsTable from '@/components/admin/products/AdminProductsTable'
 
+export const dynamic = 'force-dynamic';
 
 export default async function AdminProductsPage() {
   const result = await listAdminProducts()

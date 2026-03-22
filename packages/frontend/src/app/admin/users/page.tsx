@@ -3,6 +3,8 @@ import AdminPageHeader from '@/components/admin/AdminPageHeader'
 import AdminCapabilityBanner from '@/components/admin/AdminCapabilityBanner'
 import AdminUsersTable from '@/components/admin/users/AdminUsersTable'
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminUsersPage() {
   const result = await listAdminUsers()
 

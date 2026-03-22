@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   Search,
   ShoppingCart,
@@ -49,16 +49,30 @@ const categories = [
 
 export default function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const { getCartCount, user, isAuthenticated, logout, searchProducts, setCurrentPage } = useAppStore();
   const isClient = useIsClient();
   const [searchQuery, setSearchQuery] = useState('');
   const cartCount = isClient ? getCartCount() : 0;
   const showAccountState = isClient && isAuthenticated && user;
 
+  type AppPage = "products" | "cart" | "home" | "product-detail" | "publish";
+
+  const navigateToApp = (page: AppPage, categoryId?: string) => {
+    if (categoryId) {
+      useAppStore.getState().filterByCategory(categoryId);
+    }
+    setCurrentPage(page);
+
+    if (pathname !== '/' && !pathname.startsWith('/products')) {
+      router.push(categoryId ? `/?category=${categoryId}` : '/');
+    }
+  };
+
   const handleSearch = () => {
     if (searchQuery.trim()) {
       searchProducts(searchQuery);
-      setCurrentPage('products');
+      navigateToApp('products');
     }
   };
 
@@ -75,7 +89,7 @@ export default function Navbar() {
           <Link 
             href="/" 
             className="flex items-center gap-2 text-[#4A7C59] hover:text-[#3a6349] transition-colors"
-            onClick={() => setCurrentPage('home')}
+            onClick={() => navigateToApp('home')}
           >
             <Leaf className="h-8 w-8" />
             <span className="text-xl font-bold">Green Trade</span>
@@ -104,7 +118,7 @@ export default function Navbar() {
                   key={cat.id}
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleCategoryClick(cat.id)}
+                  onClick={() => navigateToApp('products', cat.id)}
                   className="text-gray-700 hover:text-[#4A7C59] hover:bg-[#A8D5BA]/20"
                 >
                   <cat.icon className="h-4 w-4 mr-1" />
@@ -117,7 +131,7 @@ export default function Navbar() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentPage('publish')}
+              onClick={() => navigateToApp('publish')}
               className="border-[#4A7C59] text-[#4A7C59] hover:bg-[#4A7C59] hover:text-white"
             >
               <Plus className="h-4 w-4 mr-1" />
@@ -128,7 +142,7 @@ export default function Navbar() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setCurrentPage('cart')}
+              onClick={() => navigateToApp('cart')}
               className="relative text-gray-700 hover:text-[#4A7C59]"
             >
               <ShoppingCart className="h-5 w-5" />
@@ -226,7 +240,7 @@ export default function Navbar() {
                       <Button
                         variant="ghost"
                         className="w-full justify-start transition-colors duration-200"
-                        onClick={() => handleCategoryClick(cat.id)}
+                        onClick={() => navigateToApp('products', cat.id)}
                       >
                         <cat.icon className="h-4 w-4 mr-2" />
                         {cat.label}
@@ -241,7 +255,7 @@ export default function Navbar() {
                     <Button
                       variant="outline"
                       className="w-full justify-start border-[#4A7C59] text-[#4A7C59] transition-colors duration-200"
-                      onClick={() => setCurrentPage('publish')}
+                      onClick={() => navigateToApp('publish')}
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       Publier une annonce
@@ -251,7 +265,7 @@ export default function Navbar() {
                     <Button
                       variant="ghost"
                       className="w-full justify-start transition-colors duration-200"
-                      onClick={() => setCurrentPage('cart')}
+                      onClick={() => navigateToApp('cart')}
                     >
                       <ShoppingCart className="h-4 w-4 mr-2" />
                       Panier ({cartCount})
