@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Image from 'next/image';
 import { Search, Grid3X3, List } from 'lucide-react';
 
 // UI Components
@@ -13,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import ProductCard from '@/components/product/ProductCard';
 import ProductFilters from '@/components/product/ProductFilters';
 
-import { Product } from '@/data/mockDatabase';
+import type { Product } from '@/types/models';
 import { useAppStore } from '@/store/useAppStore';
 
 const categoryLabels: Record<string, string> = {
@@ -118,10 +119,11 @@ export default function ProductsPage() {
               className="flex gap-4 p-4 bg-white rounded-xl shadow-sm hover:shadow-md cursor-pointer transition-shadow"
             >
               <div className="relative w-24 h-24 shrink-0 rounded-lg overflow-hidden">
-                <img
+                <Image
                   src={product.images[0]}
                   alt={product.title}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                 />
               </div>
               <div className="flex-1 min-w-0">

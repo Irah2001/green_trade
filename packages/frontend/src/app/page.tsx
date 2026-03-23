@@ -12,32 +12,10 @@ import PublishPage from '@/components/pages/PublishPage';
 import ProductDetail from '@/components/product/ProductDetail';
 
 import { useAppStore } from '@/store/useAppStore';
-import { productService } from '@/services/product.service';
-import type { Product } from '@/data/mockDatabase';
+import { productService, normalizeProduct } from '@/services/product.service';
+import type { Product } from '@/types/models';
 
-const FALLBACK_IMAGE = '/images/green_trade.webp';
-
-function toProduct(raw: any): Product {
-  return {
-    id: raw.id ?? '',
-    sellerId: raw.sellerId ?? '',
-    title: raw.title ?? '',
-    description: raw.description ?? '',
-    price: Number(raw.price ?? 0),
-    unit: raw.unit ?? 'unité',
-    category: ['fruits', 'vegetables', 'baskets'].includes(raw.category) ? raw.category : 'baskets',
-    organic: raw.organic ?? false,
-    images: raw.images?.length ? raw.images : [FALLBACK_IMAGE],
-    location: { city: raw.location?.city ?? '', postalCode: raw.location?.postalCode ?? '', coordinates: raw.location?.coordinates ?? [0, 0] },
-    status: raw.status ?? 'active',
-    quantity: raw.quantity ?? 0,
-    tags: raw.tags ?? [],
-    views: raw.views ?? 0,
-    createdAt: raw.createdAt ?? new Date().toISOString(),
-    updatedAt: raw.updatedAt ?? new Date().toISOString(),
-    isSurplusOfDay: false,
-  };
-}
+const toProduct = normalizeProduct;
 
 // Custom hook to handle hydration
 function useHydration() {

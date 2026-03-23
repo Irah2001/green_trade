@@ -11,7 +11,6 @@ import {
   Plus,
   Trash2,
   ShoppingBag,
-  MapPin,
   Truck,
   Store,
   CreditCard,
@@ -19,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { checkoutService } from '@/services/checkout.service';
+import SellerIdentity from '@/components/shared/seller-identity';
 
 export default function CartPage() {
   const {
@@ -133,18 +133,10 @@ export default function CartPage() {
             return (
               <Card key={sellerId} className="overflow-hidden">
                 <CardHeader className="bg-[#F8F9FA] py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#A8D5BA] flex items-center justify-center text-white font-bold text-sm">
-                      {sellerId.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <p className="font-semibold">Producteur local</p>
-                      <p className="text-sm text-gray-500 flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        {(items[0]?.product?.location?.city) || 'France'}
-                      </p>
-                    </div>
-                  </div>
+                  <SellerIdentity
+                    seller={items[0]?.product?.seller ?? null}
+                    fallbackCity={items[0]?.product?.location?.city || 'France'}
+                  />
                 </CardHeader>
                 <CardContent className="p-0">
                   {items.map((item, index) => (
