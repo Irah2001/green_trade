@@ -206,16 +206,6 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            {/* Demo accounts */}
-            <div className="mt-8 p-4 bg-gray-50 rounded-xl">
-              <p className="font-medium text-gray-700 mb-2">Comptes de démonstration :</p>
-              <div className="space-y-1 text-sm text-gray-600">
-                <p>• <span className="font-medium">john.doe@email.com</span> (utilisateur)</p>
-                <p>• <span className="font-medium">admin@greentrade.fr</span> (admin)</p>
-                <p>• <span className="font-medium">jean.dupont@email.com</span> (producteur)</p>
-              </div>
-              <p className="text-xs text-gray-500 mt-2">Mot de passe : n&apos;importe lequel</p>
-            </div>
           </div>
         </div>
       </div>

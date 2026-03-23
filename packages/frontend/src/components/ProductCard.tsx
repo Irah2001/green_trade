@@ -4,8 +4,9 @@ import Image from "next/image";
 import { MapPin, Heart, Share2, ShoppingBasket } from "lucide-react";
 import { useState } from "react";
 
-import type { Product } from "@/data/mockDatabase";
+import type { Product } from "@/types/models";
 import { useAppStore } from "@/store/useAppStore";
+import SellerIdentity from "@/components/shared/seller-identity";
 
 export default function ProductCard({ product }: Readonly<{ product: Product }>) {
   const [isFavorite, setIsFavorite] = useState(false);
@@ -77,6 +78,10 @@ export default function ProductCard({ product }: Readonly<{ product: Product }>)
           <div className="flex items-center text-sm text-gray-500 mb-3 gap-1">
             <MapPin className="w-3.5 h-3.5 text-accent" />
             <span className="line-clamp-1">{product.location.city} • <span className="opacity-75">{product.location.distance || 2.5}km</span></span>
+          </div>
+
+          <div className="mb-4">
+            <SellerIdentity seller={product.seller ?? null} fallbackCity={product.location.city} />
           </div>
 
           <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">

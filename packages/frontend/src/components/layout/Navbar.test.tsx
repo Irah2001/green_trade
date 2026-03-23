@@ -9,6 +9,7 @@ import { useIsClient } from '@/hooks/use-is-client'
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
+  usePathname: () => '/',
 }))
 
 vi.mock('next/link', () => ({

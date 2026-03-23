@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { Search, Leaf, Users, MapPin, ArrowRight, Package } from 'lucide-react';
 
@@ -9,15 +9,99 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 import ProductCard from '@/components/product/ProductCard';
-import { mockProducts, mockUsers, Product } from '@/data/mockDatabase';
+import type { Product } from '@/types/models';
+import type { BackendUser } from '@/types/user';
 import { useAppStore } from '@/store/useAppStore';
+import { getPublicUserById } from '@/services/users.service';
+import SellerIdentity from '@/components/shared/seller-identity';
 
 export default function HomePage() {
   const { setCurrentPage, setSelectedProduct, searchProducts, products } = useAppStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchCity, setSearchCity] = useState('');
+  const [producerProfiles, setProducerProfiles] = useState<Record<string, BackendUser>>({});
 
-  const activeProducts = products.filter((p) => p.status === 'active');
+  const activeProducts = useMemo(() => products.filter((p) => p.status === 'active'), [products]);
+
+  const featuredProducers = useMemo(() => {
+    const grouped = activeProducts.reduce<Record<string, { city: string; count: number; sample: Product }>>((acc, product) => {
+      const existing = acc[product.sellerId];
+      if (existing) {
+        existing.count += 1;
+        return acc;
+      }
+
+      acc[product.sellerId] = {
+        city: product.location.city,
+        count: 1,
+        sample: product,
+      };
+      return acc;
+    }, {});
+
+    return Object.entries(grouped)
+      .map(([sellerId, value]) => ({
+        id: sellerId,
+        city: value.city,
+        count: value.count,
+        avatarSeed: sellerId,
+        name: sellerId
+          .replaceAll(/[-_]+/g, ' ')
+          .replaceAll(/\b\w/g, (c) => c.toUpperCase()),
+        bio: value.sample.description,
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 3);
+  }, [activeProducts]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadProducerProfiles = async () => {
+      const sellerIds = Array.from(new Set(featuredProducers.map((producer) => producer.id)));
+
+      const results = await Promise.all(
+        sellerIds.map(async (sellerId) => {
+          try {
+            const user = await getPublicUserById(sellerId);
+            return [sellerId, user] as const;
+          } catch {
+            return null;
+          }
+        }),
+      );
+
+      if (cancelled) return;
+
+      setProducerProfiles(
+        Object.fromEntries(results.filter((entry): entry is readonly [string, BackendUser] => entry !== null)),
+      );
+    };
+
+    if (featuredProducers.length === 0) return;
+
+    void loadProducerProfiles();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [featuredProducers]);
+
+  const featuredProducerCards = useMemo(
+    () =>
+      featuredProducers.map((producer) => {
+        const profile = producerProfiles[producer.id] ?? null;
+
+        return {
+          id: producer.id,
+          city: producer.city,
+          seller: profile,
+          count: producer.count,
+          bio: producer.bio,
+        };
+      }),
+    [featuredProducers, producerProfiles],
+  );
 
   // Products tagged "surplus"
   const surplusProducts = activeProducts.filter((p) => p.tags.includes('surplus')).slice(0, 4);
@@ -368,48 +452,24 @@ export default function HomePage() {
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {mockUsers
-              .filter((u) => u.role === 'producer')
-              .slice(0, 3)
-              .map((producer) => (
+            {featuredProducerCards.map((producer) => (
                 <div
                   key={producer.id}
                   className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <div className="flex items-center gap-4 mb-4">
-                    {producer.profile?.avatar && (
-                      <div className="w-16 h-16 rounded-full overflow-hidden bg-[#A8D5BA]">
-                        <Image
-                          src={producer.profile.avatar}
-                          alt={`${producer.firstName} ${producer.lastName}`}
-                          width={64}
-                          height={64}
-                          className="object-cover"
-                        />
-                      </div>
-                    )}
-                    <div>
-                      <h3 className="font-semibold text-lg">
-                        {producer.firstName} {producer.lastName}
-                      </h3>
-                      <p className="text-gray-500 text-sm flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        {producer.location?.city}
-                      </p>
-                    </div>
+                  <div className="mb-4">
+                    <SellerIdentity seller={producer.seller} fallbackCity={producer.city || 'France'} />
                   </div>
-                  {producer.profile?.bio && (
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                      {producer.profile.bio}
-                    </p>
-                  )}
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                    {producer.bio}
+                  </p>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <span className="text-yellow-500">★</span>
-                      <span className="font-medium">{producer.rating?.toFixed(1)}</span>
+                    <div className="flex items-center gap-1 text-sm text-gray-500">
+                      <Users className="h-4 w-4" />
+                      <span>{producer.count} produits</span>
                     </div>
                     <Badge className="bg-[#A8D5BA]/30 text-[#4A7C59]">
-                      {mockProducts.filter((p) => p.sellerId === producer.id).length} produits
+                      Producteur actif
                     </Badge>
                   </div>
                 </div>

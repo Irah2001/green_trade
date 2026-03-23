@@ -8,9 +8,10 @@ import { ShoppingCart, Heart, Share2, MapPin, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import SellerIdentity from '@/components/shared/seller-identity';
 
 // Data
-import { Product } from '@/data/mockDatabase';
+import type { Product } from '@/types/models';
 
 // Store
 import { useAppStore } from '@/store/useAppStore';
@@ -123,11 +124,8 @@ export default function ProductCard({ product, onProductClick }: Readonly<Produc
       {/* Content */}
       <CardContent className="p-4">
         {/* Seller info */}
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-6 h-6 rounded-full bg-[#A8D5BA] flex items-center justify-center text-[#4A7C59] font-bold text-xs">
-            {product.sellerId?.charAt(0)?.toUpperCase() ?? 'V'}
-          </div>
-          <span className="text-xs text-gray-600">Producteur local</span>
+        <div className="mb-2">
+          <SellerIdentity seller={product.seller ?? null} fallbackCity={product.location.city} />
         </div>
 
         {/* Title */}

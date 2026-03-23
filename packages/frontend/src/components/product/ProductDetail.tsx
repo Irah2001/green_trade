@@ -23,10 +23,11 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
-import { Product } from '@/data/mockDatabase';
+import type { Product } from '@/types/models';
 import { useAppStore } from '@/store/useAppStore';
 import { useToast } from '@/hooks/use-toast';
-import ProductCard from './ProductCard';
+import ProductCard from '@/components/product/ProductCard';
+import SellerIdentity from '@/components/shared/seller-identity';
 
 interface ProductDetailProps {
   product: Product;
@@ -144,7 +145,7 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
             <div className="flex gap-2 overflow-x-auto pb-2">
               {product.images.map((img, index) => (
                 <button
-                  key={index}
+                  key={`${img}-${index}`}
                   onClick={() => setSelectedImage(index)}
                   className={`relative w-20 h-20 rounded-lg overflow-hidden shrink-0 border-2 transition-all ${
                     selectedImage === index ? 'border-olive' : 'border-transparent'
@@ -165,16 +166,11 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
         {/* Product Info */}
         <div className="space-y-6">
           {/* Seller */}
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-[#A8D5BA] flex items-center justify-center text-[#4A7C59] font-bold text-xl">
-              {product.sellerId?.charAt(0)?.toUpperCase() ?? 'V'}
-            </div>
-            <div>
-              <p className="font-medium">Producteur</p>
-              <div className="flex items-center gap-1 text-sm text-gray-500">
-                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                <span>Producteur vérifié</span>
-              </div>
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <SellerIdentity seller={product.seller ?? null} fallbackCity={product.location.city} />
+            <div className="flex items-center gap-1 text-sm text-gray-500">
+              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+              <span>Profil vérifié</span>
             </div>
           </div>
 

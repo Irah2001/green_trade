@@ -211,9 +211,11 @@ export const getUserById = async (req: Request, res: Response) => {
         lastName: true,
         role: true,
         city: true,
+        postalCode: true,
+        profile: true,
         rating: true,
         createdAt: true,
-        // Ne pas exposer l'email, le téléphone et l'adresse dans le profil public
+        // Ne pas exposer l'email dans le profil public
       },
     });
 
@@ -221,15 +223,28 @@ export const getUserById = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Utilisateur non trouvé." });
     }
 
-    // Si c'est un vendeur, on peut ajouter ses statistiques
-    if (user.role === 'farmer' || user.role === 'seller') {
+    const publicProfile =
+      user.profile && typeof user.profile === 'object' && !Array.isArray(user.profile)
+        ? {
+            avatar: (user.profile as { avatar?: string }).avatar,
+            bio: (user.profile as { bio?: string }).bio,
+          }
+        : undefined;
+
+    const publicUser = {
+      ...user,
+      profile: publicProfile,
+    };
+
+    // Si c'est un producteur, on peut ajouter ses statistiques
+    if (publicUser.role === 'producer') {
       const [productsCount, salesCount] = await Promise.all([
         prisma.product.count({ where: { sellerId: id, status: 'active' } }),
         prisma.transaction.count({ where: { sellerId: id, status: 'delivered' } }),
       ]);
 
       return res.status(200).json({
-        ...user,
+        ...publicUser,
         stats: {
           activeProducts: productsCount,
           completedSales: salesCount,
@@ -237,7 +252,7 @@ export const getUserById = async (req: Request, res: Response) => {
       });
     }
 
-    res.status(200).json(user);
+    res.status(200).json(publicUser);
   } catch (error) {
     console.error('[ERREUR] Erreur lors de la récupération du profil public:', error);
     res.status(500).json({ message: "Erreur lors de la récupération du profil." });

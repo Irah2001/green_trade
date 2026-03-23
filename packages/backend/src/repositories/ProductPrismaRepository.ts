@@ -1,10 +1,25 @@
 import prisma from '../prismaClient.js';
-import { Product, ProductProps } from '../domain/entities/Product.js';
+import { Product, ProductProps, toPublicSellerSummary } from '../domain/entities/Product.js';
+
+const productSelect = {
+  seller: {
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      city: true,
+      postalCode: true,
+      profile: true,
+    },
+  },
+} as const;
 
 function toDomain(prismaProduct: any): Product {
   const props: ProductProps = {
     id: prismaProduct.id,
     sellerId: prismaProduct.sellerId,
+    seller: toPublicSellerSummary(prismaProduct.seller),
     title: prismaProduct.title,
     description: prismaProduct.description,
     price: Number(prismaProduct.price),
@@ -47,10 +62,12 @@ export class ProductPrismaRepository {
       p = await prisma.product.update({
         where: { id: product.id },
         data: { ...data, updatedAt: new Date() },
+        include: productSelect,
       });
     } else {
       p = await prisma.product.create({
         data: { ...data, sellerId: product.sellerId },
+        include: productSelect,
       });
     }
 
@@ -58,7 +75,7 @@ export class ProductPrismaRepository {
   }
 
   async findById(id: string): Promise<Product | null> {
-    const p = await prisma.product.findUnique({ where: { id } });
+    const p = await prisma.product.findUnique({ where: { id }, include: productSelect });
     return p ? toDomain(p) : null;
   }
 
@@ -69,6 +86,7 @@ export class ProductPrismaRepository {
       orderBy: { createdAt: 'desc' },
       skip,
       take: limit,
+      include: productSelect,
     });
     return items.map(toDomain);
   }
@@ -118,6 +136,7 @@ export class ProductPrismaRepository {
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
+        include: productSelect,
       }),
     ]);
 

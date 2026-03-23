@@ -1,13 +1,12 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-import { Product, User, CartItem, Order, mockOrders } from '@/data/mockDatabase';
+import type { BackendUser } from '@/types/user';
+import type { CartItem, Order, Product } from '@/types/models';
 
 import { authService } from '@/services/auth.service';
-import { cartService } from '@/services/cart.service';
-import { productService, ProductPayload, SearchParams } from '@/services/product.service';
-
-const FALLBACK_IMAGE = '/images/green_trade.webp';
+import { cartService, normalizeCartResponse } from '@/services/cart.service';
+import { productService, ProductPayload, SearchParams, normalizeProduct } from '@/services/product.service';
 const AUTH_TOKEN_COOKIE = 'gt_token';
 const AUTH_TOKEN_MAX_AGE = 60 * 60 * 24 * 7;
 
@@ -32,41 +31,14 @@ const clearAuthToken = () => {
   }
 };
 
-const toFrontendProduct = (product: any): Product => ({
-  id: product?.id ?? '',
-  sellerId: product?.sellerId ?? '',
-  title: product?.title ?? '',
-  description: product?.description ?? '',
-  price: Number(product?.price ?? 0),
-  unit: product?.unit ?? 'unité',
-  category: ['fruits', 'vegetables', 'baskets'].includes(product?.category)
-    ? product.category
-    : 'baskets',
-  organic: product?.organic ?? false,
-  images: product?.images?.length ? product.images : [FALLBACK_IMAGE],
-  location: product?.location?.city
-    ? {
-        city: product.location.city ?? '',
-        postalCode: product.location.postalCode ?? '',
-        coordinates: product.location.coordinates ?? [0, 0],
-        distance: product.location.distance,
-      }
-    : { city: '', postalCode: '', coordinates: [0, 0] },
-  status: product?.status ?? 'active',
-  quantity: product?.quantity ?? 0,
-  tags: product?.tags ?? [],
-  views: product?.views ?? 0,
-  createdAt: product?.createdAt ?? new Date().toISOString(),
-  updatedAt: product?.updatedAt ?? new Date().toISOString(),
-  isSurplusOfDay: product?.isSurplusOfDay ?? false,
-});
+const toFrontendProduct = normalizeProduct;
 
 const mapCartItems = (cart: any): CartItem[] => {
   if (!cart?.items?.length) return [];
-  return cart.items.map((item: any) => ({
+  return normalizeCartResponse(cart).items.map((item: any) => ({
     productId: item.productId,
     quantity: item.quantity,
-    product: toFrontendProduct(item.product),
+    product: item.product,
     unitPriceSnapshot: item.unitPriceSnapshot,
   }));
 };
@@ -75,7 +47,7 @@ const isMongoObjectId = (value: string) => /^[a-f\d]{24}$/i.test(value);
 
 interface AppState {
   // Auth
-  user: User | null;
+  user: BackendUser | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   signup: (userData: any) => Promise<{ success: boolean; message?: string }>;
@@ -278,7 +250,7 @@ export const useAppStore = create<AppState>()(
           const mapped = items.map(toFrontendProduct);
           set({ products: mapped, filteredProducts: mapped });
         } catch {
-          // Fallback sur mock data si l'API est indisponible
+          set({ products: [], filteredProducts: [] });
         } finally {
           set({ productsLoading: false });
         }
@@ -368,7 +340,7 @@ export const useAppStore = create<AppState>()(
       },
 
       // Orders State
-      orders: mockOrders,
+      orders: [],
 
       createOrder: (orderData) => {
         const newOrder: Order = {
