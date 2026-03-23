@@ -69,7 +69,7 @@ export default function ProductCard({ product, onProductClick }: Readonly<Produc
       {/* Image Container */}
       <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl">
         <Image
-          src={product.images[0]}
+          src={product.images?.[0]}
           alt={product.title}
           fill
           className="object-cover transition-transform duration-300 hover:scale-105"

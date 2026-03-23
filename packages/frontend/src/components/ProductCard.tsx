@@ -56,7 +56,7 @@ export default function ProductCard({ product }: Readonly<{ product: Product }>)
         {/* Image wrapper */}
         <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-50">
           <Image
-            src={product.images[0]}
+            src={product.images?.[0]}
             alt={product.title}
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-105"
