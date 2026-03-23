@@ -83,10 +83,13 @@ interface AppState {
   createOrder: (order: Omit<Order, 'id' | 'createdAt'>) => void;
 
   // UI State
-  currentPage: 'home' | 'products' | 'product-detail' | 'cart' | 'publish';
+  currentPage: 'home' | 'products' | 'product-detail' | 'cart' | 'publish' | 'messages';
+  previousPage: 'home' | 'products' | 'product-detail' | 'cart' | 'publish' | 'messages' | null;
   selectedProductId: string | null;
-  setCurrentPage: (page: 'home' | 'products' | 'product-detail' | 'cart' | 'publish') => void;
+  activeConversationId: string | null;
+  setCurrentPage: (page: 'home' | 'products' | 'product-detail' | 'cart' | 'publish' | 'messages') => void;
   setSelectedProduct: (productId: string | null) => void;
+  setActiveConversationId: (id: string | null) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -132,7 +135,14 @@ export const useAppStore = create<AppState>()(
 
       logout: () => {
         clearAuthToken();
-        set({ user: null, isAuthenticated: false, cart: [] });
+        set((state) => ({
+          user: null,
+          isAuthenticated: false,
+          cart: [],
+          currentPage: 'home',
+          previousPage: state.currentPage !== 'home' ? state.currentPage : null,
+          activeConversationId: null,
+        }));
       },
 
       // Cart State
@@ -353,10 +363,13 @@ export const useAppStore = create<AppState>()(
 
       // UI State
       currentPage: 'home',
+      previousPage: null,
       selectedProductId: null,
 
-      setCurrentPage: (page) => set({ currentPage: page }),
+      setCurrentPage: (page) => set((state) => ({ previousPage: state.currentPage, currentPage: page })),
       setSelectedProduct: (productId) => set({ selectedProductId: productId }),
+      activeConversationId: null,
+      setActiveConversationId: (id) => set({ activeConversationId: id }),
     }),
     {
       name: 'green-trade-storage',
