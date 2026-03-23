@@ -9,6 +9,7 @@ import HomePage from '@/components/pages/HomePage';
 import ProductsPage from '@/components/pages/ProductsPage';
 import CartPage from '@/components/pages/CartPage';
 import PublishPage from '@/components/pages/PublishPage';
+import MessagesPage from '@/components/pages/MessagesPage';
 import ProductDetail from '@/components/product/ProductDetail';
 
 import { useAppStore } from '@/store/useAppStore';
@@ -121,6 +122,8 @@ export default function Home() {
         return <CartPage />;
       case 'publish':
         return <PublishPage />;
+      case 'messages':
+        return <MessagesPage />;
       default:
         return <HomePage />;
     }

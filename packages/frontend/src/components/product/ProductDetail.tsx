@@ -29,6 +29,7 @@ import { useToast } from '@/hooks/use-toast';
 import ProductCard from '@/components/product/ProductCard';
 import SellerIdentity from '@/components/shared/seller-identity';
 import ProductGallery from './ProductGallery';
+import { conversationService } from '@/services/conversation.service';
 
 interface ProductDetailProps {
   product: Product;
@@ -36,8 +37,27 @@ interface ProductDetailProps {
 }
 
 export default function ProductDetail({ product, onBack }: Readonly<ProductDetailProps>) {
-  const { addToCart, products: storeProducts } = useAppStore();
+  const { addToCart, products: storeProducts, isAuthenticated, user } = useAppStore();
   const { toast } = useToast();
+
+  const handleContactProducer = async () => {
+    if (!isAuthenticated || !user) {
+      toast({ title: 'Connexion requise', description: 'Connectez-vous pour contacter le producteur.' });
+      return;
+    }
+    if (user.id === product.sellerId) {
+      toast({ title: 'Action impossible', description: 'Vous ne pouvez pas vous contacter vous-même.' });
+      return;
+    }
+    try {
+      const conv = await conversationService.createOrFind(product.sellerId);
+      useAppStore.getState().setActiveConversationId(conv.id);
+      useAppStore.getState().setCurrentPage('messages');
+    } catch {
+      toast({ title: 'Erreur', description: "Impossible d'ouvrir la conversation." });
+    }
+  };
+
   const [quantity, setQuantity] = useState(1);
   const [isLiked, setIsLiked] = useState(false);
   const [deliveryMethod, setDeliveryMethod] = useState<'pickup' | 'delivery'>('pickup');
@@ -266,7 +286,7 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
           </div>
 
           {/* Contact Producer */}
-          <Button variant="ghost" className="w-full text-olive">
+          <Button variant="ghost" className="w-full text-olive" onClick={handleContactProducer}>
             <MessageCircle className="h-5 w-5 mr-2" />
             Contacter le producteur
           </Button>

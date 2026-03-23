@@ -15,6 +15,7 @@ import {
   LogOut,
   Settings,
   LayoutDashboard,
+  MessageCircle,
 } from 'lucide-react';
 
 // UI Components
@@ -56,7 +57,7 @@ export default function Navbar() {
   const cartCount = isClient ? getCartCount() : 0;
   const showAccountState = isClient && isAuthenticated && user;
 
-  type AppPage = "products" | "cart" | "home" | "product-detail" | "publish";
+  type AppPage = "products" | "cart" | "home" | "product-detail" | "publish" | "messages";
 
   const navigateToApp = (page: AppPage, categoryId?: string) => {
     if (categoryId) {
@@ -137,6 +138,18 @@ export default function Navbar() {
               <Plus className="h-4 w-4 mr-1" />
               Publier
             </Button>
+
+            {/* Messages */}
+            {isAuthenticated && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCurrentPage('messages')}
+                className="relative text-gray-700 hover:text-[#4A7C59]"
+              >
+                <MessageCircle className="h-5 w-5" />
+              </Button>
+            )}
 
             {/* Cart */}
             <Button
@@ -271,6 +284,18 @@ export default function Navbar() {
                       Panier ({cartCount})
                     </Button>
                   </SheetClose>
+                  {isAuthenticated && (
+                    <SheetClose asChild>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start transition-colors duration-200"
+                        onClick={() => setCurrentPage('messages')}
+                      >
+                        <MessageCircle className="h-4 w-4 mr-2" />
+                        Messages
+                      </Button>
+                    </SheetClose>
+                  )}
                 </div>
 
                 {/* Auth */}
