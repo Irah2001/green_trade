@@ -10,6 +10,7 @@ import AdminCapabilityBanner from '@/components/admin/AdminCapabilityBanner'
 import AdminUserProfileCard from '@/components/admin/users/AdminUserProfileCard'
 
 import { getAdminUser } from '@/services/admin/users.service'
+import { getUserDisplayName } from '@/types/user'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -26,7 +27,7 @@ export default async function AdminUserDetailPage({ params }: Readonly<Props>) {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title={`${result.data.firstName} ${result.data.lastName}`}
+        title={getUserDisplayName(result.data) || 'Utilisateur'}
         actions={
           <Button asChild variant="outline" size="sm">
             <Link href="/admin/users">

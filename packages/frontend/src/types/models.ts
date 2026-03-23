@@ -1,26 +1,3 @@
-export interface User {
-  id: string;
-  email: string;
-  passwordHash: string;
-  firstName: string;
-  lastName: string;
-  role: 'user' | 'admin' | 'producer';
-  profile?: {
-    avatar?: string;
-    phone?: string;
-    address?: string;
-    bio?: string;
-  };
-  location?: {
-    city: string;
-    postalCode: string;
-    coordinates: [number, number];
-    distance?: number;
-  };
-  rating: number;
-  createdAt: string;
-}
-
 export interface SellerSummary {
   id: string;
   displayName: string;
@@ -30,8 +7,6 @@ export interface SellerSummary {
   profile?: {
     avatar?: string;
     bio?: string;
-    phone?: string;
-    address?: string;
   };
 }
 

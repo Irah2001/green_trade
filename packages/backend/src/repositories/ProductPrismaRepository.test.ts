@@ -65,7 +65,12 @@ describe('ProductPrismaRepository seller serialization', () => {
         email: 'camille@example.com',
         city: 'Angers',
         postalCode: '49000',
-        profile: { avatar: '/avatars/camille.png', bio: 'Productrice locale' },
+        profile: {
+          avatar: '/avatars/camille.png',
+          bio: 'Productrice locale',
+          phone: '+33600000001',
+          address: '12 rue des Fleurs',
+        },
       },
     });
 
@@ -80,6 +85,12 @@ describe('ProductPrismaRepository seller serialization', () => {
       city: 'Angers',
       postalCode: '49000',
     });
+    expect(product?.toJSON().seller?.profile).toMatchObject({
+      avatar: '/avatars/camille.png',
+      bio: 'Productrice locale',
+    });
+    expect(product?.toJSON().seller?.profile).not.toHaveProperty('phone');
+    expect(product?.toJSON().seller?.profile).not.toHaveProperty('address');
   });
 });
 
@@ -129,7 +140,12 @@ describe('CartPrismaRepository seller serialization', () => {
               email: 'camille@example.com',
               city: 'Angers',
               postalCode: '49000',
-              profile: { avatar: '/avatars/camille.png', bio: 'Productrice locale' },
+              profile: {
+                avatar: '/avatars/camille.png',
+                bio: 'Productrice locale',
+                phone: '+33600000001',
+                address: '12 rue des Fleurs',
+              },
             },
           },
         },
@@ -145,5 +161,11 @@ describe('CartPrismaRepository seller serialization', () => {
       avatar: '/avatars/camille.png',
       city: 'Angers',
     });
+    expect(cart?.items[0].product.seller?.profile).toMatchObject({
+      avatar: '/avatars/camille.png',
+      bio: 'Productrice locale',
+    });
+    expect(cart?.items[0].product.seller?.profile).not.toHaveProperty('phone');
+    expect(cart?.items[0].product.seller?.profile).not.toHaveProperty('address');
   });
 });

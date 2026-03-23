@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 
 import ProductCard from '@/components/product/ProductCard';
 import type { Product } from '@/types/models';
-import type { BackendUser } from '@/types/user';
+import type { PublicUser } from '@/types/user';
 import { useAppStore } from '@/store/useAppStore';
 import { getPublicUserById } from '@/services/users.service';
 import SellerIdentity from '@/components/shared/seller-identity';
@@ -19,7 +19,7 @@ export default function HomePage() {
   const { setCurrentPage, setSelectedProduct, searchProducts, products } = useAppStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchCity, setSearchCity] = useState('');
-  const [producerProfiles, setProducerProfiles] = useState<Record<string, BackendUser>>({});
+  const [producerProfiles, setProducerProfiles] = useState<Record<string, PublicUser>>({});
 
   const activeProducts = useMemo(() => products.filter((p) => p.status === 'active'), [products]);
 
@@ -74,7 +74,7 @@ export default function HomePage() {
       if (cancelled) return;
 
       setProducerProfiles(
-        Object.fromEntries(results.filter((entry): entry is readonly [string, BackendUser] => entry !== null)),
+        Object.fromEntries(results.filter((entry): entry is readonly [string, PublicUser] => entry !== null)),
       );
     };
 
@@ -95,7 +95,7 @@ export default function HomePage() {
         return {
           id: producer.id,
           city: producer.city,
-          seller: profile,
+          seller: profile ?? null,
           count: producer.count,
           bio: producer.bio,
         };

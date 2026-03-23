@@ -7,8 +7,6 @@ export type PublicSellerSummary = {
   profile?: {
     avatar?: string;
     bio?: string;
-    phone?: string;
-    address?: string;
   };
 };
 
@@ -69,8 +67,6 @@ export const toPublicSellerSummary = (seller: any): PublicSellerSummary | null =
     const profile = {
       ...(seller.profile.avatar ? { avatar: seller.profile.avatar } : {}),
       ...(seller.profile.bio ? { bio: seller.profile.bio } : {}),
-      ...(seller.profile.phone ? { phone: seller.profile.phone } : {}),
-      ...(seller.profile.address ? { address: seller.profile.address } : {}),
     };
 
     if (Object.keys(profile).length > 0) {
@@ -82,7 +78,7 @@ export const toPublicSellerSummary = (seller: any): PublicSellerSummary | null =
 };
 
 export class Product {
-  private props: ProductProps;
+  private readonly props: ProductProps;
 
   constructor(props: ProductProps) {
     if (!props.title || props.title.length < 3) {
