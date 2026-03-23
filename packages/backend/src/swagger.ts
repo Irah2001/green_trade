@@ -535,10 +535,10 @@ export const swaggerDocument = {
                 type: 'object',
                 required: ['status'],
                 properties: {
-                  status: { 
-                    type: 'string', 
+                  status: {
+                    type: 'string',
                     enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'],
-                    example: 'confirmed' 
+                    example: 'confirmed'
                   }
                 }
               }
@@ -576,17 +576,17 @@ export const swaggerDocument = {
                 type: 'object',
                 required: ['trackingNumber'],
                 properties: {
-                  trackingNumber: { 
-                    type: 'string', 
-                    example: 'FR123456789' 
+                  trackingNumber: {
+                    type: 'string',
+                    example: 'FR123456789'
                   },
-                  carrier: { 
-                    type: 'string', 
-                    example: 'Colissimo' 
+                  carrier: {
+                    type: 'string',
+                    example: 'Colissimo'
                   },
-                  trackingUrl: { 
-                    type: 'string', 
-                    example: 'https://tracking.colissimo.fr/FR123456789' 
+                  trackingUrl: {
+                    type: 'string',
+                    example: 'https://tracking.colissimo.fr/FR123456789'
                   }
                 }
               }
@@ -609,7 +609,7 @@ export const swaggerDocument = {
         tags: ['Utilisateurs'],
         security: [{ bearerAuth: [] }],
         responses: {
-          200: { 
+          200: {
             description: 'Profil utilisateur récupéré',
             content: {
               'application/json': {
@@ -653,7 +653,7 @@ export const swaggerDocument = {
                   phone: { type: 'string', example: '+33612345678' },
                   city: { type: 'string', example: 'Paris' },
                   postalCode: { type: 'string', example: '75001' },
-                  profile: { 
+                  profile: {
                     type: 'object',
                     description: 'Données JSON personnalisées (bio, préférences, etc.)'
                   }
@@ -681,8 +681,8 @@ export const swaggerDocument = {
                 type: 'object',
                 required: ['password'],
                 properties: {
-                  password: { 
-                    type: 'string', 
+                  password: {
+                    type: 'string',
                     example: 'Test1234!',
                     description: 'Mot de passe actuel pour confirmer la suppression'
                   }
@@ -753,7 +753,7 @@ export const swaggerDocument = {
           }
         ],
         responses: {
-          200: { 
+          200: {
             description: 'Profil public récupéré',
             content: {
               'application/json': {
@@ -927,23 +927,23 @@ export const swaggerDocument = {
         tags: ['Paiement'],
         security: [{ bearerAuth: [] }],
         responses: {
-          200: { 
+          200: {
             description: 'Session créée avec succès. Retourne l\'URL vers laquelle rediriger l\'utilisateur.',
             content: {
               'application/json': {
                 schema: {
                   type: 'object',
                   properties: {
-                    url: { 
-                      type: 'string', 
-                      example: 'https://checkout.stripe.com/c/pay/cs_test_a1b2c3d4e5f6g7h8i9j0...' 
+                    url: {
+                      type: 'string',
+                      example: 'https://checkout.stripe.com/c/pay/cs_test_a1b2c3d4e5f6g7h8i9j0...'
                     }
                   }
                 }
               }
             }
           },
-          400: { 
+          400: {
             description: 'Panier vide',
             content: {
               'application/json': {
@@ -956,11 +956,11 @@ export const swaggerDocument = {
               }
             }
           },
-          401: { 
-            description: 'Non autorisé (Token manquant ou invalide)' 
+          401: {
+            description: 'Non autorisé (Token manquant ou invalide)'
           },
-          500: { 
-            description: 'Erreur serveur lors de la communication avec Stripe' 
+          500: {
+            description: 'Erreur serveur lors de la communication avec Stripe'
           }
         }
       }
@@ -979,8 +979,8 @@ export const swaggerDocument = {
                 type: 'object',
                 required: ['sessionId'],
                 properties: {
-                  sessionId: { 
-                    type: 'string', 
+                  sessionId: {
+                    type: 'string',
                     example: 'cs_test_a1b2c3d4e5f6g7h8i9j0...'
                   }
                 }
@@ -989,21 +989,50 @@ export const swaggerDocument = {
           }
         },
         responses: {
-          201: { 
+          201: {
             description: 'Paiement validé, transactions créées et panier vidé.'
           },
-          200: { 
+          200: {
             description: 'Commande déjà validée précédemment (Filtre anti-doublon).'
           },
-          400: { 
+          400: {
             description: 'Session ID manquant, paiement non finalisé, ou panier vide.'
           },
-          401: { 
+          401: {
             description: 'Non autorisé (Token manquant ou invalide).'
           },
-          500: { 
+          500: {
             description: 'Erreur serveur.'
           }
+        }
+      },
+    },
+    '/api/upload': {
+      post: {
+        summary: 'Uploader une image sur Cloudinary',
+        tags: ['Médias'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'multipart/form-data': {
+              schema: {
+                type: 'object',
+                properties: {
+                  image: {
+                    type: 'string',
+                    format: 'binary',
+                    description: 'Le fichier image à uploader (jpg, png, webp)'
+                  }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          200: { description: 'Image uploadée avec succès (retourne l\'URL Cloudinary)' },
+          400: { description: 'Aucun fichier fourni' },
+          500: { description: 'Erreur serveur lors de l\'upload' }
         }
       }
     }

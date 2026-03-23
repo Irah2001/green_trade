@@ -26,14 +26,21 @@ async function getAuthToken(): Promise<string | null> {
 
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const token = await getAuthToken()
+  const isFormData = init?.body instanceof FormData;
+  const headers: Record<string, string> = {
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(init?.headers as Record<string, string> ?? {}),
+  };
+
+  if (!isFormData && !headers['Content-Type']) {
+    headers['Content-Type'] = 'application/json';
+  }
+
   const response = await fetch(`${API_URL}${path}`, {
     ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(init?.headers ?? {}),
-    },
+    headers,
   })
+
   if (!response.ok) {
     const error = await response.json().catch(() => ({}))
     throw new Error(error.message || 'Erreur API')

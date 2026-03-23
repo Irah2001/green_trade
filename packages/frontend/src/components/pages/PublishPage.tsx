@@ -22,6 +22,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import MultiImageUpload from '@/components/shared/MultiImageUpload';
 
 import { useAppStore } from '@/store/useAppStore';
 import { useToast } from '@/hooks/use-toast';
@@ -40,6 +41,7 @@ export default function PublishPage() {
     category: '',
     quantity: '',
     organic: true,
+    images: [] as string[],
     city: '',
     postalCode: '',
   });
@@ -57,24 +59,6 @@ export default function PublishPage() {
 
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleImageAdd = () => {
-    // Mock image URLs for demo
-    const mockImages = [
-      'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1724128239194-4bde5d240555?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1563252722-6434563a985d?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=800&h=600&fit=crop',
-    ];
-    const randomImage = mockImages[Math.floor(Math.random() * mockImages.length)];
-    if (images.length < 5) {
-      setImages((prev) => [...prev, randomImage]);
-    }
-  };
-
-  const handleImageRemove = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async () => {
@@ -185,6 +169,7 @@ export default function PublishPage() {
                 category: '',
                 quantity: '',
                 organic: true,
+                images: [] as string[],
                 city: '',
                 postalCode: '',
               });
@@ -237,42 +222,11 @@ export default function PublishPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-4">
-              {images.map((img, index) => (
-                <div
-                  key={`${img}-${index}`}
-                  className="relative aspect-square rounded-lg overflow-hidden bg-gray-100"
-                >
-                  <Image
-                    src={img}
-                    alt={`Product ${index + 1}`}
-                    fill
-                    sizes="(max-width: 640px) 33vw, 20vw"
-                    className="object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleImageRemove(index)}
-                    className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              ))}
-              {images.length < 5 && (
-                <button
-                  type="button"
-                  onClick={handleImageAdd}
-                  className="aspect-square rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 hover:border-olive hover:text-olive transition-colors"
-                >
-                  <ImagePlus className="h-6 w-6 mb-1" />
-                  <span className="text-xs">Ajouter</span>
-                </button>
-              )}
-            </div>
-            <p className="text-sm text-gray-500 mt-2">
-              Ajoutez jusqu&apos;à 5 photos. Première photo = photo principale.
-            </p>
+            <MultiImageUpload
+              images={images}
+              onChange={setImages}
+              maxImages={5}
+            />
           </CardContent>
         </Card>
 

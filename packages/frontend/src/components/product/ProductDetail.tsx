@@ -28,6 +28,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { useToast } from '@/hooks/use-toast';
 import ProductCard from '@/components/product/ProductCard';
 import SellerIdentity from '@/components/shared/seller-identity';
+import ProductGallery from './ProductGallery';
 
 interface ProductDetailProps {
   product: Product;
@@ -37,7 +38,6 @@ interface ProductDetailProps {
 export default function ProductDetail({ product, onBack }: Readonly<ProductDetailProps>) {
   const { addToCart, products: storeProducts } = useAppStore();
   const { toast } = useToast();
-  const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isLiked, setIsLiked] = useState(false);
   const [deliveryMethod, setDeliveryMethod] = useState<'pickup' | 'delivery'>('pickup');
@@ -88,79 +88,46 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Image Gallery */}
-        <div className="space-y-4">
-          {/* Main Image */}
-          <div className="relative aspect-4/3 rounded-2xl overflow-hidden bg-gray-100 shadow-lg">
-            <Image
-              src={product.images[selectedImage]}
-              alt={product.title}
-              fill
-              className="object-cover"
-              priority
-            />
-            
-            {/* Badges */}
-            <div className="absolute top-4 left-4 flex flex-col gap-2">
-              {product.isSurplusOfDay && (
-                <Badge className="bg-earth-orange text-white text-sm px-3 py-1">
-                  🔥 Surplus du jour
-                </Badge>
-              )}
-              {product.organic && (
-                <Badge className="bg-olive text-white text-sm px-3 py-1">
-                  <Check className="h-4 w-4 mr-1" />
-                  Bio
-                </Badge>
-              )}
-            </div>
+        <div className="relative space-y-4">
+          <ProductGallery images={product.images} />
 
-            {/* Action buttons */}
-            <div className="absolute top-4 right-4 flex gap-2">
-              <Button
-                variant="secondary"
-                size="icon"
-                className="h-10 w-10 rounded-full bg-white/90 hover:bg-white shadow-lg"
-                onClick={() => setIsLiked(!isLiked)}
-              >
-                <Heart
-                  className={`h-5 w-5 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-600'}`}
-                />
-              </Button>
-              <Button
-                variant="secondary"
-                size="icon"
-                className="h-10 w-10 rounded-full bg-white/90 hover:bg-white shadow-lg"
-                onClick={() => {
-                  navigator.clipboard.writeText(globalThis.location.href);
-                  toast({ title: 'Lien copié !' });
-                }}
-              >
-                <Share2 className="h-5 w-5 text-gray-600" />
-              </Button>
-            </div>
+          <div className="absolute top-4 left-4 flex flex-col gap-2 pointer-events-none z-10">
+            {product.isSurplusOfDay && (
+              <Badge className="bg-earth-orange text-white text-sm px-3 py-1 shadow-md">
+                🔥 Surplus du jour
+              </Badge>
+            )}
+            {product.organic && (
+              <Badge className="bg-olive text-white text-sm px-3 py-1 shadow-md">
+                <Check className="h-4 w-4 mr-1" />
+                Bio
+              </Badge>
+            )}
           </div>
 
-          {/* Thumbnail Gallery */}
-          {product.images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {product.images.map((img, index) => (
-                <button
-                  key={`${img}-${index}`}
-                  onClick={() => setSelectedImage(index)}
-                  className={`relative w-20 h-20 rounded-lg overflow-hidden shrink-0 border-2 transition-all ${
-                    selectedImage === index ? 'border-olive' : 'border-transparent'
-                  }`}
-                >
-                  <Image
-                    src={img}
-                    alt={`${product.title} ${index + 1}`}
-                    fill
-                    className="object-cover"
-                  />
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="absolute top-4 right-4 flex gap-2 z-10">
+            <Button
+              variant="secondary"
+              size="icon"
+              className="h-10 w-10 rounded-full bg-white/90 hover:bg-white shadow-lg"
+              onClick={() => setIsLiked(!isLiked)}
+            >
+              <Heart
+                className={`h-5 w-5 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-600'}`}
+              />
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              className="h-10 w-10 rounded-full bg-white/90 hover:bg-white shadow-lg"
+              onClick={() => {
+                navigator.clipboard.writeText(globalThis.location.href);
+                toast({ title: 'Lien copié !' });
+              }}
+            >
+              <Share2 className="h-5 w-5 text-gray-600" />
+            </Button>
+          </div>
         </div>
 
         {/* Product Info */}
