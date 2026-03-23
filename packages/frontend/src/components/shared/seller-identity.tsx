@@ -1,11 +1,11 @@
 import Image from 'next/image';
 import { MapPin } from 'lucide-react';
 
-import type { BackendUser } from '@/types/user';
 import type { SellerSummary } from '@/types/models';
+import type { PublicUser } from '@/types/user';
 import { getUserDisplayName, getUserCity, getUserAvatar } from '@/types/user';
 
-type SellerIdentitySource = SellerSummary | BackendUser | null;
+type SellerIdentitySource = SellerSummary | PublicUser | null;
 
 interface SellerIdentityProps {
   seller: SellerIdentitySource;
@@ -15,39 +15,20 @@ interface SellerIdentityProps {
 const getSellerDisplayName = (seller: SellerIdentitySource) => {
   if (!seller) return 'Vendeur indisponible';
 
-  if ('displayName' in seller && seller.displayName) {
-    return seller.displayName;
-  }
-
-  if ('firstName' in seller || 'lastName' in seller) {
-    return getUserDisplayName(seller as BackendUser);
-  }
-
-  return 'Vendeur indisponible';
+  const name = getUserDisplayName(seller);
+  return name || 'Vendeur indisponible';
 };
 
 const getSellerCity = (seller: SellerIdentitySource, fallbackCity?: string) => {
   if (!seller) return fallbackCity ?? 'Ville inconnue';
 
-  if ('city' in seller && seller.city) {
-    return seller.city;
-  }
-
-  if ('location' in seller && seller.location?.city) {
-    return getUserCity(seller as BackendUser);
-  }
-
-  return fallbackCity ?? 'Ville inconnue';
+  return getUserCity(seller) || (fallbackCity ?? 'Ville inconnue');
 };
 
 const getSellerAvatar = (seller: SellerIdentitySource) => {
   if (!seller) return '';
 
-  if ('avatar' in seller && seller.avatar) {
-    return seller.avatar;
-  }
-
-  return getUserAvatar(seller as BackendUser);
+  return getUserAvatar(seller);
 };
 
 export default function SellerIdentity({ seller, fallbackCity }: Readonly<SellerIdentityProps>) {

@@ -25,13 +25,24 @@ describe('normalizeProduct', () => {
         avatar: '/avatars/camille.png',
         city: 'Angers',
         postalCode: '49000',
-        profile: { bio: 'Productrice locale' },
+        profile: {
+          avatar: '/avatars/camille.png',
+          bio: 'Productrice locale',
+          phone: '+33600000001',
+          address: '12 rue des Fleurs',
+        },
       },
     });
 
     expect(product.seller?.displayName).toBe('Camille Durand');
     expect(product.seller?.avatar).toBe('/avatars/camille.png');
     expect(product.seller?.city).toBe('Angers');
+    expect(product.seller?.profile).toMatchObject({
+      avatar: '/avatars/camille.png',
+      bio: 'Productrice locale',
+    });
+    expect(product.seller?.profile).not.toHaveProperty('phone');
+    expect(product.seller?.profile).not.toHaveProperty('address');
   });
 });
 
@@ -61,6 +72,12 @@ describe('normalizeCartResponse', () => {
               displayName: 'Camille Durand',
               avatar: '/avatars/camille.png',
               city: 'Angers',
+              profile: {
+                avatar: '/avatars/camille.png',
+                bio: 'Productrice locale',
+                phone: '+33600000001',
+                address: '12 rue des Fleurs',
+              },
             },
           },
         },
@@ -69,5 +86,11 @@ describe('normalizeCartResponse', () => {
 
     expect(cart.items[0].product.seller?.displayName).toBe('Camille Durand');
     expect(cart.items[0].product.seller?.city).toBe('Angers');
+    expect(cart.items[0].product.seller?.profile).toMatchObject({
+      avatar: '/avatars/camille.png',
+      bio: 'Productrice locale',
+    });
+    expect(cart.items[0].product.seller?.profile).not.toHaveProperty('phone');
+    expect(cart.items[0].product.seller?.profile).not.toHaveProperty('address');
   });
 });

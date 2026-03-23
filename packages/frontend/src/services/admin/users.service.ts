@@ -1,5 +1,6 @@
 import { apiFetch } from '@/services/api'
 import type { AdminQueryResult } from './admin-capabilities'
+import type { PublicUser } from '@/types/user'
 
 export interface AdminUserRow {
   id: string
@@ -59,20 +60,11 @@ export async function listAdminUsers(): Promise<AdminQueryResult<AdminUserRow[]>
   }
 }
 
-export async function getAdminUser(id: string): Promise<AdminQueryResult<AdminUserRow | null>> {
+export async function getAdminUser(id: string): Promise<AdminQueryResult<PublicUser | null>> {
   try {
-    const user = await apiFetch<{
-      id: string
-      firstName?: string | null
-      lastName?: string | null
-      email?: string
-      role: string
-      city?: string | null
-      rating?: number | null
-      createdAt: string
-    }>(`/api/users/${id}`)
+    const user = await apiFetch<PublicUser>(`/api/users/${id}`)
     return {
-      data: toAdminUserRow({ ...user, email: user.email ?? '' }),
+      data: user,
       source: 'api',
     }
   } catch {

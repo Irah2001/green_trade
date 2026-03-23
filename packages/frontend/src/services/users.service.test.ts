@@ -2,8 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { apiFetch } from '@/services/api';
 import { getPublicUsersByIds } from '@/services/users.service';
-import type { BackendUser } from '@/types/user';
-
+import type { PublicUser } from '@/types/user';
 
 vi.mock('@/services/api', () => ({
   apiFetch: vi.fn(),
@@ -20,22 +19,26 @@ describe('getPublicUsersByIds', () => {
 
       return {
         id,
-        email: `${id}@example.com`,
         firstName: id === 'seller-1' ? 'Camille' : 'Lucas',
         lastName: id === 'seller-1' ? 'Durand' : 'Martin',
         role: 'producer',
         city: id === 'seller-1' ? 'Nantes' : 'Lyon',
+        postalCode: id === 'seller-1' ? '44000' : '69000',
+        profile: {
+          avatar: `/avatars/${id}.png`,
+          bio: id === 'seller-1' ? 'Productrice locale' : 'Producteur local',
+        },
         createdAt: '2026-03-21T10:00:00.000Z',
-      } as BackendUser;
-
+      } as PublicUser;
     });
 
     const profiles = await getPublicUsersByIds(['seller-1', 'seller-2', 'seller-1']);
 
     expect(Object.keys(profiles)).toEqual(['seller-1', 'seller-2']);
     expect(profiles['seller-1'].firstName).toBe('Camille');
-
     expect(profiles['seller-2'].city).toBe('Lyon');
+    expect(profiles['seller-1']).not.toHaveProperty('email');
+    expect(profiles['seller-1']).not.toHaveProperty('passwordHash');
     expect(vi.mocked(apiFetch)).toHaveBeenCalledTimes(2);
   });
 });

@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-import type { AdminUserRow } from '@/services/admin/users.service'
+import type { PublicUser } from '@/types/user'
+import { getUserDisplayName } from '@/types/user'
 import { deleteAdminUser } from '@/services/admin/users.service'
 import type { AdminDataSource } from '@/services/admin/admin-capabilities'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -20,7 +21,7 @@ const ROLE_LABEL: Record<string, string> = {
 };
 
 interface Props {
-  user: AdminUserRow
+  user: PublicUser
   source: AdminDataSource
   onDelete?: () => void
 }
@@ -29,9 +30,10 @@ export default function AdminUserProfileCard({ user, source, onDelete }: Readonl
   const router = useRouter()
   const [isDeleting, setIsDeleting] = useState(false)
   const canModify = source === 'api'
+  const userName = getUserDisplayName(user) || 'Cet utilisateur'
 
   const handleDelete = async () => {
-    if (!globalThis.confirm(`Supprimer le compte de ${user.firstName} ${user.lastName} ? Cette action est irréversible.`)) {
+    if (!globalThis.confirm(`Supprimer le compte de ${userName} ? Cette action est irréversible.`)) {
       return
     }
 
@@ -56,16 +58,16 @@ export default function AdminUserProfileCard({ user, source, onDelete }: Readonl
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-lg">{user.firstName} {user.lastName}</CardTitle>
+        <CardTitle className="text-lg">{userName}</CardTitle>
         <SourceBadge source={source} />
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
-          <Detail label="Email" value={user.email} />
-          <Detail label="Rôle" value={ROLE_LABEL[user.role] ?? user.role} />
+          <Detail label="Email" value="—" />
+          <Detail label="Rôle" value={ROLE_LABEL[user.role ?? ''] ?? user.role ?? '—'} />
           <Detail label="Ville" value={user.city || '—'} />
-          <Detail label="Note" value={user.rating.toFixed(1)} />
-          <Detail label="Inscription" value={new Date(user.createdAt).toLocaleDateString('fr-FR')} />
+          <Detail label="Note" value={typeof user.rating === 'number' ? user.rating.toFixed(1) : '—'} />
+          <Detail label="Inscription" value={user.createdAt ? new Date(user.createdAt).toLocaleDateString('fr-FR') : '—'} />
         </div>
 
         <div className="flex gap-2 border-t pt-4">

@@ -51,8 +51,6 @@ export const normalizeSellerSummary = (seller: any): SellerSummary | null => {
       ? {
           avatar: seller.profile.avatar,
           bio: seller.profile.bio,
-          phone: seller.profile.phone,
-          address: seller.profile.address,
         }
       : undefined,
   };
