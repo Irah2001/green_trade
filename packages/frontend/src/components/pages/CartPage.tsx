@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useAppStore } from '@/store/useAppStore';
-import { mockUsers } from '@/data/mockDatabase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -12,13 +11,14 @@ import {
   Plus,
   Trash2,
   ShoppingBag,
-  MapPin,
   Truck,
   Store,
   CreditCard,
   CheckCircle,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { checkoutService } from '@/services/checkout.service';
+import SellerIdentity from '@/components/shared/seller-identity';
 
 export default function CartPage() {
   const {
@@ -27,14 +27,11 @@ export default function CartPage() {
     updateCartQuantity,
     removeFromCart,
     clearCart,
-    createOrder,
-    user,
     isAuthenticated,
   } = useAppStore();
   const { toast } = useToast();
   const [deliveryMethod, setDeliveryMethod] = useState<'pickup' | 'delivery'>('pickup');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [orderSuccess, setOrderSuccess] = useState(false);
 
   const total = getCartTotal();
   const deliveryFee = deliveryMethod === 'delivery' ? 2.5 : 0;
@@ -52,7 +49,7 @@ export default function CartPage() {
     });
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!isAuthenticated) {
       toast({
         title: 'Connexion requise',
@@ -73,60 +70,25 @@ export default function CartPage() {
 
     setIsProcessing(true);
 
-    // Simulate order processing
-    setTimeout(() => {
-      cart.forEach((item) => {
-        createOrder({
-          buyerId: user!.id,
-          sellerId: item.product.sellerId,
-          productId: item.productId,
-          quantity: item.quantity,
-          amount: item.product.price * item.quantity,
-          status: 'pending',
-          deliveryMethod,
-        });
-      });
+    try {
+      const data = await checkoutService.createCheckoutSession();
 
-      clearCart();
-      setIsProcessing(false);
-      setOrderSuccess(true);
-
+      if (data?.url) {
+        globalThis.location.href = data.url;
+      } else {
+        throw new Error('URL de paiement non reçue.');
+      }
+    } catch (error: any) {
+      console.error('Erreur Checkout:', error);
       toast({
-        title: 'Commande confirmée !',
-        description: 'Vous recevrez une confirmation par email',
+        title: 'Erreur de paiement',
+        description: error.message || 'Impossible d\'initier le paiement.',
+        variant: 'destructive',
       });
-    }, 2000);
+      setIsProcessing(false);
+      return;
+    }
   };
-
-  if (orderSuccess) {
-    return (
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-        <div className="w-20 h-20 rounded-full bg-[#A8D5BA] flex items-center justify-center mx-auto mb-6">
-          <CheckCircle className="h-10 w-10 text-[#4A7C59]" />
-        </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          Commande confirmée !
-        </h1>
-        <p className="text-gray-600 mb-8">
-          Merci pour votre commande. Vous recevrez un email de confirmation avec les détails de retrait.
-        </p>
-        <div className="bg-white rounded-xl p-6 shadow-sm mb-8">
-          <h3 className="font-semibold mb-4">Récapitulatif</h3>
-          <div className="space-y-2 text-sm text-gray-600">
-            <p>• Votre commande a été transmise aux producteurs</p>
-            <p>• Vous serez notifié quand elle sera prête</p>
-            <p>• N'oubliez pas d'apporter vos sacs réutilisables !</p>
-          </div>
-        </div>
-        <Button
-          onClick={() => useAppStore.getState().setCurrentPage('home')}
-          className="bg-[#4A7C59] hover:bg-[#3a6349] text-white px-8"
-        >
-          Retour à l'accueil
-        </Button>
-      </div>
-    );
-  }
 
   if (cart.length === 0) {
     return (
@@ -168,32 +130,13 @@ export default function CartPage() {
         {/* Cart Items */}
         <div className="lg:col-span-2 space-y-6">
           {Object.entries(itemsBySeller).map(([sellerId, items]) => {
-            const seller = mockUsers.find((u) => u.id === sellerId);
             return (
               <Card key={sellerId} className="overflow-hidden">
                 <CardHeader className="bg-[#F8F9FA] py-4">
-                  <div className="flex items-center gap-3">
-                    {seller?.profile?.avatar && (
-                      <div className="w-10 h-10 rounded-full overflow-hidden bg-[#A8D5BA]">
-                        <Image
-                          src={seller.profile.avatar}
-                          alt={seller.firstName}
-                          width={40}
-                          height={40}
-                          className="object-cover"
-                        />
-                      </div>
-                    )}
-                    <div>
-                      <p className="font-semibold">
-                        {seller?.firstName} {seller?.lastName}
-                      </p>
-                      <p className="text-sm text-gray-500 flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        {seller?.location?.city}
-                      </p>
-                    </div>
-                  </div>
+                  <SellerIdentity
+                    seller={items[0]?.product?.seller ?? null}
+                    fallbackCity={items[0]?.product?.location?.city || 'France'}
+                  />
                 </CardHeader>
                 <CardContent className="p-0">
                   {items.map((item, index) => (

@@ -1,48 +1,44 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-import { Product, User, CartItem, Order, mockUsers, mockProducts, mockOrders } from '@/data/mockDatabase';
+import type { BackendUser } from '@/types/user';
+import type { CartItem, Order, Product } from '@/types/models';
 
 import { authService } from '@/services/auth.service';
-import { cartService } from '@/services/cart.service';
+import { cartService, normalizeCartResponse } from '@/services/cart.service';
+import { productService, ProductPayload, SearchParams, normalizeProduct } from '@/services/product.service';
+const AUTH_TOKEN_COOKIE = 'gt_token';
+const AUTH_TOKEN_MAX_AGE = 60 * 60 * 24 * 7;
 
-const FALLBACK_IMAGE = '/images/green_trade.webp';
+const persistAuthToken = (token: string) => {
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem(AUTH_TOKEN_COOKIE, token);
+  }
 
-const toFrontendProduct = (product: any): Product => ({
-  id: product?.id ?? '',
-  sellerId: product?.sellerId ?? '',
-  title: product?.title ?? '',
-  description: product?.description ?? '',
-  price: Number(product?.price ?? 0),
-  unit: product?.unit ?? 'unité',
-  category: ['fruits', 'vegetables', 'baskets'].includes(product?.category)
-    ? product.category
-    : 'baskets',
-  organic: product?.organic ?? false,
-  images: product?.images?.length ? product.images : [FALLBACK_IMAGE],
-  location: product?.location?.city
-    ? {
-        city: product.location.city ?? '',
-        postalCode: product.location.postalCode ?? '',
-        coordinates: product.location.coordinates ?? [0, 0],
-        distance: product.location.distance,
-      }
-    : { city: '', postalCode: '', coordinates: [0, 0] },
-  status: product?.status ?? 'active',
-  quantity: product?.quantity ?? 0,
-  tags: product?.tags ?? [],
-  views: product?.views ?? 0,
-  createdAt: product?.createdAt ?? new Date().toISOString(),
-  updatedAt: product?.updatedAt ?? new Date().toISOString(),
-  isSurplusOfDay: product?.isSurplusOfDay ?? false,
-});
+  if (typeof document !== 'undefined') {
+    const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'Secure;' : '';
+    document.cookie = `${AUTH_TOKEN_COOKIE}=${encodeURIComponent(token)}; path=/; max-age=${AUTH_TOKEN_MAX_AGE}; samesite=lax; ${isSecure}`;
+  }
+};
+
+const clearAuthToken = () => {
+  if (typeof localStorage !== 'undefined') {
+    localStorage.removeItem(AUTH_TOKEN_COOKIE);
+  }
+
+  if (typeof document !== 'undefined') {
+    document.cookie = `${AUTH_TOKEN_COOKIE}=; path=/; max-age=0; samesite=lax`;
+  }
+};
+
+const toFrontendProduct = normalizeProduct;
 
 const mapCartItems = (cart: any): CartItem[] => {
   if (!cart?.items?.length) return [];
-  return cart.items.map((item: any) => ({
+  return normalizeCartResponse(cart).items.map((item: any) => ({
     productId: item.productId,
     quantity: item.quantity,
-    product: toFrontendProduct(item.product),
+    product: item.product,
     unitPriceSnapshot: item.unitPriceSnapshot,
   }));
 };
@@ -51,7 +47,7 @@ const isMongoObjectId = (value: string) => /^[a-f\d]{24}$/i.test(value);
 
 interface AppState {
   // Auth
-  user: User | null;
+  user: BackendUser | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   signup: (userData: any) => Promise<{ success: boolean; message?: string }>;
@@ -70,6 +66,12 @@ interface AppState {
   // Products
   products: Product[];
   filteredProducts: Product[];
+  productsLoading: boolean;
+  loadProducts: (params?: SearchParams) => Promise<void>;
+  createProduct: (data: ProductPayload) => Promise<{ success: boolean; id?: string; message?: string }>;
+  updateProduct: (id: string, data: Partial<ProductPayload>) => Promise<{ success: boolean; message?: string }>;
+  deleteProduct: (id: string) => Promise<{ success: boolean; message?: string }>;
+  selectedCategory: string | null;
   setFilteredProducts: (products: Product[]) => void;
   searchProducts: (query: string) => void;
   filterByCategory: (category: string | null) => void;
@@ -81,10 +83,13 @@ interface AppState {
   createOrder: (order: Omit<Order, 'id' | 'createdAt'>) => void;
 
   // UI State
-  currentPage: 'home' | 'products' | 'product-detail' | 'cart' | 'publish' | 'admin';
+  currentPage: 'home' | 'products' | 'product-detail' | 'cart' | 'publish' | 'messages';
+  previousPage: 'home' | 'products' | 'product-detail' | 'cart' | 'publish' | 'messages' | null;
   selectedProductId: string | null;
-  setCurrentPage: (page: 'home' | 'products' | 'product-detail' | 'cart' | 'publish' | 'admin') => void;
+  activeConversationId: string | null;
+  setCurrentPage: (page: 'home' | 'products' | 'product-detail' | 'cart' | 'publish' | 'messages') => void;
   setSelectedProduct: (productId: string | null) => void;
+  setActiveConversationId: (id: string | null) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -98,7 +103,7 @@ export const useAppStore = create<AppState>()(
         try {
           const { user, token } = await authService.login({ email, password });
 
-          localStorage.setItem('gt_token', token);
+          persistAuthToken(token);
 
           set({
             user,
@@ -115,7 +120,7 @@ export const useAppStore = create<AppState>()(
         try {
           const { user, token } = await authService.signup(userData);
 
-          localStorage.setItem('gt_token', token);
+          persistAuthToken(token);
 
           set({
             user,
@@ -129,8 +134,15 @@ export const useAppStore = create<AppState>()(
       },
 
       logout: () => {
-        localStorage.removeItem('gt_token');
-        set({ user: null, isAuthenticated: false, cart: [] });
+        clearAuthToken();
+        set((state) => ({
+          user: null,
+          isAuthenticated: false,
+          cart: [],
+          currentPage: 'home',
+          previousPage: state.currentPage !== 'home' ? state.currentPage : null,
+          activeConversationId: null,
+        }));
       },
 
       // Cart State
@@ -142,7 +154,6 @@ export const useAppStore = create<AppState>()(
           const cart = await cartService.getCart();
           set({ cart: mapCartItems(cart) });
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.error(error);
         }
       },
@@ -172,7 +183,6 @@ export const useAppStore = create<AppState>()(
           const cart = await cartService.addItem({ productId: product.id, quantity });
           set({ cart: mapCartItems(cart) });
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.error(error);
         }
       },
@@ -187,7 +197,6 @@ export const useAppStore = create<AppState>()(
           const cart = await cartService.removeItem(productId);
           set({ cart: mapCartItems(cart) });
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.error(error);
         }
       },
@@ -210,7 +219,6 @@ export const useAppStore = create<AppState>()(
           const cart = await cartService.updateItem(productId, quantity);
           set({ cart: mapCartItems(cart) });
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.error(error);
         }
       },
@@ -225,7 +233,6 @@ export const useAppStore = create<AppState>()(
           const cart = await cartService.clearCart();
           set({ cart: mapCartItems(cart) });
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.error(error);
         }
       },
@@ -242,8 +249,60 @@ export const useAppStore = create<AppState>()(
       },
 
       // Products State
-      products: mockProducts.filter(p => p.status === 'active'),
-      filteredProducts: mockProducts.filter(p => p.status === 'active'),
+      products: [],
+      filteredProducts: [],
+      productsLoading: false,
+
+      loadProducts: async (params?) => {
+        set({ productsLoading: true });
+        try {
+          const { items } = await productService.getProducts(params);
+          const mapped = items.map(toFrontendProduct);
+          set({ products: mapped, filteredProducts: mapped });
+        } catch {
+          set({ products: [], filteredProducts: [] });
+        } finally {
+          set({ productsLoading: false });
+        }
+      },
+
+      createProduct: async (data) => {
+        try {
+          const created = await productService.createProduct(data);
+          const product = toFrontendProduct(created);
+          set(state => ({ products: [product, ...state.products], filteredProducts: [product, ...state.filteredProducts] }));
+          return { success: true, id: created.id };
+        } catch (error: any) {
+          return { success: false, message: error.message };
+        }
+      },
+
+      updateProduct: async (id, data) => {
+        try {
+          const updated = await productService.updateProduct(id, data);
+          const product = toFrontendProduct(updated);
+          set(state => ({
+            products: state.products.map(p => p.id === id ? product : p),
+            filteredProducts: state.filteredProducts.map(p => p.id === id ? product : p),
+          }));
+          return { success: true };
+        } catch (error: any) {
+          return { success: false, message: error.message };
+        }
+      },
+
+      deleteProduct: async (id) => {
+        try {
+          await productService.deleteProduct(id);
+          set(state => ({
+            products: state.products.filter(p => p.id !== id),
+            filteredProducts: state.filteredProducts.filter(p => p.id !== id),
+          }));
+          return { success: true };
+        } catch (error: any) {
+          return { success: false, message: error.message };
+        }
+      },
 
       setFilteredProducts: (products: Product[]) => set({ filteredProducts: products }),
 
@@ -259,13 +318,16 @@ export const useAppStore = create<AppState>()(
         set({ filteredProducts: filtered });
       },
 
+      selectedCategory: null,
+
       filterByCategory: (category: string | null) => {
         if (!category) {
-          set({ filteredProducts: get().products });
+          set({ filteredProducts: get().products, selectedCategory: null });
           return;
         }
         set({
           filteredProducts: get().products.filter(p => p.category === category),
+          selectedCategory: category,
         });
       },
 
@@ -288,7 +350,7 @@ export const useAppStore = create<AppState>()(
       },
 
       // Orders State
-      orders: mockOrders,
+      orders: [],
 
       createOrder: (orderData) => {
         const newOrder: Order = {
@@ -301,10 +363,13 @@ export const useAppStore = create<AppState>()(
 
       // UI State
       currentPage: 'home',
+      previousPage: null,
       selectedProductId: null,
 
-      setCurrentPage: (page) => set({ currentPage: page }),
+      setCurrentPage: (page) => set((state) => ({ previousPage: state.currentPage, currentPage: page })),
       setSelectedProduct: (productId) => set({ selectedProductId: productId }),
+      activeConversationId: null,
+      setActiveConversationId: (id) => set({ activeConversationId: id }),
     }),
     {
       name: 'green-trade-storage',

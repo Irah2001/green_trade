@@ -1,6 +1,51 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import prisma from '../prismaClient.js';
+import { anonymizeUser } from '../utils/rgpd.utils.js';
+
+/**
+ * Récupérer tous les utilisateurs (admin uniquement)
+ */
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).userId;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Non authentifié." });
+    }
+
+    const requester = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+
+    if (requester?.role !== 'admin') {
+      return res.status(403).json({ message: "Accès réservé aux administrateurs." });
+    }
+
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        phone: true,
+        city: true,
+        postalCode: true,
+        profile: true,
+        rating: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error('[ERREUR] Erreur lors de la récupération des utilisateurs:', error);
+    res.status(500).json({ message: "Erreur lors de la récupération des utilisateurs." });
+  }
+};
 
 /**
  * Récupérer le profil de l'utilisateur connecté
@@ -132,42 +177,7 @@ export const deleteAccount = async (req: Request, res: Response) => {
 
     // RGPD: Anonymiser l'utilisateur au lieu de le supprimer complètement
     // On garde les transactions pour l'historique mais on anonymise les données personnelles
-    await prisma.$transaction(async (tx) => {
-      // 1. Anonymiser les données personnelles de l'utilisateur
-      const anonymizedEmail = `deleted-${userId}@anonymized.local`;
-      await tx.user.update({
-        where: { id: userId },
-        data: {
-          email: anonymizedEmail,
-          passwordHash: '', // Vider le mot de passe
-          firstName: 'Utilisateur',
-          lastName: 'Supprimé',
-          phone: null,
-          city: null,
-          postalCode: null,
-          profile: { deleted: true, deletedAt: new Date().toISOString() },
-          resetToken: null,
-          resetTokenExpiry: null,
-        }
-      });
-      
-      // 2. Supprimer les données non essentielles
-      // Supprimer le panier (données temporaires)
-      await tx.cart.deleteMany({ where: { userId } });
-      
-      // Supprimer les produits actifs du vendeur (ou les désactiver)
-      await tx.product.updateMany({ 
-        where: { sellerId: userId, status: 'active' },
-        data: { status: 'deleted' }
-      });
-      
-      // Supprimer les messages (contenu privé)
-      await tx.message.deleteMany({ where: { senderId: userId } });
-      
-      // 3. Les transactions sont CONSERVÉES pour l'historique comptable
-      // mais les données personnelles sont déjà anonymisées via l'update du User
-      // Les transactions pointent vers un utilisateur "Utilisateur Supprimé"
-    });
+    await anonymizeUser(userId);
 
     console.log(`[OK] Compte anonymisé (RGPD) pour l'utilisateur: ${user.email}`);
     res.status(200).json({ 
@@ -201,9 +211,11 @@ export const getUserById = async (req: Request, res: Response) => {
         lastName: true,
         role: true,
         city: true,
+        postalCode: true,
+        profile: true,
         rating: true,
         createdAt: true,
-        // Ne pas exposer l'email, le téléphone et l'adresse dans le profil public
+        // Ne pas exposer l'email dans le profil public
       },
     });
 
@@ -211,15 +223,28 @@ export const getUserById = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Utilisateur non trouvé." });
     }
 
-    // Si c'est un vendeur, on peut ajouter ses statistiques
-    if (user.role === 'farmer' || user.role === 'seller') {
+    const publicProfile =
+      user.profile && typeof user.profile === 'object' && !Array.isArray(user.profile)
+        ? {
+            avatar: (user.profile as { avatar?: string }).avatar,
+            bio: (user.profile as { bio?: string }).bio,
+          }
+        : undefined;
+
+    const publicUser = {
+      ...user,
+      profile: publicProfile,
+    };
+
+    // Si c'est un producteur, on peut ajouter ses statistiques
+    if (publicUser.role === 'producer') {
       const [productsCount, salesCount] = await Promise.all([
         prisma.product.count({ where: { sellerId: id, status: 'active' } }),
         prisma.transaction.count({ where: { sellerId: id, status: 'delivered' } }),
       ]);
 
       return res.status(200).json({
-        ...user,
+        ...publicUser,
         stats: {
           activeProducts: productsCount,
           completedSales: salesCount,
@@ -227,7 +252,7 @@ export const getUserById = async (req: Request, res: Response) => {
       });
     }
 
-    res.status(200).json(user);
+    res.status(200).json(publicUser);
   } catch (error) {
     console.error('[ERREUR] Erreur lors de la récupération du profil public:', error);
     res.status(500).json({ message: "Erreur lors de la récupération du profil." });

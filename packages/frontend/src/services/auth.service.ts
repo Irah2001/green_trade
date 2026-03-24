@@ -1,55 +1,48 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+// src/services/auth.service.ts
+import { apiFetch } from './api';
 
+/**
+ * Service gérant l'authentification en utilisant la fonction utilitaire apiFetch.
+ * Le token est automatiquement ajouté aux headers via apiFetch s'il est présent.
+ */
 export const authService = {
+  /**
+   * Connecte l'utilisateur et retourne ses informations ainsi que le token.
+   */
   async login(credentials: { email: string; password: any }) {
-    const response = await fetch(`${API_URL}/api/auth/login`, {
+    return apiFetch<any>('/api/auth/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(credentials),
     });
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Identifiants invalides');
-    }
-    return response.json(); // Retourne { user, token }
   },
 
+  /**
+   * Inscrit un nouvel utilisateur.
+   */
   async signup(userData: any) {
-    const response = await fetch(`${API_URL}/api/auth/signup`, {
+    return apiFetch<any>('/api/auth/signup', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData),
     });
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Erreur lors de l'inscription");
-    }
-    return response.json();
   },
 
+  /**
+   * Demande un lien de réinitialisation de mot de passe par email.
+   */
   async forgotPassword(email: string) {
-    const response = await fetch(`${API_URL}/api/auth/forgot-password`, {
+    return apiFetch<any>('/api/auth/forgot-password', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),
     });
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Erreur lors de l'envoi de l'email");
-    }
-    return response.json();
   },
 
+  /**
+   * Réinitialise le mot de passe à l'aide d'un token reçu par email.
+   */
   async resetPassword(token: string, newPassword: string) {
-    const response = await fetch(`${API_URL}/api/auth/reset-password`, {
+    return apiFetch<any>('/api/auth/reset-password', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token, newPassword }),
     });
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Erreur lors de la réinitialisation");
-    }
-    return response.json();
   }
 };

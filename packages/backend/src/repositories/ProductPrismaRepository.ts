@@ -1,10 +1,25 @@
 import prisma from '../prismaClient.js';
-import { Product, ProductProps } from '../domain/entities/Product';
+import { Product, ProductProps, toPublicSellerSummary } from '../domain/entities/Product.js';
+
+const productSelect = {
+  seller: {
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      city: true,
+      postalCode: true,
+      profile: true,
+    },
+  },
+} as const;
 
 function toDomain(prismaProduct: any): Product {
   const props: ProductProps = {
     id: prismaProduct.id,
     sellerId: prismaProduct.sellerId,
+    seller: toPublicSellerSummary(prismaProduct.seller),
     title: prismaProduct.title,
     description: prismaProduct.description,
     price: Number(prismaProduct.price),
@@ -14,6 +29,8 @@ function toDomain(prismaProduct: any): Product {
     images: prismaProduct.images ?? [],
     location: prismaProduct.location ?? undefined,
     status: prismaProduct.status,
+    quantity: prismaProduct.quantity ?? 0,
+    unit: prismaProduct.unit ?? 'unité',
     tags: prismaProduct.tags ?? [],
     createdAt: prismaProduct.createdAt ? new Date(prismaProduct.createdAt) : new Date(),
     updatedAt: prismaProduct.updatedAt ? new Date(prismaProduct.updatedAt) : new Date(),
@@ -24,43 +41,41 @@ function toDomain(prismaProduct: any): Product {
 
 export class ProductPrismaRepository {
   async save(product: Product): Promise<Product> {
-    const p = await prisma.product.upsert({
-      where: { id: product.id ?? '' },
-      update: {
-        title: product.title,
-        description: product.description,
-        price: product.price,
-        currency: (product as any).currency,
-        category: product.category,
-        condition: product.condition,
-        images: product.images,
-        location: product.location ? (product.location as any) : null,
-        status: product.status,
-        tags: product.toJSON().tags ?? [],
-        views: (product as any).views ?? 0,
-        updatedAt: new Date(),
-      },
-      create: {
-        sellerId: product.sellerId,
-        title: product.title,
-        description: product.description,
-        price: product.price,
-        currency: (product as any).currency,
-        category: product.category,
-        condition: product.condition,
-        images: product.images,
-        location: product.location ? (product.location as any) : null,
-        status: product.status,
-        tags: product.toJSON().tags ?? [],
-        views: (product as any).views ?? 0,
-      },
-    });
+    const data = {
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      currency: (product as any).currency,
+      category: product.category,
+      condition: product.condition,
+      images: product.images,
+      location: product.location ? (product.location as any) : null,
+      status: product.status,
+      quantity: product.quantity,
+      unit: product.unit,
+      tags: product.toJSON().tags ?? [],
+      views: (product as any).views ?? 0,
+    };
+
+    let p;
+    if (product.id) {
+      p = await prisma.product.update({
+        where: { id: product.id },
+        data: { ...data, updatedAt: new Date() },
+        include: productSelect,
+      });
+    } else {
+      p = await prisma.product.create({
+        data: { ...data, sellerId: product.sellerId },
+        include: productSelect,
+      });
+    }
 
     return toDomain(p);
   }
 
   async findById(id: string): Promise<Product | null> {
-    const p = await prisma.product.findUnique({ where: { id } });
+    const p = await prisma.product.findUnique({ where: { id }, include: productSelect });
     return p ? toDomain(p) : null;
   }
 
@@ -71,6 +86,7 @@ export class ProductPrismaRepository {
       orderBy: { createdAt: 'desc' },
       skip,
       take: limit,
+      include: productSelect,
     });
     return items.map(toDomain);
   }
@@ -120,6 +136,7 @@ export class ProductPrismaRepository {
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
+        include: productSelect,
       }),
     ]);
 

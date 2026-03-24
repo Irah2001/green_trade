@@ -19,8 +19,6 @@ import {
 // Store
 import { useAppStore } from '@/store/useAppStore';
 
-// Data
-import { mockProducts } from '@/data/mockDatabase';
 
 interface ProductFiltersProps {
   onFilterChange?: () => void;
@@ -152,7 +150,7 @@ function FilterContent ({
   );
 }
 
-export default function ProductFilters({ onFilterChange }: ProductFiltersProps) {
+export default function ProductFilters({ onFilterChange }: Readonly<ProductFiltersProps>) {
   const { setFilteredProducts, products } = useAppStore();
   
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -160,7 +158,7 @@ export default function ProductFilters({ onFilterChange }: ProductFiltersProps) 
   const [organicOnly, setOrganicOnly] = useState(false);
   const [selectedDistance, setSelectedDistance] = useState<number | null>(null);
 
-  const maxPrice = Math.max(...mockProducts.map((p) => p.price));
+  const maxPrice = products.length > 0 ? Math.max(...products.map((p) => p.price)) : 100;
 
   const applyFilters = () => {
     let filtered = products;

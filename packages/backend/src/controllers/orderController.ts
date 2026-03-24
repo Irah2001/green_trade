@@ -180,6 +180,50 @@ export const getMyOrders = async (req: Request, res: Response) => {
 };
 
 /**
+ * Récupérer toutes les commandes (admin uniquement)
+ */
+export const getAllOrders = async (req: Request, res: Response) => {
+  try {
+    const transactions = await prisma.transaction.findMany({
+      include: {
+        buyer: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+        seller: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+        product: {
+          select: {
+            id: true,
+            title: true,
+            price: true,
+            images: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    res.status(200).json({ orders: transactions });
+  } catch (error) {
+    console.error('Erreur dans getAllOrders:', error);
+    res.status(500).json({ message: "Erreur lors de la récupération des commandes." });
+  }
+};
+
+/**
  * Récupérer une commande spécifique
  */
 export const getOrderById = async (req: Request, res: Response) => {
@@ -194,6 +238,11 @@ export const getOrderById = async (req: Request, res: Response) => {
     if (!id || typeof id !== 'string') {
       return res.status(400).json({ message: "ID de commande invalide." });
     }
+
+    const currentUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true }
+    });
 
     const transaction = await prisma.transaction.findUnique({
       where: { id },
@@ -222,8 +271,10 @@ export const getOrderById = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Commande non trouvée." });
     }
 
+    const isAdmin = currentUser?.role === 'admin';
+
     // Vérifier que l'utilisateur a le droit de voir cette commande
-    if (transaction.buyerId !== userId && transaction.sellerId !== userId) {
+    if (!isAdmin && transaction.buyerId !== userId && transaction.sellerId !== userId) {
       return res.status(403).json({ message: "Accès non autorisé." });
     }
 

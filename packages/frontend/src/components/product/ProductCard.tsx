@@ -2,15 +2,16 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { ShoppingCart, Heart, Share2, MapPin, Star, Check } from 'lucide-react';
+import { ShoppingCart, Heart, Share2, MapPin, Check } from 'lucide-react';
 
 // Components
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import SellerIdentity from '@/components/shared/seller-identity';
 
 // Data
-import { Product, mockUsers } from '@/data/mockDatabase';
+import type { Product } from '@/types/models';
 
 // Store
 import { useAppStore } from '@/store/useAppStore';
@@ -28,8 +29,6 @@ export default function ProductCard({ product, onProductClick }: Readonly<Produc
   const { toast } = useToast();
   const [isLiked, setIsLiked] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
-
-  const seller = mockUsers.find((u) => u.id === product.sellerId);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -70,7 +69,7 @@ export default function ProductCard({ product, onProductClick }: Readonly<Produc
       {/* Image Container */}
       <div className="relative aspect-[4/3] overflow-hidden rounded-t-2xl">
         <Image
-          src={product.images[0]}
+          src={product.images?.[0]}
           alt={product.title}
           fill
           className="object-cover transition-transform duration-300 hover:scale-105"
@@ -125,26 +124,8 @@ export default function ProductCard({ product, onProductClick }: Readonly<Produc
       {/* Content */}
       <CardContent className="p-4">
         {/* Seller info */}
-        <div className="flex items-center gap-2 mb-2">
-          {seller?.profile?.avatar && (
-            <div className="w-6 h-6 rounded-full overflow-hidden bg-[#A8D5BA]">
-              <Image
-                src={seller.profile.avatar}
-                alt={`${seller.firstName} ${seller.lastName}`}
-                width={24}
-                height={24}
-                className="object-cover"
-              />
-            </div>
-          )}
-          <span className="text-xs text-gray-600">
-            {seller?.firstName} • {seller?.rating && (
-              <span className="flex items-center gap-1 inline-flex">
-                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                {seller.rating.toFixed(1)}
-              </span>
-            )}
-          </span>
+        <div className="mb-2">
+          <SellerIdentity seller={product.seller ?? null} fallbackCity={product.location.city} />
         </div>
 
         {/* Title */}

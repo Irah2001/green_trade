@@ -4,11 +4,15 @@ import Image from 'next/image';
 import { Leaf, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+// UI Components
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+// Services
 import { authService } from '@/services/auth.service';
+// Hooks
+import { useToast } from '@/hooks/use-toast';
+// Assets
 import greenTradeImg from '../../../public/images/green_trade.webp';
 
 export default function ForgotPasswordPage() {
@@ -69,7 +73,7 @@ export default function ForgotPasswordPage() {
             Mot de passe oublié ?
           </h1>
           <p className="text-white/90 text-lg mb-8">
-            Pas de panique, ça arrive aux meilleurs d'entre nous. Entrez votre adresse e-mail pour réinitialiser votre mot de passe.
+            Pas de panique, ça arrive aux meilleurs d&apos;entre nous. Entrez votre adresse e-mail pour réinitialiser votre mot de passe.
           </p>
         </div>
 
@@ -79,7 +83,7 @@ export default function ForgotPasswordPage() {
               Le lien de réinitialisation sera valide pendant 15 minutes.
             </p>
             <p className="text-white/70 text-sm">
-              Assurez-vous de vérifier vos spams si vous ne recevez pas l'email
+              Assurez-vous de vérifier vos spams si vous ne recevez pas l&apos;email
             </p>
           </div>
         </div>
@@ -138,7 +142,7 @@ export default function ForgotPasswordPage() {
                   </div>
                   <h2 className="text-3xl font-bold text-gray-900 mb-2">Réinitialisation</h2>
                   <p className="text-gray-600">
-                    Saisissez l'e-mail associé à votre compte.
+                    Saisissez l&apos;e-mail associé à votre compte.
                   </p>
                 </div>
 

@@ -17,15 +17,19 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 
+// UI components
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
-import { Product, mockUsers, mockProducts } from '@/data/mockDatabase';
+import type { Product } from '@/types/models';
 import { useAppStore } from '@/store/useAppStore';
 import { useToast } from '@/hooks/use-toast';
-import ProductCard from './ProductCard';
+import ProductCard from '@/components/product/ProductCard';
+import SellerIdentity from '@/components/shared/seller-identity';
+import ProductGallery from './ProductGallery';
+import { conversationService } from '@/services/conversation.service';
 
 interface ProductDetailProps {
   product: Product;
@@ -33,17 +37,33 @@ interface ProductDetailProps {
 }
 
 export default function ProductDetail({ product, onBack }: Readonly<ProductDetailProps>) {
-  const { addToCart } = useAppStore();
+  const { addToCart, products: storeProducts, isAuthenticated, user } = useAppStore();
   const { toast } = useToast();
-  const [selectedImage, setSelectedImage] = useState(0);
+
+  const handleContactProducer = async () => {
+    if (!isAuthenticated || !user) {
+      toast({ title: 'Connexion requise', description: 'Connectez-vous pour contacter le producteur.' });
+      return;
+    }
+    if (user.id === product.sellerId) {
+      toast({ title: 'Action impossible', description: 'Vous ne pouvez pas vous contacter vous-même.' });
+      return;
+    }
+    try {
+      const conv = await conversationService.createOrFind(product.sellerId);
+      useAppStore.getState().setActiveConversationId(conv.id);
+      useAppStore.getState().setCurrentPage('messages');
+    } catch {
+      toast({ title: 'Erreur', description: "Impossible d'ouvrir la conversation." });
+    }
+  };
+
   const [quantity, setQuantity] = useState(1);
   const [isLiked, setIsLiked] = useState(false);
   const [deliveryMethod, setDeliveryMethod] = useState<'pickup' | 'delivery'>('pickup');
 
-  const seller = mockUsers.find((u) => u.id === product.sellerId);
-  
-  // Get suggested products (same category, different product)
-  const suggestedProducts = mockProducts
+  // Get suggested products from the real store
+  const suggestedProducts = storeProducts
     .filter((p) => p.category === product.category && p.id !== product.id && p.status === 'active')
     .slice(0, 4);
 
@@ -88,110 +108,58 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Image Gallery */}
-        <div className="space-y-4">
-          {/* Main Image */}
-          <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gray-100 shadow-lg">
-            <Image
-              src={product.images[selectedImage]}
-              alt={product.title}
-              fill
-              className="object-cover"
-              priority
-            />
-            
-            {/* Badges */}
-            <div className="absolute top-4 left-4 flex flex-col gap-2">
-              {product.isSurplusOfDay && (
-                <Badge className="bg-[#E88D67] text-white text-sm px-3 py-1">
-                  🔥 Surplus du jour
-                </Badge>
-              )}
-              {product.organic && (
-                <Badge className="bg-[#4A7C59] text-white text-sm px-3 py-1">
-                  <Check className="h-4 w-4 mr-1" />
-                  Bio
-                </Badge>
-              )}
-            </div>
+        <div className="relative space-y-4">
+          <ProductGallery images={product.images} />
 
-            {/* Action buttons */}
-            <div className="absolute top-4 right-4 flex gap-2">
-              <Button
-                variant="secondary"
-                size="icon"
-                className="h-10 w-10 rounded-full bg-white/90 hover:bg-white shadow-lg"
-                onClick={() => setIsLiked(!isLiked)}
-              >
-                <Heart
-                  className={`h-5 w-5 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-600'}`}
-                />
-              </Button>
-              <Button
-                variant="secondary"
-                size="icon"
-                className="h-10 w-10 rounded-full bg-white/90 hover:bg-white shadow-lg"
-                onClick={() => {
-                  navigator.clipboard.writeText(globalThis.location.href);
-                  toast({ title: 'Lien copié !' });
-                }}
-              >
-                <Share2 className="h-5 w-5 text-gray-600" />
-              </Button>
-            </div>
+          <div className="absolute top-4 left-4 flex flex-col gap-2 pointer-events-none z-10">
+            {product.isSurplusOfDay && (
+              <Badge className="bg-earth-orange text-white text-sm px-3 py-1 shadow-md">
+                🔥 Surplus du jour
+              </Badge>
+            )}
+            {product.organic && (
+              <Badge className="bg-olive text-white text-sm px-3 py-1 shadow-md">
+                <Check className="h-4 w-4 mr-1" />
+                Bio
+              </Badge>
+            )}
           </div>
 
-          {/* Thumbnail Gallery */}
-          {product.images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {product.images.map((img, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedImage(index)}
-                  className={`relative w-20 h-20 rounded-lg overflow-hidden shrink-0 border-2 transition-all ${
-                    selectedImage === index ? 'border-[#4A7C59]' : 'border-transparent'
-                  }`}
-                >
-                  <Image
-                    src={img}
-                    alt={`${product.title} ${index + 1}`}
-                    fill
-                    className="object-cover"
-                  />
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="absolute top-4 right-4 flex gap-2 z-10">
+            <Button
+              variant="secondary"
+              size="icon"
+              className="h-10 w-10 rounded-full bg-white/90 hover:bg-white shadow-lg"
+              onClick={() => setIsLiked(!isLiked)}
+            >
+              <Heart
+                className={`h-5 w-5 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-600'}`}
+              />
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              className="h-10 w-10 rounded-full bg-white/90 hover:bg-white shadow-lg"
+              onClick={() => {
+                navigator.clipboard.writeText(globalThis.location.href);
+                toast({ title: 'Lien copié !' });
+              }}
+            >
+              <Share2 className="h-5 w-5 text-gray-600" />
+            </Button>
+          </div>
         </div>
 
         {/* Product Info */}
         <div className="space-y-6">
           {/* Seller */}
-          {seller && (
-            <div className="flex items-center gap-3">
-              {seller.profile?.avatar && (
-                <div className="w-12 h-12 rounded-full overflow-hidden bg-[#A8D5BA]">
-                  <Image
-                    src={seller.profile.avatar}
-                    alt={`${seller.firstName} ${seller.lastName}`}
-                    width={48}
-                    height={48}
-                    className="object-cover"
-                  />
-                </div>
-              )}
-              <div>
-                <p className="font-medium">
-                  {seller.firstName} {seller.lastName}
-                </p>
-                <div className="flex items-center gap-1 text-sm text-gray-500">
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  <span>{seller.rating?.toFixed(1)}</span>
-                  <span className="mx-1">•</span>
-                  <span>Producteur vérifié</span>
-                </div>
-              </div>
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <SellerIdentity seller={product.seller ?? null} fallbackCity={product.location.city} />
+            <div className="flex items-center gap-1 text-sm text-gray-500">
+              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+              <span>Profil vérifié</span>
             </div>
-          )}
+          </div>
 
           {/* Title */}
           <h1 className="text-3xl font-bold text-gray-900">{product.title}</h1>
@@ -304,7 +272,7 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
             <Button
               variant="outline"
               onClick={handleAddToCart}
-              className="flex-1 border-[#4A7C59] text-[#4A7C59] hover:bg-[#A8D5BA]/20"
+              className="flex-1 border-olive text-[#4A7C59] hover:bg-[#A8D5BA]/20"
             >
               <ShoppingCart className="h-5 w-5 mr-2" />
               Ajouter au panier
@@ -318,7 +286,7 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
           </div>
 
           {/* Contact Producer */}
-          <Button variant="ghost" className="w-full text-[#4A7C59]">
+          <Button variant="ghost" className="w-full text-olive" onClick={handleContactProducer}>
             <MessageCircle className="h-5 w-5 mr-2" />
             Contacter le producteur
           </Button>
@@ -330,9 +298,9 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
         <CardContent className="p-0">
           <div className="relative h-64 bg-gray-100">
             {/* Placeholder for map */}
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#A8D5BA]/30 to-[#4A7C59]/10">
+            <div className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-[#A8D5BA]/30 to-[#4A7C59]/10">
               <div className="text-center">
-                <MapPin className="h-12 w-12 text-[#4A7C59] mx-auto mb-2" />
+                <MapPin className="h-12 w-12 text-olive mx-auto mb-2" />
                 <p className="font-medium text-gray-700">{product.location.city}</p>
                 <p className="text-sm text-gray-500">{product.location.postalCode}</p>
               </div>
@@ -350,8 +318,9 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
               <ProductCard
                 key={p.id}
                 product={p}
-                onProductClick={() => {
+                onProductClick={(_p: Product) => {
                   useAppStore.getState().setSelectedProduct(p.id);
+                  useAppStore.getState().setCurrentPage('product-detail');
                 }}
               />
             ))}

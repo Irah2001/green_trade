@@ -1,6 +1,19 @@
+export type PublicSellerSummary = {
+  id: string;
+  displayName: string;
+  avatar?: string;
+  city?: string;
+  postalCode?: string;
+  profile?: {
+    avatar?: string;
+    bio?: string;
+  };
+};
+
 export type ProductProps = {
   id?: string;
   sellerId: string;
+  seller?: PublicSellerSummary | null;
   title: string;
   description: string;
   price: number;
@@ -17,13 +30,55 @@ export type ProductProps = {
   };
   status?: 'active' | 'sold' | 'reserved' | 'archived';
   tags?: string[];
+  quantity?: number;
+  unit?: string;
   views?: number;
   createdAt?: Date;
   updatedAt?: Date;
 };
 
+export const toPublicSellerSummary = (seller: any): PublicSellerSummary | null => {
+  if (!seller) {
+    return null;
+  }
+
+  const firstName = typeof seller.firstName === 'string' ? seller.firstName : '';
+  const lastName = typeof seller.lastName === 'string' ? seller.lastName : '';
+  const displayName = seller.displayName ?? `${firstName} ${lastName}`.trim();
+
+  const summary: PublicSellerSummary = {
+    id: seller.id,
+    displayName: displayName || seller.email || 'Vendeur',
+  };
+
+  if (seller.avatar ?? seller.profile?.avatar) {
+    summary.avatar = seller.avatar ?? seller.profile?.avatar;
+  }
+
+  if (seller.city ?? seller.location?.city) {
+    summary.city = seller.city ?? seller.location?.city;
+  }
+
+  if (seller.postalCode ?? seller.location?.postalCode) {
+    summary.postalCode = seller.postalCode ?? seller.location?.postalCode;
+  }
+
+  if (seller.profile) {
+    const profile = {
+      ...(seller.profile.avatar ? { avatar: seller.profile.avatar } : {}),
+      ...(seller.profile.bio ? { bio: seller.profile.bio } : {}),
+    };
+
+    if (Object.keys(profile).length > 0) {
+      summary.profile = profile;
+    }
+  }
+
+  return summary;
+};
+
 export class Product {
-  private props: ProductProps;
+  private readonly props: ProductProps;
 
   constructor(props: ProductProps) {
     if (!props.title || props.title.length < 3) {
@@ -47,6 +102,10 @@ export class Product {
 
   get sellerId() {
     return this.props.sellerId;
+  }
+
+  get seller() {
+    return this.props.seller ?? null;
   }
 
   get title() {
@@ -85,11 +144,22 @@ export class Product {
     return this.props.status!;
   }
 
+  get quantity() {
+    return this.props.quantity ?? 0;
+  }
+
+  get unit() {
+    return this.props.unit ?? 'unité';
+  }
+
   get views() {
     return this.props.views ?? 0;
   }
 
   toJSON() {
-    return { ...this.props };
+    return {
+      ...this.props,
+      seller: this.props.seller ? { ...this.props.seller } : null,
+    };
   }
 }

@@ -54,6 +54,8 @@ model Product {
   location    Json?
   status      String   @default("active")
   tags        String[]
+  quantity    Int      @default(0)
+  unit        String   @default("unité")
   views       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -92,6 +94,7 @@ model Message {
   content        String
   isRead         Boolean  @default(false)
   createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   // relations
   conversation Conversation @relation("ConversationMessages", fields: [conversationId], references: [id])
@@ -102,12 +105,12 @@ model Message {
 }
 
 model Transaction {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  buyerId         String   @db.ObjectId
-  sellerId        String   @db.ObjectId
-  productId       String   @db.ObjectId
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  buyerId         String    @db.ObjectId
+  sellerId        String    @db.ObjectId
+  productId       String    @db.ObjectId
   amount          Float
-  quantity        Int     @default(1)
+  quantity        Int       @default(1)
   currency        String?
   status          String
   trackingNumber  String?
@@ -116,8 +119,9 @@ model Transaction {
   shippedAt       DateTime?
   deliveredAt     DateTime?
   stripePaymentId String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  stripeSessionId String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   // relations
   buyer   User    @relation("UserBuyerTransactions", fields: [buyerId], references: [id])
@@ -142,9 +146,9 @@ model Cart {
 }
 
 model CartItem {
-  id                String  @id @default(auto()) @map("_id") @db.ObjectId
-  cartId            String  @db.ObjectId
-  productId         String  @db.ObjectId
+  id                String @id @default(auto()) @map("_id") @db.ObjectId
+  cartId            String @db.ObjectId
+  productId         String @db.ObjectId
   quantity          Int
   unitPriceSnapshot Float
 
@@ -152,7 +156,7 @@ model CartItem {
   cart    Cart    @relation(fields: [cartId], references: [id])
   product Product @relation(fields: [productId], references: [id])
 
+  @@unique([cartId, productId])
   @@index([cartId])
   @@index([productId])
-  @@unique([cartId, productId])
 }

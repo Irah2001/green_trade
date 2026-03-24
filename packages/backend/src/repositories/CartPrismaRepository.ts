@@ -1,25 +1,69 @@
 import prisma from '../prismaClient.js';
+import { toPublicSellerSummary } from '../domain/entities/Product.js';
+
+const productSelect = {
+  seller: {
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      city: true,
+      postalCode: true,
+      profile: true,
+    },
+  },
+} as const;
+
+const cartSelect = {
+  items: {
+    include: {
+      product: {
+        include: productSelect,
+      },
+    },
+  },
+} as const;
+
+const serializeProduct = (product: any) => ({
+  ...product,
+  seller: toPublicSellerSummary(product?.seller),
+});
+
+const serializeCart = (cart: any) => ({
+  ...cart,
+  items: Array.isArray(cart?.items)
+    ? cart.items.map((item: any) => ({
+        ...item,
+        product: serializeProduct(item.product),
+      }))
+    : [],
+});
 
 export class CartPrismaRepository {
   async getOrCreateCart(userId: string) {
     const existing = await prisma.cart.findUnique({
       where: { userId },
-      include: { items: { include: { product: true } } },
+      include: cartSelect,
     });
 
-    if (existing) return existing;
+    if (existing) return serializeCart(existing);
 
-    return prisma.cart.create({
+    const created = await prisma.cart.create({
       data: { userId },
-      include: { items: { include: { product: true } } },
+      include: cartSelect,
     });
+
+    return serializeCart(created);
   }
 
   async getCart(userId: string) {
-    return prisma.cart.findUnique({
+    const cart = await prisma.cart.findUnique({
       where: { userId },
-      include: { items: { include: { product: true } } },
+      include: cartSelect,
     });
+
+    return cart ? serializeCart(cart) : null;
   }
 
   async addItem(userId: string, productId: string, quantity: number, unitPriceSnapshot: number) {

@@ -1,14 +1,23 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { MapPin, Heart, Share2, ShoppingBasket } from "lucide-react";
 import { useState } from "react";
 
-import type { Product } from "@/data/mockDatabase";
+import type { Product } from "@/types/models";
+import { useAppStore } from "@/store/useAppStore";
+import SellerIdentity from "@/components/shared/seller-identity";
 
 export default function ProductCard({ product }: Readonly<{ product: Product }>) {
   const [isFavorite, setIsFavorite] = useState(false);
+  const addToCart = useAppStore((state) => state.addToCart);
+  const setSelectedProduct = useAppStore((state) => state.setSelectedProduct);
+  const setCurrentPage = useAppStore((state) => state.setCurrentPage);
+
+  const handleCardClick = () => {
+    setSelectedProduct(product.id);
+    setCurrentPage('product-detail');
+  };
 
   return (
     <div className="relative flex flex-col bg-white rounded-2xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.08)] hover-scale group overflow-hidden border border-gray-100/50">
@@ -26,16 +35,16 @@ export default function ProductCard({ product }: Readonly<{ product: Product }>)
             </span>
           )}
         </div>
-        
+
         <div className="flex flex-col gap-2">
-          <button 
-            onClick={(e) => { e.preventDefault(); setIsFavorite(!isFavorite); }} 
+          <button
+            onClick={(e) => { e.stopPropagation(); setIsFavorite(!isFavorite); }}
             className="p-1.5 bg-white/80 backdrop-blur-md text-gray-700 rounded-full hover:bg-white transition-all shadow-sm"
           >
             <Heart className={`w-4 h-4 ${isFavorite ? "fill-accent text-accent" : ""}`} />
           </button>
-          <button 
-            onClick={(e) => { e.preventDefault(); /* Share Action */ }} 
+          <button
+            onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(`${globalThis.location.origin}/?product=${product.id}`); }}
             className="p-1.5 bg-white/80 backdrop-blur-md text-gray-700 rounded-full hover:bg-white transition-all shadow-sm opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0"
           >
             <Share2 className="w-4 h-4" />
@@ -43,11 +52,11 @@ export default function ProductCard({ product }: Readonly<{ product: Product }>)
         </div>
       </div>
 
-      <Link href={`/products/${product.id}`} className="flex-1 flex flex-col">
+      <button onClick={handleCardClick} className="flex-1 flex flex-col text-left">
         {/* Image wrapper */}
         <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-50">
           <Image
-            src={product.images[0]}
+            src={product.images?.[0]}
             alt={product.title}
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -71,16 +80,23 @@ export default function ProductCard({ product }: Readonly<{ product: Product }>)
             <span className="line-clamp-1">{product.location.city} • <span className="opacity-75">{product.location.distance || 2.5}km</span></span>
           </div>
 
+          <div className="mb-4">
+            <SellerIdentity seller={product.seller ?? null} fallbackCity={product.location.city} />
+          </div>
+
           <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">
             <div className="text-xs font-medium text-olive bg-light-green/20 px-2.5 py-1 rounded-md">
               Disponible {product.quantity} {product.unit}
             </div>
           </div>
         </div>
-      </Link>
-      
+      </button>
+
       <div className="px-4 pb-4">
-        <button className="w-full flex items-center justify-center gap-2 bg-olive text-white font-medium py-2.5 rounded-xl hover:bg-olive/90 transition-colors shadow-sm focus:ring-4 focus:ring-olive/20 outline-none">
+        <button
+          onClick={(e) => { e.stopPropagation(); addToCart(product, 1); }}
+          className="w-full flex items-center justify-center gap-2 bg-olive text-white font-medium py-2.5 rounded-xl hover:bg-olive/90 transition-colors shadow-sm focus:ring-4 focus:ring-olive/20 outline-none"
+        >
           <ShoppingBasket className="w-4 h-4" />
           Ajouter
         </button>

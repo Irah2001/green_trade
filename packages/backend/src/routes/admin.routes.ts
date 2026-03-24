@@ -1,18 +1,21 @@
 import { Router } from 'express';
 import { deleteExpiredAnonymizedAccounts } from '../utils/rgpd.utils.js';
-import { authenticate } from '../middlewares/auth.middleware.js';
+import { authenticate, isAdmin } from '../middlewares/auth.middleware.js';
 import { 
   getStats, 
   getAllUsers, 
   getAllOrders, 
   banUser,
-  getAllProducts 
+  getAllProducts,
+  adminUpdateUser,
+  adminDeleteUser
 } from '../controllers/adminController.js';
 
 const router: Router = Router();
 
-// Toutes les routes admin nécessitent l'authentification
+// Toutes les routes admin nécessitent l'authentification et le rôle admin
 router.use(authenticate);
+router.use(isAdmin);
 
 /**
  * @route GET /api/admin/stats
@@ -50,24 +53,26 @@ router.get('/products', getAllProducts);
 router.patch('/users/:id/ban', banUser);
 
 /**
+ * @route PATCH /api/admin/users/:id
+ * @desc Modifier n'importe quel utilisateur (admin)
+ * @access Admin uniquement
+ */
+router.patch('/users/:id', adminUpdateUser);
+
+/**
+ * @route DELETE /api/admin/users/:id
+ * @desc Supprimer un utilisateur (anonymisation RGPD)
+ * @access Admin uniquement
+ */
+router.delete('/users/:id', adminDeleteUser);
+
+/**
  * @route POST /api/admin/rgpd/cleanup
  * @desc Supprimer les comptes anonymisés expirés (cron job)
- * @access Admin seulement
+ * @access Admin uniquement
  */
 router.post('/rgpd/cleanup', async (req, res) => {
   try {
-    const userId = (req as any).userId;
-    
-    // Vérifier que l'utilisateur est admin
-    const user = await (await import('../prismaClient.js')).default.user.findUnique({
-      where: { id: userId },
-      select: { role: true }
-    });
-
-    if (!user || user.role !== 'admin') {
-      return res.status(403).json({ message: "Accès refusé. Admin requis." });
-    }
-
     const daysToKeep = Number(req.body.daysToKeep) || 30;
     const deletedCount = await deleteExpiredAnonymizedAccounts(daysToKeep);
 
@@ -81,5 +86,6 @@ router.post('/rgpd/cleanup', async (req, res) => {
     res.status(500).json({ message: "Erreur lors du nettoyage RGPD." });
   }
 });
+router.delete('/users/:id', authenticate, isAdmin, adminDeleteUser);
 
 export default router;

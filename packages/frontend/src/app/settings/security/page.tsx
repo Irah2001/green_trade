@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { z } from "zod"
 import { useForm } from "@tanstack/react-form"
 import { ShieldAlert, Mail, Lock } from "lucide-react"
 
+// UI Components
 import {
   Card,
   CardContent,
@@ -17,9 +17,16 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
+
+// Hooks
+import { useIsClient } from "@/hooks/use-is-client"
 import { useAppStore } from "@/store/useAppStore"
 import { useToast } from "@/hooks/use-toast"
+
+// Types
 import type { BackendUser } from "@/types/user"
+
+// Utils
 import { getErrorMessage } from "@/lib/utils"
 
 /* ── Zod Schemas ─────────────────────────────────────────────── */
@@ -49,11 +56,7 @@ const passwordUpdateSchema = z
 export default function SecuritySettingsPage() {
   const user = useAppStore((state) => state.user) as BackendUser | null
   const { toast } = useToast()
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
+  const isMounted = useIsClient()
 
   /* ── TanStack Forms ────────────────────────────────────────── */
 
@@ -68,7 +71,7 @@ export default function SecuritySettingsPage() {
         return result.success ? undefined : result.error.issues.map(i => i.message).join(", ")
       },
     },
-    onSubmit: async ({ value }) => {
+    onSubmit: async ({ value: _value }) => {
       try {
         // TODO: Replace with real API call
         await new Promise((resolve) => setTimeout(resolve, 800))
@@ -98,7 +101,7 @@ export default function SecuritySettingsPage() {
         return result.success ? undefined : result.error.issues.map(i => i.message).join(", ")
       },
     },
-    onSubmit: async ({ value }) => {
+    onSubmit: async ({ value: _value }) => {
       try {
         // TODO: Replace with real API call
         await new Promise((resolve) => setTimeout(resolve, 800))
@@ -161,6 +164,7 @@ export default function SecuritySettingsPage() {
                     <Input
                       id="currentPassword"
                       type="password"
+                      autoComplete="current-password"
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
@@ -250,6 +254,7 @@ export default function SecuritySettingsPage() {
                     <Input
                       id="pwd-currentPassword"
                       type="password"
+                      autoComplete="current-password"
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
@@ -271,6 +276,7 @@ export default function SecuritySettingsPage() {
                     <Input
                       id="pwd-newPassword"
                       type="password"
+                      autoComplete="new-password"
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
@@ -298,6 +304,7 @@ export default function SecuritySettingsPage() {
                     <Input
                       id="pwd-confirmPassword"
                       type="password"
+                      autoComplete="new-password"
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}

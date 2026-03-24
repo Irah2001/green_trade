@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Image from 'next/image';
 import { Search, Grid3X3, List } from 'lucide-react';
 
 // UI Components
@@ -13,11 +14,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import ProductCard from '@/components/product/ProductCard';
 import ProductFilters from '@/components/product/ProductFilters';
 
-import { Product } from '@/data/mockDatabase';
+import type { Product } from '@/types/models';
 import { useAppStore } from '@/store/useAppStore';
 
+const categoryLabels: Record<string, string> = {
+  fruits: '🍎 Fruits',
+  vegetables: '🥕 Légumes',
+  baskets: '🧺 Paniers',
+};
+
 export default function ProductsPage() {
-  const { filteredProducts, searchProducts, setSelectedProduct, setCurrentPage, filterByCategory } = useAppStore();
+  const { filteredProducts, searchProducts, setSelectedProduct, setCurrentPage, filterByCategory, selectedCategory } = useAppStore();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState<string>('newest');
   const [searchQuery, setSearchQuery] = useState('');
@@ -112,10 +119,11 @@ export default function ProductsPage() {
               className="flex gap-4 p-4 bg-white rounded-xl shadow-sm hover:shadow-md cursor-pointer transition-shadow"
             >
               <div className="relative w-24 h-24 shrink-0 rounded-lg overflow-hidden">
-                <img
+                <Image
                   src={product.images[0]}
                   alt={product.title}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                 />
               </div>
               <div className="flex-1 min-w-0">
@@ -146,7 +154,9 @@ export default function ProductsPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Tous les produits</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          {selectedCategory ? categoryLabels[selectedCategory] ?? 'Tous les produits' : 'Tous les produits'}
+        </h1>
         <p className="text-gray-600">
           {displayProducts.length} produit{displayProducts.length > 1 ? 's' : ''} disponible{displayProducts.length > 1 ? 's' : ''}
         </p>
