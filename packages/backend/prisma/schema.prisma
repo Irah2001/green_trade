@@ -27,6 +27,12 @@ model User {
   resetToken       String?
   resetTokenExpiry DateTime?
 
+  // Ban management
+  isBanned  Boolean   @default(false)
+  banReason String?
+  bannedAt  DateTime?
+  bannedBy  String?
+
   // relations
   products           Product[]     @relation("SellerProducts")
   posts              Message[]     @relation("UserMessages")

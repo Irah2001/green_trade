@@ -45,20 +45,19 @@ const categories = [
 
 export default function Navbar() {
   const router = useRouter();
-  const { cart, getCartCount, user, isAuthenticated, logout, searchProducts, setCurrentPage } = useAppStore();
+  const { cart, getCartCount, user, isAuthenticated, logout, searchProducts } = useAppStore();
   const [searchQuery, setSearchQuery] = useState('');
   const cartCount = getCartCount();
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
       searchProducts(searchQuery);
-      setCurrentPage('products');
+      router.push('/products');
     }
   };
 
-  const handleCategoryClick = (categoryId: string) => {
-    useAppStore.getState().filterByCategory(categoryId);
-    setCurrentPage('products');
+  const handleCategoryClick = () => {
+    router.push('/products');
   };
 
   return (
@@ -70,7 +69,6 @@ export default function Navbar() {
             <Link 
               href="/" 
               className="flex items-center gap-2 text-[#4A7C59] hover:text-[#3a6349] transition-colors"
-              onClick={() => setCurrentPage('home')}
             >
               <Leaf className="h-8 w-8" />
               <span className="text-xl font-bold">Green Trade</span>
@@ -99,7 +97,7 @@ export default function Navbar() {
                     key={cat.id}
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleCategoryClick(cat.id)}
+                    onClick={handleCategoryClick}
                     className="text-gray-700 hover:text-[#4A7C59] hover:bg-[#A8D5BA]/20"
                   >
                     <cat.icon className="h-4 w-4 mr-1" />
@@ -112,7 +110,7 @@ export default function Navbar() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage('publish')}
+                onClick={() => router.push('/publish')}
                 className="border-[#4A7C59] text-[#4A7C59] hover:bg-[#4A7C59] hover:text-white"
               >
                 <Plus className="h-4 w-4 mr-1" />
@@ -123,7 +121,7 @@ export default function Navbar() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setCurrentPage('cart')}
+                onClick={() => router.push('/cart')}
                 className="relative text-gray-700 hover:text-[#4A7C59]"
               >
                 <ShoppingCart className="h-5 w-5" />
@@ -151,7 +149,7 @@ export default function Navbar() {
                     <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     {user.role === 'admin' && (
-                      <DropdownMenuItem onClick={() => setCurrentPage('admin')}>
+                      <DropdownMenuItem onClick={() => router.push('/admin')}>
                         <LayoutDashboard className="h-4 w-4 mr-2" />
                         Tableau de bord Admin
                       </DropdownMenuItem>
@@ -221,7 +219,7 @@ export default function Navbar() {
                         key={cat.id}
                         variant="ghost"
                         className="w-full justify-start"
-                        onClick={() => handleCategoryClick(cat.id)}
+                        onClick={handleCategoryClick}
                       >
                         <cat.icon className="h-4 w-4 mr-2" />
                         {cat.label}
@@ -234,7 +232,7 @@ export default function Navbar() {
                     <Button
                       variant="outline"
                       className="w-full justify-start border-[#4A7C59] text-[#4A7C59]"
-                      onClick={() => setCurrentPage('publish')}
+                      onClick={() => router.push('/publish')}
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       Publier une annonce
@@ -242,7 +240,7 @@ export default function Navbar() {
                     <Button
                       variant="ghost"
                       className="w-full justify-start"
-                      onClick={() => setCurrentPage('cart')}
+                      onClick={() => router.push('/cart')}
                     >
                       <ShoppingCart className="h-4 w-4 mr-2" />
                       Panier ({cartCount})
@@ -265,7 +263,7 @@ export default function Navbar() {
                           <Button
                             variant="ghost"
                             className="w-full justify-start"
-                            onClick={() => setCurrentPage('admin')}
+                            onClick={() => router.push('/admin')}
                           >
                             <LayoutDashboard className="h-4 w-4 mr-2" />
                             Tableau de bord Admin

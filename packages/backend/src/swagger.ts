@@ -594,6 +594,227 @@ export const swaggerDocument = {
           }
         }
       }
+    },
+    '/api/admin/stats': {
+      get: {
+        summary: 'Récupérer les statistiques globales de la plateforme',
+        description: 'Retourne les statistiques complètes: utilisateurs, produits, commandes, revenus (Admin uniquement)',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: 'Statistiques récupérées avec succès',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    totalUsers: { type: 'number', example: 156 },
+                    totalProducts: { type: 'number', example: 423 },
+                    totalOrders: { type: 'number', example: 89 },
+                    totalRevenue: { type: 'number', example: 4567.89 },
+                    ordersByStatus: {
+                      type: 'object',
+                      properties: {
+                        pending: { type: 'number', example: 12 },
+                        paid: { type: 'number', example: 34 },
+                        shipped: { type: 'number', example: 28 },
+                        delivered: { type: 'number', example: 15 }
+                      }
+                    },
+                    recentOrders: { type: 'number', example: 23 }
+                  }
+                }
+              }
+            }
+          },
+          403: { description: 'Accès refusé (rôle admin requis)' },
+          500: { description: 'Erreur serveur' }
+        }
+      }
+    },
+    '/api/admin/users': {
+      get: {
+        summary: 'Récupérer tous les utilisateurs',
+        description: 'Liste tous les utilisateurs avec pagination et filtres (Admin uniquement)',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            in: 'query',
+            name: 'page',
+            schema: { type: 'integer', default: 1 },
+            description: 'Numéro de page'
+          },
+          {
+            in: 'query',
+            name: 'limit',
+            schema: { type: 'integer', default: 20 },
+            description: 'Nombre d\'éléments par page'
+          },
+          {
+            in: 'query',
+            name: 'role',
+            schema: { type: 'string', enum: ['all', 'buyer', 'farmer', 'admin'] },
+            description: 'Filtrer par rôle'
+          },
+          {
+            in: 'query',
+            name: 'search',
+            schema: { type: 'string' },
+            description: 'Rechercher par email, prénom ou nom'
+          }
+        ],
+        responses: {
+          200: { description: 'Liste des utilisateurs avec pagination' },
+          403: { description: 'Accès refusé' },
+          500: { description: 'Erreur serveur' }
+        }
+      }
+    },
+    '/api/admin/orders': {
+      get: {
+        summary: 'Récupérer toutes les commandes',
+        description: 'Liste toutes les commandes avec pagination et filtres (Admin uniquement)',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            in: 'query',
+            name: 'page',
+            schema: { type: 'integer', default: 1 },
+            description: 'Numéro de page'
+          },
+          {
+            in: 'query',
+            name: 'limit',
+            schema: { type: 'integer', default: 20 },
+            description: 'Nombre d\'éléments par page'
+          },
+          {
+            in: 'query',
+            name: 'status',
+            schema: { type: 'string', enum: ['all', 'pending', 'paid', 'shipped', 'delivered'] },
+            description: 'Filtrer par statut'
+          }
+        ],
+        responses: {
+          200: { description: 'Liste des commandes avec pagination' },
+          403: { description: 'Accès refusé' },
+          500: { description: 'Erreur serveur' }
+        }
+      }
+    },
+    '/api/admin/products': {
+      get: {
+        summary: 'Récupérer tous les produits',
+        description: 'Liste tous les produits y compris inactifs avec pagination (Admin uniquement)',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            in: 'query',
+            name: 'page',
+            schema: { type: 'integer', default: 1 },
+            description: 'Numéro de page'
+          },
+          {
+            in: 'query',
+            name: 'limit',
+            schema: { type: 'integer', default: 20 },
+            description: 'Nombre d\'éléments par page'
+          },
+          {
+            in: 'query',
+            name: 'status',
+            schema: { type: 'string', enum: ['all', 'active', 'inactive', 'deleted'] },
+            description: 'Filtrer par statut'
+          }
+        ],
+        responses: {
+          200: { description: 'Liste des produits avec pagination' },
+          403: { description: 'Accès refusé' },
+          500: { description: 'Erreur serveur' }
+        }
+      }
+    },
+    '/api/admin/users/{id}/ban': {
+      patch: {
+        summary: 'Bannir ou débannir un utilisateur',
+        description: 'Bloque ou débloque l\'accès d\'un utilisateur à la plateforme (Admin uniquement)',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            in: 'path',
+            name: 'id',
+            required: true,
+            schema: { type: 'string' },
+            description: 'ID de l\'utilisateur',
+            example: '507f1f77bcf86cd799439011'
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['isBanned'],
+                properties: {
+                  isBanned: {
+                    type: 'boolean',
+                    example: true,
+                    description: 'true pour bannir, false pour débannir'
+                  },
+                  reason: {
+                    type: 'string',
+                    example: 'Violation des conditions d\'utilisation',
+                    description: 'Raison du bannissement (optionnel)'
+                  }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          200: { description: 'Utilisateur banni/débanni avec succès' },
+          400: { description: 'Données invalides' },
+          403: { description: 'Accès refusé ou tentative de bannir un admin' },
+          404: { description: 'Utilisateur non trouvé' },
+          500: { description: 'Erreur serveur' }
+        }
+      }
+    },
+    '/api/admin/rgpd/cleanup': {
+      post: {
+        summary: 'Nettoyage RGPD des comptes anonymisés',
+        description: 'Supprime les comptes anonymisés après le délai de rétention (Admin uniquement)',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  daysToKeep: {
+                    type: 'number',
+                    default: 30,
+                    example: 30,
+                    description: 'Nombre de jours de rétention'
+                  }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          200: { description: 'Nettoyage RGPD effectué avec succès' },
+          403: { description: 'Accès refusé' },
+          500: { description: 'Erreur serveur' }
+        }
+      }
     }
   }
 };
