@@ -27,7 +27,7 @@ export const getConversations = async (req: AuthRequest, res: Response) => {
 };
 
 export const getMessages = async (req: AuthRequest, res: Response) => {
-  const { id } = req.params;
+  const { id } = req.params as { id: string };
   const limit = Number(req.query.limit) || 50;
   const before = req.query.before ? new Date(req.query.before as string) : undefined;
 
@@ -45,7 +45,7 @@ export const getMessages = async (req: AuthRequest, res: Response) => {
 };
 
 export const markAsRead = async (req: AuthRequest, res: Response) => {
-  const { id } = req.params;
+  const { id } = req.params as { id: string };
   try {
     await ConversationRepository.markAsRead(id, req.userId!);
     res.json({ success: true });
@@ -55,7 +55,7 @@ export const markAsRead = async (req: AuthRequest, res: Response) => {
 };
 
 export const editMessage = async (req: AuthRequest, res: Response) => {
-  const { messageId } = req.params;
+  const { messageId } = req.params as { messageId: string };
   const { content } = req.body;
   if (!content?.trim()) return res.status(400).json({ message: "Contenu requis" });
 
@@ -72,7 +72,7 @@ export const editMessage = async (req: AuthRequest, res: Response) => {
 };
 
 export const deleteMessage = async (req: AuthRequest, res: Response) => {
-  const { messageId } = req.params;
+  const { messageId } = req.params as { messageId: string };
   try {
     const msg = await ConversationRepository.findMessageById(messageId);
     if (!msg) return res.status(404).json({ message: "Message introuvable" });
@@ -86,7 +86,7 @@ export const deleteMessage = async (req: AuthRequest, res: Response) => {
 };
 
 export const deleteConversation = async (req: AuthRequest, res: Response) => {
-  const { id } = req.params;
+  const { id } = req.params as { id: string };
   try {
     const conv = await ConversationRepository.findById(id);
     if (!conv) return res.status(404).json({ message: "Conversation introuvable" });
