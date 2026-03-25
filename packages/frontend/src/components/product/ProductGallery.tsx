@@ -20,7 +20,7 @@ export default function ProductGallery({ images }: Readonly<ProductGalleryProps>
           alt="Vue principale du produit"
           fill
           priority
-          quality={95}
+          quality={70}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 75vw, 60vw"
           className="object-cover transition-opacity duration-300"
         />
