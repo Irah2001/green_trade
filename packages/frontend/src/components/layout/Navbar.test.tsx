@@ -40,7 +40,7 @@ describe('Navbar', () => {
     mockedUseIsClient.mockReturnValue(false)
     mockedUseAppStore.mockReturnValue({
       getCartCount: () => 3,
-      user: { firstName: 'Ana', lastName: 'Dupont', role: 'user' },
+      user: { firstName: 'Ana', lastName: 'Dupont', role: 'buyer' },
       isAuthenticated: true,
       logout: vi.fn(),
       searchProducts: vi.fn(),

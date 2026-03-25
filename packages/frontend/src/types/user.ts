@@ -1,3 +1,5 @@
+import type { UserRole } from '@greentrade/shared';
+
 /**
  * Common shape for anything that can render a user identity in the UI.
  * It intentionally only contains public/display-safe fields.
@@ -55,7 +57,7 @@ export interface BackendUser {
   passwordHash: string;
   firstName: string;
   lastName: string;
-  role: "user" | "admin" | "producer";
+  role: UserRole;
   phone?: string;
   city?: string;
   postalCode?: string;

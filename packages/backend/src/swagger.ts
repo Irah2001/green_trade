@@ -853,7 +853,7 @@ export const swaggerDocument = {
                 properties: {
                   firstName: { type: 'string', example: 'Marie' },
                   lastName: { type: 'string', example: 'Dupont' },
-                  role: { type: 'string', enum: ['buyer', 'seller', 'farmer', 'admin'], example: 'seller' },
+                   role: { type: 'string', enum: ['buyer', 'seller', 'admin'], example: 'seller' },
                   phone: { type: 'string', example: '+33612345678' },
                   city: { type: 'string', example: 'Paris' },
                   postalCode: { type: 'string', example: '75001' },

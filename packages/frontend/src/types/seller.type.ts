@@ -1,5 +1,5 @@
-export type FarmerFormData = {
-  accountType: 'producer';
+export type SellerFormData = {
+  accountType: 'seller';
   firstName: string;
   lastName: string;
   email: string;

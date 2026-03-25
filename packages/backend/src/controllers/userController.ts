@@ -236,8 +236,8 @@ export const getUserById = async (req: Request, res: Response) => {
       profile: publicProfile,
     };
 
-    // Si c'est un producteur, on peut ajouter ses statistiques
-    if (publicUser.role === 'producer') {
+    // Si c'est un vendeur, on peut ajouter ses statistiques
+    if (publicUser.role === 'seller') {
       const [productsCount, salesCount] = await Promise.all([
         prisma.product.count({ where: { sellerId: id, status: 'active' } }),
         prisma.transaction.count({ where: { sellerId: id, status: 'delivered' } }),

@@ -17,10 +17,7 @@ import {
 const ROLE_LABEL: Record<string, string> = {
   buyer: 'Acheteur',
   seller: 'Vendeur',
-  farmer: 'Agriculteur',
   admin: 'Admin',
-  user: 'Utilisateur',
-  producer: 'Producteur',
 };
 
 interface Props {

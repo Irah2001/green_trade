@@ -19,12 +19,12 @@ import { useToast } from '@/hooks/use-toast';
 
 // Types
 import { ClientFormData } from '@/types/client.type';
-import { FarmerFormData } from '@/types/farmer.type';
+import { SellerFormData } from '@/types/seller.type';
 
 // Images
 import greenTradeImg from '../../../public/images/green_trade.webp';
 
-type SignUpFormData = ClientFormData | FarmerFormData;
+type SignUpFormData = ClientFormData | SellerFormData;
 
 const initialForm: SignUpFormData = {
   accountType: 'buyer',
@@ -210,14 +210,14 @@ export default function SignUpPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setForm(prev => ({ ...prev, accountType: 'producer' }))}
+                    onClick={() => setForm(prev => ({ ...prev, accountType: 'seller' }))}
                     className={`p-4 rounded-xl border-2 text-left transition-all ${
-                      form.accountType === 'producer'
+                      form.accountType === 'seller'
                         ? 'border-[#4A7C59] bg-[#A8D5BA]/20'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <p className="font-semibold">🌾 Producteur</p>
+                    <p className="font-semibold">🌾 Vendeur</p>
                     <p className="text-xs text-gray-500">Vendre vos produits</p>
                   </button>
                 </div>
