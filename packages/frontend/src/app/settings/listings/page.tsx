@@ -1,6 +1,7 @@
 "use client"
 
 import Image from "next/image"
+import Link from "next/link"
 import { useCallback, useEffect, useState } from "react"
 import { PackageSearch, ShoppingBag, Trash2 } from "lucide-react"
 
@@ -12,7 +13,7 @@ import { Separator } from "@/components/ui/separator"
 import { useIsClient } from "@/hooks/use-is-client"
 import { useToast } from "@/hooks/use-toast"
 import { useAppStore } from "@/store/useAppStore"
-import { productService } from "@/services/product.service"
+import { normalizeProduct, productService } from "@/services/product.service"
 import type { Product } from "@/types/models"
 
 function ListingsSkeleton() {
@@ -66,8 +67,9 @@ export default function ListingsSettingsPage() {
       }
       
       const result = await productService.getProductsBySeller(user.id, { limit: 100 })
-      
-      const processed = result.items
+      const toProduct = normalizeProduct;
+      const normalizedResult = result.items.map(toProduct);
+      const processed = normalizedResult
         .filter((item: Product) => item.status === "active" || item.status === "reserved")
         .sort((a, b) => {
           if (a.status !== b.status) {
@@ -94,7 +96,12 @@ export default function ListingsSettingsPage() {
   const handleDelete = async (product: Product) => {
     try {
       setDeletingId(product.id)
-      await deleteProduct(product.id)
+      const result = await deleteProduct(product.id)
+
+      if (!result.success) {
+        throw new Error(result.message ?? "Impossible de supprimer cette annonce.")
+      }
+
       setListings((current) => current.filter((item) => item.id !== product.id))
       toast({
         title: "Annonce supprimée",
@@ -220,7 +227,7 @@ function NoAccessState() {
           </p>
         </div>
         <Button asChild className="bg-olive text-white hover:bg-olive-dark">
-          <a href="/settings/profile">Retour aux paramètres</a>
+          <Link href="/settings/profile">Retour aux paramètres</Link>
         </Button>
       </CardContent>
     </Card>
