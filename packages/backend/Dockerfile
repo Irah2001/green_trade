@@ -50,9 +50,10 @@ RUN pnpm install --frozen-lockfile --prod
 COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/dist ./packages/backend/dist
 COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/prisma ./packages/backend/prisma
 
+COPY --from=builder --chown=nodejs:nodejs /app/packages/shared ./packages/shared
+
 COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/node_modules ./packages/backend/node_modules
-
 
 # Changer vers l'utilisateur non-root
 USER nodejs
