@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 
 import ListingsSettingsPage from './page'
 import { productService } from '@/services/product.service'
@@ -35,16 +35,19 @@ vi.mock('@/services/api', async (importOriginal) => {
   }
 })
 
+const toastMock = vi.hoisted(() => vi.fn())
+
 vi.mock('@/hooks/use-toast', () => ({
-  useToast: () => ({ toast: vi.fn() }),
+  useToast: () => ({ toast: toastMock }),
 }))
 
 const mockedProductService = vi.mocked(productService)
+const defaultDeleteProduct = useAppStore.getState().deleteProduct
 
 describe('ListingsSettingsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    useAppStore.setState({ isAuthenticated: false, user: null, cart: [] })
+    useAppStore.setState({ isAuthenticated: false, user: null, cart: [], deleteProduct: defaultDeleteProduct as any })
   })
 
   it('shows the reserved access state for non sellers', () => {
@@ -91,5 +94,52 @@ describe('ListingsSettingsPage', () => {
     await waitFor(() => {
       expect(mockedProductService.getProductsBySeller).toHaveBeenCalledWith('seller-1', { limit: 100 })
     })
+  })
+
+  it('shows an error toast when deletion fails', async () => {
+    const deleteProductMock = vi.fn().mockResolvedValue({ success: false, message: 'Suppression refusée' })
+
+    useAppStore.setState({
+      isAuthenticated: true,
+      user: { id: 'seller-1', role: 'seller' } as any,
+      deleteProduct: deleteProductMock as any,
+    })
+    mockedProductService.getProductsBySeller.mockResolvedValue({
+      items: [
+        {
+          id: 'product-1',
+          title: 'Pommes bio',
+          price: 12,
+          quantity: 5,
+          status: 'active',
+          organic: true,
+          images: ['/pommes.jpg'],
+          location: { city: 'Angers', postalCode: '49000', coordinates: [1, 2] },
+          category: 'fruits',
+          createdAt: '2026-03-21T10:00:00.000Z',
+          sellerId: 'seller-1',
+        },
+      ],
+      total: 1,
+    } as any)
+
+    render(<ListingsSettingsPage />)
+
+    expect(await screen.findByText(/pommes bio/i)).not.toBeNull()
+
+    fireEvent.click(screen.getAllByRole('button', { name: /supprimer/i })[0])
+    expect(await screen.findByText(/supprimer cette annonce/i)).not.toBeNull()
+
+    fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: /supprimer/i }))
+
+    await waitFor(() => {
+      expect(deleteProductMock).toHaveBeenCalledWith('product-1')
+      expect(toastMock).toHaveBeenCalledWith(expect.objectContaining({
+        title: 'Suppression impossible',
+        variant: 'destructive',
+      }))
+    })
+
+    expect(screen.getByText(/pommes bio/i)).not.toBeNull()
   })
 })

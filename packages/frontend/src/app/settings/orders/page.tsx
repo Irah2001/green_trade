@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { ArrowRight, PackageSearch, ShoppingBag } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -38,6 +38,7 @@ export default function OrdersSettingsPage() {
   const isMounted = useIsClient()
   const user = useAppStore((state) => state.user)
   const isAuthenticated = useAppStore((state) => state.isAuthenticated)
+  const isMountedRef = useRef(false)
 
   const [orders, setOrders] = useState<OrderRow[]>([])
   const [loading, setLoading] = useState(isAuthenticated)
@@ -45,26 +46,36 @@ export default function OrdersSettingsPage() {
 
   const isAuthorized = isAuthenticated
 
+  useEffect(() => {
+    isMountedRef.current = true
+
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
+
   const fetchOrders = useCallback(async (isSilent = false) => {
     if (!isAuthorized) {
-      if (!isSilent) setLoading(false)
-      setOrders([])
+      if (!isSilent && isMountedRef.current) setLoading(false)
+      if (isMountedRef.current) setOrders([])
       return
     }
 
     try {
-      if (!isSilent) {
+      if (!isSilent && isMountedRef.current) {
         setLoading(true)
         setError('')
       }
       const result = await orderService.getMyOrders()
+      if (!isMountedRef.current) return
       setOrders(result.orders)
       setError('')
     } catch (err) {
+      if (!isMountedRef.current) return
       setError(err instanceof Error ? err.message : 'Impossible de charger vos commandes.')
       setOrders([])
     } finally {
-      if (!isSilent) setLoading(false)
+      if (!isSilent && isMountedRef.current) setLoading(false)
     }
   }, [isAuthorized])
 

@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
+import * as React from 'react'
 
 import Navbar from '@/components/layout/Navbar'
 import { useAppStore } from '@/store/useAppStore'
@@ -26,6 +27,28 @@ vi.mock('@/store/useAppStore', () => ({
 
 vi.mock('@/hooks/use-is-client', () => ({
   useIsClient: vi.fn(),
+}))
+
+type Props = { children?: React.ReactNode }
+
+vi.mock('@/components/ui/dropdown-menu', () => ({
+  DropdownMenu: ({ children }: Props) => <div data-slot="dropdown-menu">{children}</div>,
+  DropdownMenuTrigger: ({ children }: Props) => <>{children}</>,
+  DropdownMenuContent: ({ children }: Props) => <div data-testid="dropdown-menu-content">{children}</div>,
+  DropdownMenuLabel: ({ children }: Props) => <div>{children}</div>,
+  DropdownMenuSeparator: () => <hr />,
+  DropdownMenuItem: ({ children, ...props }: Props) => <div {...props}>{children}</div>,
+}))
+
+vi.mock('@/components/ui/sheet', () => ({
+  Sheet: ({ children }: Props) => <div data-slot="sheet">{children}</div>,
+  SheetTrigger: ({ children }: Props) => <>{children}</>,
+  SheetClose: ({ children }: Props) => <>{children}</>,
+  SheetContent: ({ children }: Props) => <div data-testid="sheet-content">{children}</div>,
+  SheetHeader: ({ children }: Props) => <div>{children}</div>,
+  SheetTitle: ({ children }: Props) => <h2>{children}</h2>,
+  SheetDescription: ({ children }: Props) => <p>{children}</p>,
+  SheetFooter: ({ children }: Props) => <div>{children}</div>,
 }))
 
 const mockedUseAppStore = vi.mocked(useAppStore)
@@ -54,7 +77,7 @@ describe('Navbar', () => {
     expect(screen.getAllByText(/connexion/i).length).toBeGreaterThan(0)
   })
 
-  it('shows the seller listings entry for sellers', () => {
+  it('shows the seller listings entry in both menus for sellers', () => {
     mockedUseIsClient.mockReturnValue(true)
     mockedUseAppStore.mockReturnValue({
       getCartCount: () => 0,
@@ -67,6 +90,7 @@ describe('Navbar', () => {
 
     render(<Navbar />)
 
-    expect(screen.getByText(/camille/i)).not.toBeNull()
+    expect(within(screen.getByTestId('dropdown-menu-content')).getByText(/mes annonces/i)).not.toBeNull()
+    expect(within(screen.getByTestId('sheet-content')).getByText(/mes annonces/i)).not.toBeNull()
   })
 })
