@@ -4,14 +4,19 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 import { cn } from "@/lib/utils"
-import { NAV_ITEMS } from '@/components/layout/settings-nav'
+import { getSettingsNavItems } from '@/components/layout/settings-nav'
+import { useIsClient } from "@/hooks/use-is-client"
+import { useAppStore } from "@/store/useAppStore"
 
 export default function SettingsSidebar() {
   const pathname = usePathname()
+  const isMounted = useIsClient()
+  const user = useAppStore((state) => state.user)
+  const navItems = getSettingsNavItems(isMounted ? user?.role ?? null : null)
 
   return (
     <nav className="grid gap-1 text-sm text-muted-foreground w-full">
-      {NAV_ITEMS.map((item) => {
+      {navItems.map((item) => {
         const Icon = item.icon
         const isActive = pathname === item.href
         return (

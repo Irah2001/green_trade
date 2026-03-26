@@ -45,5 +45,10 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
     const error = await response.json().catch(() => ({}))
     throw new Error(error.message || 'Erreur API')
   }
+
+  if (response.status === 204 || response.status === 205) {
+    return undefined as T
+  }
+
   return response.json() as Promise<T>
 }

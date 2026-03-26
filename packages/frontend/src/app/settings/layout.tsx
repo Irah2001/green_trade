@@ -16,13 +16,9 @@ export default function SettingsLayout({ children }: Readonly<SettingsLayoutProp
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40 font-poppins">
       <Navbar />
-      <main className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 p-4 md:gap-8 md:p-10">
+      <main className="flex min-h-[calc(100vh-(--spacing(16)))] flex-1 flex-col gap-4 p-4 md:gap-8 md:p-10">
         <div className="mx-auto grid w-full max-w-6xl gap-2">
           <h1 className="text-3xl font-semibold">Paramètres</h1>
-          <p className="text-muted-foreground text-sm">
-            Personnalisez votre profil, vos informations personnelles et votre
-            mot de passe.
-          </p>
         </div>
         <div className="mx-auto grid w-full max-w-6xl items-start gap-6 md:grid-cols-[200px_1fr] lg:grid-cols-[250px_1fr]">
           <SettingsSidebar />
