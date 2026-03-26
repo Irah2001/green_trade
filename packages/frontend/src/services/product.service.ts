@@ -31,7 +31,26 @@ export type SearchParams = {
   limit?: number;
 };
 
+export type SellerProductsParams = {
+  page?: number;
+  limit?: number;
+};
+
 const FALLBACK_IMAGE = '/images/green_trade.webp';
+
+const buildQueryString = (params?: Record<string, unknown>) => {
+  if (!params) {
+    return '';
+  }
+
+  const queryString = new URLSearchParams(
+    Object.entries(params)
+      .filter(([_, value]) => value !== undefined && value !== '')
+      .map(([key, value]) => [key, String(value)])
+  ).toString();
+
+  return queryString ? `?${queryString}` : '';
+};
 
 export const normalizeSellerSummary = (seller: any): SellerSummary | null => {
   if (!seller) {
@@ -95,15 +114,21 @@ export const productService = {
    * Récupère la liste des produits avec filtres optionnels.
    */
   async getProducts(params?: SearchParams): Promise<{ items: any[]; total: number }> {
-    const queryString = params
-      ? '?' + new URLSearchParams(
-          Object.entries(params)
-            .filter(([_, value]) => value !== undefined && value !== '')
-            .map(([key, value]) => [key, String(value)])
-        ).toString()
-      : '';
+    const queryString = buildQueryString(params);
 
     return apiFetch<{ items: any[]; total: number }>(`/api/products${queryString}`);
+  },
+
+  /**
+   * Récupère les produits d'un vendeur.
+   */
+  async getProductsBySeller(
+    sellerId: string,
+    params?: SellerProductsParams
+  ): Promise<{ items: any[]; total: number }> {
+    const queryString = buildQueryString(params);
+
+    return apiFetch<{ items: any[]; total: number }>(`/api/products/seller/${sellerId}${queryString}`);
   },
 
   /**

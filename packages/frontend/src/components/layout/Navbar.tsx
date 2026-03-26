@@ -11,6 +11,7 @@ import {
   Apple,
   Carrot,
   ShoppingBasket,
+  ShoppingBag,
   Plus,
   LogOut,
   Settings,
@@ -56,6 +57,7 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState('');
   const cartCount = isClient ? getCartCount() : 0;
   const showAccountState = isClient && isAuthenticated && user;
+  const isSeller = Boolean(showAccountState && user.role === 'seller');
 
   type AppPage = "products" | "cart" | "home" | "product-detail" | "publish" | "messages";
 
@@ -186,6 +188,12 @@ export default function Navbar() {
                     <DropdownMenuItem onClick={() => router.push('/admin/orders')}>
                       <LayoutDashboard className="h-4 w-4 mr-2" />
                       Tableau de bord Admin
+                    </DropdownMenuItem>
+                  )}
+                  {isSeller && (
+                    <DropdownMenuItem onClick={() => router.push('/settings/listings')}>
+                      <ShoppingBag className="h-4 w-4 mr-2" />
+                      Mes annonces
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem onClick={() => router.push('/settings/profile')}>
@@ -319,6 +327,18 @@ export default function Navbar() {
                           >
                             <LayoutDashboard className="h-4 w-4 mr-2" />
                             Tableau de bord Admin
+                          </Button>
+                        </SheetClose>
+                      )}
+                      {isSeller && (
+                        <SheetClose asChild>
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start transition-colors duration-200"
+                            onClick={() => router.push('/settings/listings')}
+                          >
+                            <ShoppingBag className="h-4 w-4 mr-2" />
+                            Mes annonces
                           </Button>
                         </SheetClose>
                       )}

@@ -53,4 +53,20 @@ describe('Navbar', () => {
     expect(screen.queryByText(/ana dupont/i)).toBeNull()
     expect(screen.getAllByText(/connexion/i).length).toBeGreaterThan(0)
   })
+
+  it('shows the seller listings entry for sellers', () => {
+    mockedUseIsClient.mockReturnValue(true)
+    mockedUseAppStore.mockReturnValue({
+      getCartCount: () => 0,
+      user: { firstName: 'Camille', lastName: 'Durand', role: 'seller' },
+      isAuthenticated: true,
+      logout: vi.fn(),
+      searchProducts: vi.fn(),
+      setCurrentPage: vi.fn(),
+    } as any)
+
+    render(<Navbar />)
+
+    expect(screen.getByText(/camille/i)).not.toBeNull()
+  })
 })

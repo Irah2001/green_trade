@@ -1,14 +1,11 @@
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, Pencil } from 'lucide-react'
-// UI Components
-import { Button } from '@/components/ui/button'
 // Services
 import { getAdminProduct } from '@/services/admin/products.service'
 // Components
 import AdminPageHeader from '@/components/admin/AdminPageHeader'
 import AdminCapabilityBanner from '@/components/admin/AdminCapabilityBanner'
 import AdminProductDetail from '@/components/admin/products/AdminProductDetail'
+import AdminProductActions from '@/components/admin/products/AdminProductActions'
 
 
 interface Props {
@@ -28,22 +25,7 @@ export default async function AdminProductDetailPage({ params }: Readonly<Props>
       <AdminPageHeader
         title={result.data.title}
         description={result.data.description}
-        actions={
-          <div className="flex gap-2">
-            <Button asChild variant="outline" size="sm">
-              <Link href="/admin/products">
-                <ArrowLeft className="mr-1 h-4 w-4" />
-                Retour
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="sm">
-              <Link href={`/admin/products/${id}/edit`}>
-                <Pencil className="mr-1 h-4 w-4" />
-                Modifier
-              </Link>
-            </Button>
-          </div>
-        }
+        actions={<AdminProductActions productId={id} productTitle={result.data.title} />}
       />
       <AdminCapabilityBanner resource="products" action="detail" source={result.source} />
       <AdminProductDetail product={result.data} source={result.source} />
