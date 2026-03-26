@@ -53,6 +53,7 @@ model Product {
   views       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  isDeleted   Boolean  @default(false)
 
   // relations
   seller        User?          @relation("SellerProducts", fields: [sellerId], references: [id])
