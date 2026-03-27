@@ -155,36 +155,7 @@ export const swaggerDocument = {
         tags: ['Panier'],
         security: [{ bearerAuth: [] }],
         responses: {
-          200: {
-            description: 'Panier récupéré',
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  properties: {
-                    id: { type: 'string', example: '507f1f77bcf86cd799439011' },
-                    userId: { type: 'string', example: '507f1f77bcf86cd799439012' },
-                    createdAt: { type: 'string', format: 'date-time' },
-                    updatedAt: { type: 'string', format: 'date-time' },
-                    items: {
-                      type: 'array',
-                      items: {
-                        type: 'object',
-                        properties: {
-                          id: { type: 'string' },
-                          cartId: { type: 'string' },
-                          productId: { type: 'string' },
-                          quantity: { type: 'integer', example: 2 },
-                          unitPriceSnapshot: { type: 'number', example: 12.5 },
-                          product: { type: 'object' }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
+          200: { description: 'Panier récupéré' },
           401: { description: 'Non autorisé' },
           500: { description: 'Erreur serveur' }
         }
@@ -229,145 +200,9 @@ export const swaggerDocument = {
         }
       }
     },
-    '/api/products': {
-      get: {
-        summary: 'Lister et rechercher les produits',
-        tags: ['Produits'],
-        parameters: [
-          { name: 'text', in: 'query', schema: { type: 'string' }, description: 'Recherche textuelle (titre, description)' },
-          { name: 'category', in: 'query', schema: { type: 'string', enum: ['fruits', 'vegetables', 'baskets'] } },
-          { name: 'minPrice', in: 'query', schema: { type: 'number' } },
-          { name: 'maxPrice', in: 'query', schema: { type: 'number' } },
-          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
-          { name: 'limit', in: 'query', schema: { type: 'integer', default: 20 } }
-        ],
-        responses: {
-          200: { description: 'Liste des produits ({ items, total })' },
-          500: { description: 'Erreur serveur' }
-        }
-      },
-      post: {
-        summary: 'Créer un produit',
-        tags: ['Produits'],
-        security: [{ bearerAuth: [] }],
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                required: ['title', 'description', 'price', 'category'],
-                properties: {
-                  title: { type: 'string', example: 'Pommes bio du verger' },
-                  description: { type: 'string', example: 'Pommes non traitées, récoltées hier.' },
-                  price: { type: 'number', example: 2.5 },
-                  category: { type: 'string', enum: ['fruits', 'vegetables', 'baskets'], example: 'fruits' },
-                  condition: { type: 'string', enum: ['neuf', 'excellent', 'bon', 'acceptable'], example: 'bon' },
-                  images: { type: 'array', items: { type: 'string' } },
-                  tags: { type: 'array', items: { type: 'string' }, example: ['bio', 'surplus'] },
-                  status: { type: 'string', enum: ['active', 'sold', 'reserved', 'archived'], example: 'active' },
-                  location: {
-                    type: 'object',
-                    properties: {
-                      type: { type: 'string', example: 'Point' },
-                      coordinates: { type: 'array', items: { type: 'number' }, example: [-1.5536, 47.2184] },
-                      city: { type: 'string', example: 'Nantes' },
-                      postalCode: { type: 'string', example: '44000' }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        responses: {
-          201: { description: 'Produit créé' },
-          400: { description: 'Données invalides' },
-          401: { description: 'Non autorisé' }
-        }
-      }
-    },
-    '/api/products/seller/{sellerId}': {
-      get: {
-        summary: 'Lister les produits d\'un vendeur',
-        tags: ['Produits'],
-        parameters: [
-          { name: 'sellerId', in: 'path', required: true, schema: { type: 'string' }, description: 'ID du vendeur' },
-          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
-          { name: 'limit', in: 'query', schema: { type: 'integer', default: 20 } }
-        ],
-        responses: {
-          200: { description: 'Liste des produits du vendeur ({ items, total })' },
-          500: { description: 'Erreur serveur' }
-        }
-      }
-    },
-    '/api/products/{id}': {
-      get: {
-        summary: 'Récupérer un produit par ID',
-        tags: ['Produits'],
-        parameters: [
-          { name: 'id', in: 'path', required: true, schema: { type: 'string' } }
-        ],
-        responses: {
-          200: { description: 'Produit trouvé' },
-          404: { description: 'Produit non trouvé' },
-          500: { description: 'Erreur serveur' }
-        }
-      },
-      put: {
-        summary: 'Mettre à jour un produit',
-        tags: ['Produits'],
-        security: [{ bearerAuth: [] }],
-        parameters: [
-          { name: 'id', in: 'path', required: true, schema: { type: 'string' } }
-        ],
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  title: { type: 'string' },
-                  description: { type: 'string' },
-                  price: { type: 'number' },
-                  category: { type: 'string', enum: ['fruits', 'vegetables', 'baskets'] },
-                  condition: { type: 'string', enum: ['neuf', 'excellent', 'bon', 'acceptable'] },
-                  status: { type: 'string', enum: ['active', 'sold', 'reserved', 'archived'] },
-                  images: { type: 'array', items: { type: 'string' } },
-                  tags: { type: 'array', items: { type: 'string' } }
-                }
-              }
-            }
-          }
-        },
-        responses: {
-          200: { description: 'Produit mis à jour' },
-          400: { description: 'Données invalides' },
-          401: { description: 'Non autorisé' },
-          403: { description: 'Accès interdit (pas propriétaire)' },
-          404: { description: 'Produit non trouvé' }
-        }
-      },
-      delete: {
-        summary: 'Supprimer un produit',
-        tags: ['Produits'],
-        security: [{ bearerAuth: [] }],
-        parameters: [
-          { name: 'id', in: 'path', required: true, schema: { type: 'string' } }
-        ],
-        responses: {
-          204: { description: 'Produit supprimé' },
-          401: { description: 'Non autorisé' },
-          403: { description: 'Accès interdit (pas propriétaire)' },
-          404: { description: 'Produit non trouvé' }
-        }
-      }
-    },
     '/api/cart/items/{productId}': {
       put: {
-        summary: 'Mettre à jour la quantité d\'un produit dans le panier',
+        summary: 'Mettre à jour la quantité d\'un produit',
         tags: ['Panier'],
         security: [{ bearerAuth: [] }],
         parameters: [
@@ -375,8 +210,7 @@ export const swaggerDocument = {
             name: 'productId',
             in: 'path',
             required: true,
-            schema: { type: 'string' },
-            example: '507f1f77bcf86cd799439011'
+            schema: { type: 'string' }
           }
         ],
         requestBody: {
@@ -387,7 +221,7 @@ export const swaggerDocument = {
                 type: 'object',
                 required: ['quantity'],
                 properties: {
-                  quantity: { type: 'integer', example: 3 }
+                  quantity: { type: 'integer', example: 1 }
                 }
               }
             }
@@ -397,7 +231,6 @@ export const swaggerDocument = {
           200: { description: 'Quantité mise à jour' },
           400: { description: 'Requête invalide' },
           401: { description: 'Non autorisé' },
-          404: { description: 'Produit introuvable dans le panier' },
           500: { description: 'Erreur serveur' }
         }
       },
@@ -410,15 +243,13 @@ export const swaggerDocument = {
             name: 'productId',
             in: 'path',
             required: true,
-            schema: { type: 'string' },
-            example: '507f1f77bcf86cd799439011'
+            schema: { type: 'string' }
           }
         ],
         responses: {
           200: { description: 'Produit supprimé' },
           400: { description: 'Requête invalide' },
           401: { description: 'Non autorisé' },
-          404: { description: 'Produit introuvable dans le panier' },
           500: { description: 'Erreur serveur' }
         }
       }
@@ -456,36 +287,7 @@ export const swaggerDocument = {
         tags: ['Commandes'],
         security: [{ bearerAuth: [] }],
         responses: {
-          200: {
-            description: 'Liste des commandes (achetées et vendues)',
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  properties: {
-                    orders: {
-                      type: 'array',
-                      items: {
-                        type: 'object',
-                        properties: {
-                          id: { type: 'string' },
-                          buyerId: { type: 'string' },
-                          sellerId: { type: 'string' },
-                          productId: { type: 'string' },
-                          amount: { type: 'number', example: 25 },
-                          quantity: { type: 'integer', example: 2 },
-                          currency: { type: 'string', example: 'EUR' },
-                          status: { type: 'string', example: 'pending' },
-                          createdAt: { type: 'string', format: 'date-time' },
-                          updatedAt: { type: 'string', format: 'date-time' }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
+          200: { description: 'Liste des commandes (achetées et vendues)' },
           401: { description: 'Non authentifié' },
           500: { description: 'Erreur serveur' }
         }
@@ -535,10 +337,10 @@ export const swaggerDocument = {
                 type: 'object',
                 required: ['status'],
                 properties: {
-                  status: {
-                    type: 'string',
+                  status: { 
+                    type: 'string', 
                     enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'],
-                    example: 'confirmed'
+                    example: 'confirmed' 
                   }
                 }
               }
@@ -576,17 +378,17 @@ export const swaggerDocument = {
                 type: 'object',
                 required: ['trackingNumber'],
                 properties: {
-                  trackingNumber: {
-                    type: 'string',
-                    example: 'FR123456789'
+                  trackingNumber: { 
+                    type: 'string', 
+                    example: 'FR123456789' 
                   },
-                  carrier: {
-                    type: 'string',
-                    example: 'Colissimo'
+                  carrier: { 
+                    type: 'string', 
+                    example: 'Colissimo' 
                   },
-                  trackingUrl: {
-                    type: 'string',
-                    example: 'https://tracking.colissimo.fr/FR123456789'
+                  trackingUrl: { 
+                    type: 'string', 
+                    example: 'https://tracking.colissimo.fr/FR123456789' 
                   }
                 }
               }
@@ -609,7 +411,7 @@ export const swaggerDocument = {
         tags: ['Utilisateurs'],
         security: [{ bearerAuth: [] }],
         responses: {
-          200: {
+          200: { 
             description: 'Profil utilisateur récupéré',
             content: {
               'application/json': {
@@ -653,7 +455,7 @@ export const swaggerDocument = {
                   phone: { type: 'string', example: '+33612345678' },
                   city: { type: 'string', example: 'Paris' },
                   postalCode: { type: 'string', example: '75001' },
-                  profile: {
+                  profile: { 
                     type: 'object',
                     description: 'Données JSON personnalisées (bio, préférences, etc.)'
                   }
@@ -681,8 +483,8 @@ export const swaggerDocument = {
                 type: 'object',
                 required: ['password'],
                 properties: {
-                  password: {
-                    type: 'string',
+                  password: { 
+                    type: 'string', 
                     example: 'Test1234!',
                     description: 'Mot de passe actuel pour confirmer la suppression'
                   }
@@ -696,44 +498,6 @@ export const swaggerDocument = {
           400: { description: 'Mot de passe manquant' },
           401: { description: 'Non authentifié ou mot de passe incorrect' },
           404: { description: 'Utilisateur non trouvé' },
-          500: { description: 'Erreur serveur' }
-        }
-      }
-    },
-    '/api/users': {
-      get: {
-        summary: 'Récupérer tous les utilisateurs (admin uniquement)',
-        tags: ['Utilisateurs', 'Administration'],
-        security: [{ bearerAuth: [] }],
-        responses: {
-          200: {
-            description: 'Liste des utilisateurs récupérée',
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      id: { type: 'string', example: '507f1f77bcf86cd799439011' },
-                      email: { type: 'string', example: 'user@example.com' },
-                      firstName: { type: 'string', example: 'Marie' },
-                      lastName: { type: 'string', example: 'Dupont' },
-                      role: { type: 'string', example: 'seller' },
-                      phone: { type: 'string', example: '+33612345678' },
-                      city: { type: 'string', example: 'Paris' },
-                      postalCode: { type: 'string', example: '75001' },
-                      profile: { type: 'object' },
-                      rating: { type: 'number', example: 4.5 },
-                      createdAt: { type: 'string', format: 'date-time' }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          401: { description: 'Non authentifié' },
-          403: { description: 'Accès réservé aux administrateurs' },
           500: { description: 'Erreur serveur' }
         }
       }
@@ -753,7 +517,7 @@ export const swaggerDocument = {
           }
         ],
         responses: {
-          200: {
+          200: { 
             description: 'Profil public récupéré',
             content: {
               'application/json': {
@@ -786,140 +550,6 @@ export const swaggerDocument = {
         }
       }
     },
-    '/api/admin/rgpd/cleanup': {
-      post: {
-        summary: 'Nettoyer les comptes anonymisés expirés',
-        tags: ['Administration'],
-        security: [{ bearerAuth: [] }],
-        requestBody: {
-          required: false,
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  daysToKeep: {
-                    type: 'integer',
-                    example: 30,
-                    description: 'Nombre de jours avant suppression des comptes anonymisés'
-                  }
-                }
-              }
-            }
-          }
-        },
-        responses: {
-          200: {
-            description: 'Nettoyage RGPD terminé',
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  properties: {
-                    message: { type: 'string', example: 'Nettoyage RGPD terminé.' },
-                    deletedCount: { type: 'integer', example: 12 },
-                    daysToKeep: { type: 'integer', example: 30 }
-                  }
-                }
-              }
-            }
-          },
-          401: { description: 'Non authentifié' },
-          403: { description: 'Accès refusé. Admin requis' },
-          500: { description: 'Erreur serveur' }
-        }
-      }
-    },
-    '/api/admin/users/{id}': {
-      patch: {
-        summary: 'Admin: modifier un utilisateur',
-        tags: ['Administration'],
-        security: [{ bearerAuth: [] }],
-        parameters: [
-          {
-            name: 'id',
-            in: 'path',
-            required: true,
-            schema: { type: 'string' },
-            example: '507f1f77bcf86cd799439011'
-          }
-        ],
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  firstName: { type: 'string', example: 'Marie' },
-                  lastName: { type: 'string', example: 'Dupont' },
-                   role: { type: 'string', enum: ['buyer', 'seller', 'admin'], example: 'seller' },
-                  phone: { type: 'string', example: '+33612345678' },
-                  city: { type: 'string', example: 'Paris' },
-                  postalCode: { type: 'string', example: '75001' },
-                  profile: { type: 'object', description: 'Données JSON personnalisées' }
-                }
-              }
-            }
-          }
-        },
-        responses: {
-          200: {
-            description: 'Utilisateur mis à jour',
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  properties: {
-                    message: { type: 'string', example: 'Utilisateur mis à jour.' },
-                    user: { type: 'object' }
-                  }
-                }
-              }
-            }
-          },
-          400: { description: 'Aucune donnée fournie ou rôle invalide' },
-          401: { description: 'Non authentifié' },
-          403: { description: 'Accès réservé aux administrateurs' },
-          404: { description: 'Utilisateur non trouvé' },
-          500: { description: 'Erreur serveur' }
-        }
-      },
-      delete: {
-        summary: 'Admin: supprimer un utilisateur (RGPD)',
-        tags: ['Administration'],
-        security: [{ bearerAuth: [] }],
-        parameters: [
-          {
-            name: 'id',
-            in: 'path',
-            required: true,
-            schema: { type: 'string' },
-            example: '507f1f77bcf86cd799439011'
-          }
-        ],
-        responses: {
-          200: {
-            description: 'Utilisateur supprimé (anonymisé RGPD)',
-            content: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  properties: {
-                    message: { type: 'string', example: 'Utilisateur supprimé (anonymisé RGPD).' }
-                  }
-                }
-              }
-            }
-          },
-          400: { description: 'ID manquant ou tentative de suppression de son propre compte' },
-          401: { description: 'Non authentifié' },
-          403: { description: 'Accès réservé aux administrateurs' },
-          404: { description: 'Utilisateur non trouvé' },
-          500: { description: 'Erreur serveur' }
-        }
-      }
-    },
     '/api/checkout/create-session': {
       post: {
         summary: 'Créer une session de paiement Stripe',
@@ -927,23 +557,23 @@ export const swaggerDocument = {
         tags: ['Paiement'],
         security: [{ bearerAuth: [] }],
         responses: {
-          200: {
+          200: { 
             description: 'Session créée avec succès. Retourne l\'URL vers laquelle rediriger l\'utilisateur.',
             content: {
               'application/json': {
                 schema: {
                   type: 'object',
                   properties: {
-                    url: {
-                      type: 'string',
-                      example: 'https://checkout.stripe.com/c/pay/cs_test_a1b2c3d4e5f6g7h8i9j0...'
+                    url: { 
+                      type: 'string', 
+                      example: 'https://checkout.stripe.com/c/pay/cs_test_a1b2c3d4e5f6g7h8i9j0...' 
                     }
                   }
                 }
               }
             }
           },
-          400: {
+          400: { 
             description: 'Panier vide',
             content: {
               'application/json': {
@@ -956,32 +586,191 @@ export const swaggerDocument = {
               }
             }
           },
-          401: {
-            description: 'Non autorisé (Token manquant ou invalide)'
+          401: { 
+            description: 'Non autorisé (Token manquant ou invalide)' 
           },
-          500: {
-            description: 'Erreur serveur lors de la communication avec Stripe'
+          500: { 
+            description: 'Erreur serveur lors de la communication avec Stripe' 
           }
         }
       }
     },
-    '/api/checkout/confirm-session': {
-      post: {
-        summary: 'Confirmer le paiement et créer la commande',
-        description: 'Vérifie le statut du paiement auprès de Stripe, crée les transactions correspondantes pour chaque article du panier, et vide le panier de l\'utilisateur.',
-        tags: ['Paiement'],
+    '/api/admin/stats': {
+      get: {
+        summary: 'Récupérer les statistiques globales de la plateforme',
+        description: 'Retourne les statistiques complètes: utilisateurs, produits, commandes, revenus (Admin uniquement)',
+        tags: ['Admin'],
         security: [{ bearerAuth: [] }],
+        responses: {
+          200: {
+            description: 'Statistiques récupérées avec succès',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    totalUsers: { type: 'number', example: 156 },
+                    totalProducts: { type: 'number', example: 423 },
+                    totalOrders: { type: 'number', example: 89 },
+                    totalRevenue: { type: 'number', example: 4567.89 },
+                    ordersByStatus: {
+                      type: 'object',
+                      properties: {
+                        pending: { type: 'number', example: 12 },
+                        paid: { type: 'number', example: 34 },
+                        shipped: { type: 'number', example: 28 },
+                        delivered: { type: 'number', example: 15 }
+                      }
+                    },
+                    recentOrders: { type: 'number', example: 23 }
+                  }
+                }
+              }
+            }
+          },
+          403: { description: 'Accès refusé (rôle admin requis)' },
+          500: { description: 'Erreur serveur' }
+        }
+      }
+    },
+    '/api/admin/users': {
+      get: {
+        summary: 'Récupérer tous les utilisateurs',
+        description: 'Liste tous les utilisateurs avec pagination et filtres (Admin uniquement)',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            in: 'query',
+            name: 'page',
+            schema: { type: 'integer', default: 1 },
+            description: 'Numéro de page'
+          },
+          {
+            in: 'query',
+            name: 'limit',
+            schema: { type: 'integer', default: 20 },
+            description: 'Nombre d\'éléments par page'
+          },
+          {
+            in: 'query',
+            name: 'role',
+            schema: { type: 'string', enum: ['all', 'buyer', 'farmer', 'admin'] },
+            description: 'Filtrer par rôle'
+          },
+          {
+            in: 'query',
+            name: 'search',
+            schema: { type: 'string' },
+            description: 'Rechercher par email, prénom ou nom'
+          }
+        ],
+        responses: {
+          200: { description: 'Liste des utilisateurs avec pagination' },
+          403: { description: 'Accès refusé' },
+          500: { description: 'Erreur serveur' }
+        }
+      }
+    },
+    '/api/admin/orders': {
+      get: {
+        summary: 'Récupérer toutes les commandes',
+        description: 'Liste toutes les commandes avec pagination et filtres (Admin uniquement)',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            in: 'query',
+            name: 'page',
+            schema: { type: 'integer', default: 1 },
+            description: 'Numéro de page'
+          },
+          {
+            in: 'query',
+            name: 'limit',
+            schema: { type: 'integer', default: 20 },
+            description: 'Nombre d\'éléments par page'
+          },
+          {
+            in: 'query',
+            name: 'status',
+            schema: { type: 'string', enum: ['all', 'pending', 'paid', 'shipped', 'delivered'] },
+            description: 'Filtrer par statut'
+          }
+        ],
+        responses: {
+          200: { description: 'Liste des commandes avec pagination' },
+          403: { description: 'Accès refusé' },
+          500: { description: 'Erreur serveur' }
+        }
+      }
+    },
+    '/api/admin/products': {
+      get: {
+        summary: 'Récupérer tous les produits',
+        description: 'Liste tous les produits y compris inactifs avec pagination (Admin uniquement)',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            in: 'query',
+            name: 'page',
+            schema: { type: 'integer', default: 1 },
+            description: 'Numéro de page'
+          },
+          {
+            in: 'query',
+            name: 'limit',
+            schema: { type: 'integer', default: 20 },
+            description: 'Nombre d\'éléments par page'
+          },
+          {
+            in: 'query',
+            name: 'status',
+            schema: { type: 'string', enum: ['all', 'active', 'inactive', 'deleted'] },
+            description: 'Filtrer par statut'
+          }
+        ],
+        responses: {
+          200: { description: 'Liste des produits avec pagination' },
+          403: { description: 'Accès refusé' },
+          500: { description: 'Erreur serveur' }
+        }
+      }
+    },
+    '/api/admin/users/{id}/ban': {
+      patch: {
+        summary: 'Bannir ou débannir un utilisateur',
+        description: 'Bloque ou débloque l\'accès d\'un utilisateur à la plateforme (Admin uniquement)',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            in: 'path',
+            name: 'id',
+            required: true,
+            schema: { type: 'string' },
+            description: 'ID de l\'utilisateur',
+            example: '507f1f77bcf86cd799439011'
+          }
+        ],
         requestBody: {
           required: true,
           content: {
             'application/json': {
               schema: {
                 type: 'object',
-                required: ['sessionId'],
+                required: ['isBanned'],
                 properties: {
-                  sessionId: {
+                  isBanned: {
+                    type: 'boolean',
+                    example: true,
+                    description: 'true pour bannir, false pour débannir'
+                  },
+                  reason: {
                     type: 'string',
-                    example: 'cs_test_a1b2c3d4e5f6g7h8i9j0...'
+                    example: 'Violation des conditions d\'utilisation',
+                    description: 'Raison du bannissement (optionnel)'
                   }
                 }
               }
@@ -989,40 +778,31 @@ export const swaggerDocument = {
           }
         },
         responses: {
-          201: {
-            description: 'Paiement validé, transactions créées et panier vidé.'
-          },
-          200: {
-            description: 'Commande déjà validée précédemment (Filtre anti-doublon).'
-          },
-          400: {
-            description: 'Session ID manquant, paiement non finalisé, ou panier vide.'
-          },
-          401: {
-            description: 'Non autorisé (Token manquant ou invalide).'
-          },
-          500: {
-            description: 'Erreur serveur.'
-          }
+          200: { description: 'Utilisateur banni/débanni avec succès' },
+          400: { description: 'Données invalides' },
+          403: { description: 'Accès refusé ou tentative de bannir un admin' },
+          404: { description: 'Utilisateur non trouvé' },
+          500: { description: 'Erreur serveur' }
         }
-      },
+      }
     },
-    '/api/upload': {
+    '/api/admin/rgpd/cleanup': {
       post: {
-        summary: 'Uploader une image sur Cloudinary',
-        tags: ['Médias'],
+        summary: 'Nettoyage RGPD des comptes anonymisés',
+        description: 'Supprime les comptes anonymisés après le délai de rétention (Admin uniquement)',
+        tags: ['Admin'],
         security: [{ bearerAuth: [] }],
         requestBody: {
-          required: true,
           content: {
-            'multipart/form-data': {
+            'application/json': {
               schema: {
                 type: 'object',
                 properties: {
-                  image: {
-                    type: 'string',
-                    format: 'binary',
-                    description: 'Le fichier image à uploader (jpg, png, webp)'
+                  daysToKeep: {
+                    type: 'number',
+                    default: 30,
+                    example: 30,
+                    description: 'Nombre de jours de rétention'
                   }
                 }
               }
@@ -1030,9 +810,9 @@ export const swaggerDocument = {
           }
         },
         responses: {
-          200: { description: 'Image uploadée avec succès (retourne l\'URL Cloudinary)' },
-          400: { description: 'Aucun fichier fourni' },
-          500: { description: 'Erreur serveur lors de l\'upload' }
+          200: { description: 'Nettoyage RGPD effectué avec succès' },
+          403: { description: 'Accès refusé' },
+          500: { description: 'Erreur serveur' }
         }
       }
     }
