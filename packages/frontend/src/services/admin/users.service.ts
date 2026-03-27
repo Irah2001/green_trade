@@ -79,7 +79,7 @@ export async function getAdminUser(id: string): Promise<AdminQueryResult<PublicU
 export interface AdminUserUpdatePayload {
   firstName?: string
   lastName?: string
-  role?: 'buyer' | 'seller' | 'farmer' | 'admin'
+  role?: 'buyer' | 'seller' | 'admin'
   phone?: string | null
   city?: string | null
   postalCode?: string | null

@@ -82,7 +82,10 @@ export class ProductPrismaRepository {
   async findBySellerId(sellerId: string, page = 1, limit = 20): Promise<Product[]> {
     const skip = (page - 1) * limit;
     const items = await prisma.product.findMany({
-      where: { sellerId },
+      where: {
+        sellerId,
+        isDeleted: false
+      },
       orderBy: { createdAt: 'desc' },
       skip,
       take: limit,
@@ -101,7 +104,9 @@ export class ProductPrismaRepository {
     limit?: number;
   }): Promise<{ items: Product[]; total: number }> {
     const { text, category, minPrice, maxPrice, page = 1, limit = 20 } = query;
-    const where: any = {};
+    const where: any = {
+      isDeleted: false
+    };
 
     const and: any[] = [];
 
@@ -144,8 +149,14 @@ export class ProductPrismaRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await prisma.product.delete({ where: { id } });
-  }
+  // On ne supprime plus, on archive !
+  await prisma.product.update({
+    where: { id },
+    data: {
+      isDeleted: true
+    }
+  });
+}
 }
 
 export default ProductPrismaRepository;

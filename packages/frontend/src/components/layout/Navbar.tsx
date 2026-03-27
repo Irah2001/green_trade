@@ -2,8 +2,24 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useAppStore } from '@/store/useAppStore';
+import { useRouter, usePathname } from 'next/navigation';
+import {
+  Search,
+  ShoppingCart,
+  Menu,
+  Leaf,
+  Apple,
+  Carrot,
+  ShoppingBasket,
+  ShoppingBag,
+  Plus,
+  LogOut,
+  Settings,
+  LayoutDashboard,
+  MessageCircle,
+} from 'lucide-react';
+
+// UI Components
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';

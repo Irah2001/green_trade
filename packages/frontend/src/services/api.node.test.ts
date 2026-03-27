@@ -39,4 +39,20 @@ describe('apiFetch', () => {
       })
     )
   })
+
+  it('returns undefined for no-content responses', async () => {
+    mockedCookies.mockResolvedValue({
+      get: () => undefined,
+    } as any)
+
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 204,
+      json: vi.fn().mockRejectedValue(new Error('Unexpected end of JSON input')),
+    })
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(apiFetch('/api/products/1', { method: 'DELETE' })).resolves.toBeUndefined()
+  })
 })

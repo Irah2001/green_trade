@@ -21,7 +21,7 @@ describe('getPublicUsersByIds', () => {
         id,
         firstName: id === 'seller-1' ? 'Camille' : 'Lucas',
         lastName: id === 'seller-1' ? 'Durand' : 'Martin',
-        role: 'producer',
+        role: 'seller',
         city: id === 'seller-1' ? 'Nantes' : 'Lyon',
         postalCode: id === 'seller-1' ? '44000' : '69000',
         profile: {

@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import prisma from '../prismaClient.js';
 import { sendWelcomeEmail, sendResetPasswordEmail, sendPasswordChangedEmail } from '../services/email.service.js';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1d';
+const SIGNUP_ROLES = ['buyer', 'seller'] as const;
 
 // Regex pour validation du mot de passe
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$/;
@@ -19,6 +20,12 @@ export const signup = async (req: Request, res: Response) => {
     if (!PASSWORD_REGEX.test(password)) {
       return res.status(400).json({
         message: "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial."
+      });
+    }
+
+    if (!SIGNUP_ROLES.includes(accountType)) {
+      return res.status(400).json({
+        message: `Type de compte invalide. Valeurs: ${SIGNUP_ROLES.join(', ')}`,
       });
     }
 

@@ -1,7 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-import { normalizeProduct } from '@/services/product.service';
+import { productService, normalizeProduct } from '@/services/product.service';
 import { normalizeCartResponse } from '@/services/cart.service';
+
+vi.mock('@/services/api', () => ({
+  apiFetch: vi.fn(),
+}))
 
 describe('normalizeProduct', () => {
   it('keeps the public seller summary from the API without synthesizing labels', () => {
@@ -94,3 +98,14 @@ describe('normalizeCartResponse', () => {
     expect(cart.items[0].product.seller?.profile).not.toHaveProperty('address');
   });
 });
+
+describe('productService', () => {
+  it('builds the seller listings endpoint with query params', async () => {
+    const api = await import('@/services/api')
+    ;(api.apiFetch as any).mockResolvedValue({ items: [], total: 0 })
+
+    await productService.getProductsBySeller('seller-1', { page: 2, limit: 20 })
+
+    expect(api.apiFetch).toHaveBeenCalledWith('/api/products/seller/seller-1?page=2&limit=20')
+  })
+})

@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import { USER_ROLES } from '@greentrade/shared';
 import prisma from '../prismaClient.js';
 import { AuthRequest } from '../middlewares/auth.middleware.js';
 import { auditLog } from '../utils/audit.utils.js';
@@ -434,9 +435,8 @@ export const adminUpdateUser = async (req: AuthRequest, res: Response) => {
     if (firstName !== undefined) updateData.firstName = firstName;
     if (lastName !== undefined) updateData.lastName = lastName;
     if (role !== undefined) {
-      const validRoles = ['buyer', 'seller', 'farmer', 'admin'];
-      if (!validRoles.includes(role)) {
-        return res.status(400).json({ message: `Rôle invalide. Valeurs: ${validRoles.join(', ')}` });
+      if (!USER_ROLES.includes(role)) {
+        return res.status(400).json({ message: `Rôle invalide. Valeurs: ${USER_ROLES.join(', ')}` });
       }
       updateData.role = role;
     }

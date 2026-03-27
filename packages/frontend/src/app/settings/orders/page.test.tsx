@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import OrdersSettingsPage from './page'
 import { orderService } from '@/services/order.service'
 import { useAppStore } from '@/store/useAppStore'
@@ -60,6 +60,33 @@ describe('OrdersSettingsPage', () => {
     await screen.findByText(/aucune commande/i)
   })
 
+  it('ignores a late orders response after unmount', async () => {
+    useAppStore.setState({ isAuthenticated: true, user: { id: 'user-1' } as any })
+    let resolveOrders: ((value: any) => void) | undefined
+    mockedOrderService.getMyOrders.mockReturnValue(
+      new Promise((resolve) => {
+        resolveOrders = resolve
+      }) as any
+    )
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    const { unmount } = render(<OrdersSettingsPage />)
+
+    await waitFor(() => {
+      expect(mockedOrderService.getMyOrders).toHaveBeenCalled()
+    })
+
+    unmount()
+
+    await act(async () => {
+      resolveOrders?.({ orders: [] })
+      await Promise.resolve()
+    })
+
+    expect(consoleErrorSpy).not.toHaveBeenCalled()
+    consoleErrorSpy.mockRestore()
+  })
+
   it('uses the primary green style for the detail button', async () => {
     useAppStore.setState({ isAuthenticated: true, user: { id: 'user-1' } as any })
     mockedOrderService.getMyOrders.mockResolvedValue({
@@ -83,8 +110,8 @@ describe('OrdersSettingsPage', () => {
     render(<OrdersSettingsPage />)
 
     const link = await screen.findByRole('link', { name: /voir détail/i })
-    expect(link.className).toContain('bg-[#4A7C59]')
+    expect(link.className).toContain('bg-olive')
     expect(link.className).toContain('text-white')
-    expect(link.className).toContain('hover:bg-[#3a6349]')
+    expect(link.className).toContain('hover:bg-olive-dark')
   })
 })
