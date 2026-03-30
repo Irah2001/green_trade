@@ -19,7 +19,7 @@ function normalizeTransaction(transaction: TransactionLike) {
 /**
  * Créer une nouvelle commande (Transaction)
  */
-export const createOrder = async (req: AuthRequest, res: Response) => {
+export const createOrder = async (req: Request & { userId?: string }, res: Response) => {
   try {
     const { productId, quantity } = req.body;
     const buyerId = req.userId;

@@ -1,13 +1,6 @@
 import { apiFetch } from '@/services/api'
+import { normalizeOrderStatus } from '@greentrade/shared'
 import type { AdminQueryResult } from './admin-capabilities'
-
-const LEGACY_CONFIRMED_STATUSES = new Set(['paid'])
-
-function normalizeOrderStatus(status: string): string {
-  if (status === 'pending' || status === 'confirmed' || status === 'cancelled') return status
-  if (LEGACY_CONFIRMED_STATUSES.has(status)) return 'confirmed'
-  return 'pending'
-}
 
 export interface AdminOrderRow {
   id: string
@@ -37,7 +30,7 @@ function toAdminOrderRow(order: {
     id: order.id,
     buyerName,
     productTitle,
-      status: normalizeOrderStatus(order.status),
+    status: normalizeOrderStatus(order.status),
     amount: order.amount,
     quantity: order.quantity,
     createdAt: order.createdAt,

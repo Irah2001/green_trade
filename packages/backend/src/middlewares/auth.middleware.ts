@@ -3,16 +3,22 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
-export interface AuthRequest extends Request {
-  userId?: string;
-  userRole?: string;
+declare global {
+  namespace Express {
+    interface Request {
+      userId?: string;
+      userRole?: string;
+    }
+  }
 }
+
+export type AuthRequest = Request;
 
 export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
   // Récupérer le header Authorization (format: "Bearer <token>")
   const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!authHeader?.startsWith('Bearer ')) {
     return res.status(401).json({ message: "Accès refusé. Aucun token fourni." });
   }
 
@@ -30,6 +36,7 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
 
     next();
   } catch (error) {
+    console.error('Erreur de vérification JWT:', error);
     return res.status(403).json({ message: "Token invalide ou expiré." });
   }
 };

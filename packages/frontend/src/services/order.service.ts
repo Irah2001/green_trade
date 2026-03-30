@@ -1,3 +1,4 @@
+import { normalizeOrderStatus, type OrderStatus } from '@greentrade/shared'
 import { apiFetch } from './api'
 
 type OrderUser = {
@@ -42,22 +43,21 @@ export type OrderRow = {
   productImage: string
   amount: number
   quantity: number
-  status: string
+  status: OrderStatus
   createdAt: string
 }
 
 const FALLBACK_IMAGE = '/images/green_trade.webp'
-const LEGACY_CONFIRMED_STATUSES = new Set(['paid'])
 
 function formatUserLabel(user: OrderUser | null | undefined): string {
   if (!user) return '—'
   return [user.firstName, user.lastName].filter(Boolean).join(' ') || user.email || '—'
 }
 
-export function normalizeOrderStatus(status: string | null | undefined): 'pending' | 'confirmed' | 'cancelled' {
-  if (status === 'pending' || status === 'confirmed' || status === 'cancelled') return status
-  if (status && LEGACY_CONFIRMED_STATUSES.has(status)) return 'confirmed'
-  return 'pending'
+type NormalizedOrderStatus = 'pending' | 'confirmed' | 'cancelled'
+
+function isNormalizedOrderStatus(status: string | null | undefined): status is NormalizedOrderStatus {
+  return status === 'pending' || status === 'confirmed' || status === 'cancelled'
 }
 
 export function normalizeOrderRow(order: OrderApiRow): OrderRow {
