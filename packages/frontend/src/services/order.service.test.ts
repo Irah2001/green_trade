@@ -21,14 +21,32 @@ describe('normalizeOrderRow', () => {
     expect(order.buyerLabel).toBe('—')
     expect(order.sellerLabel).toBe('—')
   })
+
+  it('does not expose tracking fields', () => {
+    const order = normalizeOrderRow({
+      id: 'order-2',
+      buyer: null,
+      seller: null,
+      product: null,
+      amount: 12.5,
+      quantity: 2,
+      status: 'confirmed',
+      createdAt: '2026-03-21T10:00:00.000Z',
+      trackingNumber: 'FR123456789',
+      carrier: 'Colissimo',
+    } as any)
+
+    expect(order).not.toHaveProperty('trackingNumber')
+    expect(order).not.toHaveProperty('carrier')
+  })
 })
 
 describe('getOrderStatusMeta', () => {
-  it('maps shipped orders to a violet badge', () => {
-    const meta = getOrderStatusMeta('shipped')
+  it('maps legacy statuses to the confirmed badge', () => {
+    const meta = getOrderStatusMeta('paid')
 
-    expect(meta.label).toBe('Expédiée')
-    expect(meta.className).toContain('violet')
+    expect(meta.label).toBe('Confirmée')
+    expect(meta.className).toContain('blue')
   })
 
   it('maps confirmed orders to a blue badge', () => {

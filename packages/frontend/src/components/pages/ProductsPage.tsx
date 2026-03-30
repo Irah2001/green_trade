@@ -80,7 +80,7 @@ export default function ProductsPage() {
               filterByCategory(null);
               searchProducts('');
             }}
-            className="bg-[#4A7C59] hover:bg-[#3a6349] text-white"
+            className="bg-olive hover:bg-olive-dark text-white"
           >
             Réinitialiser les filtres
           </Button>
@@ -113,10 +113,11 @@ export default function ProductsPage() {
           }
 
           return (
-            <div
+            <button
               key={product.id}
+              type="button"
               onClick={() => handleProductClick(product)}
-              className="flex gap-4 p-4 bg-white rounded-xl shadow-sm hover:shadow-md cursor-pointer transition-shadow"
+              className="flex w-full gap-4 p-4 bg-white rounded-xl shadow-sm hover:shadow-md cursor-pointer text-left transition-shadow"
             >
               <div className="relative w-24 h-24 shrink-0 rounded-lg overflow-hidden">
                 <Image
@@ -137,13 +138,13 @@ export default function ProductsPage() {
                 </div>
               </div>
               <div className="text-right shrink-0">
-                <p className="text-lg font-bold text-[#4A7C59]">{product.price.toFixed(2)}€</p>
+                <p className="text-lg font-bold text-olive">{product.price.toFixed(2)}€</p>
                 <p className="text-xs text-gray-500">/{product.unit}</p>
-                <Button size="sm" className="mt-2 bg-[#4A7C59] hover:bg-[#3a6349] text-white rounded-full">
+                <Button size="sm" className="mt-2 bg-olive hover:bg-olive-dark text-white rounded-full">
                   Ajouter
                 </Button>
               </div>
-            </div>
+            </button>
           );
         })}
       </div>

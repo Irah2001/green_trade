@@ -537,7 +537,7 @@ export const swaggerDocument = {
                 properties: {
                   status: {
                     type: 'string',
-                    enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'],
+                    enum: ['pending', 'confirmed', 'cancelled'],
                     example: 'confirmed'
                   }
                 }
@@ -550,54 +550,6 @@ export const swaggerDocument = {
           400: { description: 'Statut invalide' },
           401: { description: 'Non authentifié' },
           403: { description: 'Seul le vendeur peut mettre à jour le statut' },
-          404: { description: 'Commande non trouvée' },
-          500: { description: 'Erreur serveur' }
-        }
-      }
-    },
-    '/api/orders/{id}/ship': {
-      post: {
-        summary: 'Marquer une commande comme expédiée (vendeur uniquement)',
-        tags: ['Commandes'],
-        security: [{ bearerAuth: [] }],
-        parameters: [
-          {
-            name: 'id',
-            in: 'path',
-            required: true,
-            schema: { type: 'string' }
-          }
-        ],
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                required: ['trackingNumber'],
-                properties: {
-                  trackingNumber: {
-                    type: 'string',
-                    example: 'FR123456789'
-                  },
-                  carrier: {
-                    type: 'string',
-                    example: 'Colissimo'
-                  },
-                  trackingUrl: {
-                    type: 'string',
-                    example: 'https://tracking.colissimo.fr/FR123456789'
-                  }
-                }
-              }
-            }
-          }
-        },
-        responses: {
-          200: { description: 'Commande expédiée, email envoyé à l\'acheteur' },
-          400: { description: 'Numéro de suivi manquant' },
-          401: { description: 'Non authentifié' },
-          403: { description: 'Seul le vendeur peut expédier' },
           404: { description: 'Commande non trouvée' },
           500: { description: 'Erreur serveur' }
         }

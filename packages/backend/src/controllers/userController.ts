@@ -240,7 +240,12 @@ export const getUserById = async (req: Request, res: Response) => {
     if (publicUser.role === 'seller') {
       const [productsCount, salesCount] = await Promise.all([
         prisma.product.count({ where: { sellerId: id, status: 'active' } }),
-        prisma.transaction.count({ where: { sellerId: id, status: 'delivered' } }),
+        prisma.transaction.count({
+          where: {
+            sellerId: id,
+            status: { in: ['confirmed', 'paid', 'shipped', 'delivered'] },
+          },
+        }),
       ]);
 
       return res.status(200).json({

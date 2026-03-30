@@ -1,6 +1,14 @@
 import { apiFetch } from '@/services/api'
 import type { AdminQueryResult } from './admin-capabilities'
 
+const LEGACY_CONFIRMED_STATUSES = new Set(['paid'])
+
+function normalizeOrderStatus(status: string): string {
+  if (status === 'pending' || status === 'confirmed' || status === 'cancelled') return status
+  if (LEGACY_CONFIRMED_STATUSES.has(status)) return 'confirmed'
+  return 'pending'
+}
+
 export interface AdminOrderRow {
   id: string
   buyerName: string
@@ -8,7 +16,6 @@ export interface AdminOrderRow {
   status: string
   amount: number
   quantity: number
-  deliveryMethod: string
   createdAt: string
 }
 
@@ -19,7 +26,6 @@ function toAdminOrderRow(order: {
   status: string
   amount: number
   quantity: number
-  deliveryMethod?: string
   createdAt: string
 }): AdminOrderRow {
   const buyerName = order.buyer
@@ -31,10 +37,9 @@ function toAdminOrderRow(order: {
     id: order.id,
     buyerName,
     productTitle,
-    status: order.status,
+      status: normalizeOrderStatus(order.status),
     amount: order.amount,
     quantity: order.quantity,
-    deliveryMethod: order.deliveryMethod ?? 'delivery',
     createdAt: order.createdAt,
   }
 }
@@ -48,7 +53,6 @@ export async function listAdminOrders(): Promise<AdminQueryResult<AdminOrderRow[
       status: string
       amount: number
       quantity: number
-      deliveryMethod?: string
       createdAt: string
     }> }>('/api/admin/orders')
     return {
@@ -73,7 +77,6 @@ export async function getAdminOrder(id: string): Promise<AdminQueryResult<AdminO
       status: string
       amount: number
       quantity: number
-      deliveryMethod?: string
       createdAt: string
     } }>(`/api/orders/${id}`)
     return {

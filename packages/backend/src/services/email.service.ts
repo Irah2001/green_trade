@@ -194,34 +194,3 @@ export const sendProducerNotificationEmail = async (
   }
 };
 
-// Envoyer une notification d'expédition au client
-export const sendShipmentNotificationEmail = async (
-  to: string,
-  firstName: string,
-  shipmentDetails: { productName: string; quantity: number; trackingNumber: string; carrier?: string; trackingUrl?: string; shippedAt?: string }
-): Promise<void> => {
-  try {
-    const template = readTemplate('shipment-notification');
-    const html = replaceVariables(template, {
-      Prénom: firstName,
-      ProductName: shipmentDetails.productName,
-      Quantity: shipmentDetails.quantity.toString(),
-      TrackingNumber: shipmentDetails.trackingNumber,
-      Carrier: shipmentDetails.carrier || 'Transporteur non précisé',
-      TrackingUrl: shipmentDetails.trackingUrl || '#',
-      ShippedAt: shipmentDetails.shippedAt || new Date().toLocaleString('fr-FR'),
-    });
-
-    await transporter.sendMail({
-      from: `GreenTrade <${process.env.EMAIL_FROM || process.env.EMAIL_USER || 'noreply@greentrade.com'}>`,
-      to,
-      subject: 'Votre commande a été expédiée',
-      html,
-    });
-
-    console.log('Email d\'expédition envoyé à:', to);
-  } catch (error) {
-    console.error('Erreur lors de l\'envoi de l\'email d\'expédition:', error);
-    throw error;
-  }
-};

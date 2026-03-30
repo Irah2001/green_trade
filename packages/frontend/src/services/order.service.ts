@@ -26,8 +26,6 @@ export type OrderApiRow = {
   quantity: number
   status: string
   createdAt: string
-  trackingNumber?: string | null
-  carrier?: string | null
 }
 
 export type OrderRow = {
@@ -46,15 +44,20 @@ export type OrderRow = {
   quantity: number
   status: string
   createdAt: string
-  trackingNumber: string | null
-  carrier: string | null
 }
 
 const FALLBACK_IMAGE = '/images/green_trade.webp'
+const LEGACY_CONFIRMED_STATUSES = new Set(['paid'])
 
 function formatUserLabel(user: OrderUser | null | undefined): string {
   if (!user) return '—'
   return [user.firstName, user.lastName].filter(Boolean).join(' ') || user.email || '—'
+}
+
+export function normalizeOrderStatus(status: string | null | undefined): 'pending' | 'confirmed' | 'cancelled' {
+  if (status === 'pending' || status === 'confirmed' || status === 'cancelled') return status
+  if (status && LEGACY_CONFIRMED_STATUSES.has(status)) return 'confirmed'
+  return 'pending'
 }
 
 export function normalizeOrderRow(order: OrderApiRow): OrderRow {
@@ -72,21 +75,15 @@ export function normalizeOrderRow(order: OrderApiRow): OrderRow {
     productImage: order.product?.images?.[0] ?? FALLBACK_IMAGE,
     amount: Number(order.amount ?? 0),
     quantity: Number(order.quantity ?? 0),
-    status: order.status ?? 'pending',
+    status: normalizeOrderStatus(order.status),
     createdAt: order.createdAt,
-    trackingNumber: order.trackingNumber ?? null,
-    carrier: order.carrier ?? null,
   }
 }
 
 export function getOrderStatusMeta(status: string) {
-    switch (status) {
+  switch (normalizeOrderStatus(status)) {
     case 'confirmed':
       return { label: 'Confirmée', className: 'bg-blue-500/10 text-blue-700 border-blue-500/20' }
-    case 'shipped':
-      return { label: 'Expédiée', className: 'bg-violet-500/10 text-violet-700 border-violet-500/20' }
-    case 'delivered':
-      return { label: 'Livrée', className: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20' }
     case 'cancelled':
       return { label: 'Annulée', className: 'bg-red-500/10 text-red-700 border-red-500/20' }
     case 'pending':

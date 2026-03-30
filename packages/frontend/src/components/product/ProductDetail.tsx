@@ -11,7 +11,6 @@ import {
   Minus,
   Plus,
   MessageCircle,
-  Truck,
   Store,
   ArrowLeft,
 } from 'lucide-react';
@@ -59,8 +58,6 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
 
   const [quantity, setQuantity] = useState(1);
   const [isLiked, setIsLiked] = useState(false);
-  const [deliveryMethod, setDeliveryMethod] = useState<'pickup' | 'delivery'>('pickup');
-
   // Get suggested products from the real store
   const suggestedProducts = storeProducts
     .filter((p) => p.category === product.category && p.id !== product.id && p.status === 'active')
@@ -165,13 +162,13 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
 
           {/* Location */}
           <div className="flex items-center gap-2 text-gray-600">
-            <MapPin className="h-5 w-5 text-[#4A7C59]" />
+            <MapPin className="h-5 w-5 text-olive" />
             <span>{product.location.city}, {product.location.postalCode}</span>
           </div>
 
           {/* Price */}
           <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-bold text-[#4A7C59]">
+            <span className="text-4xl font-bold text-olive">
               {product.price.toFixed(2)}€
             </span>
             <span className="text-gray-500 text-lg">/{product.unit}</span>
@@ -179,7 +176,7 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
 
           {/* Availability */}
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="bg-[#A8D5BA]/20 text-[#4A7C59]">
+            <Badge variant="secondary" className="bg-light-green/20 text-olive">
               {product.quantity} {product.unit} disponible{product.quantity > 1 ? 's' : ''}
             </Badge>
           </div>
@@ -198,41 +195,12 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
 
           <Separator />
 
-          {/* Delivery Method */}
-          <div className="space-y-3">
-            <p className="text-sm font-medium">Mode de retrait</p>
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                variant={deliveryMethod === 'pickup' ? 'default' : 'outline'}
-                onClick={() => setDeliveryMethod('pickup')}
-                className={`h-auto py-4 ${
-                  deliveryMethod === 'pickup'
-                    ? 'bg-[#4A7C59] hover:bg-[#3a6349] text-white'
-                    : 'border-gray-300'
-                }`}
-              >
-                <Store className="h-5 w-5 mr-2" />
-                <div className="text-left">
-                  <p className="font-medium">Retrait</p>
-                  <p className="text-xs opacity-80">Chez le producteur</p>
-                </div>
-              </Button>
-              <Button
-                variant={deliveryMethod === 'delivery' ? 'default' : 'outline'}
-                onClick={() => setDeliveryMethod('delivery')}
-                className={`h-auto py-4 ${
-                  deliveryMethod === 'delivery'
-                    ? 'bg-[#4A7C59] hover:bg-[#3a6349] text-white'
-                    : 'border-gray-300'
-                }`}
-              >
-                <Truck className="h-5 w-5 mr-2" />
-                <div className="text-left">
-                  <p className="font-medium">Livraison</p>
-                  <p className="text-xs opacity-80">À domicile</p>
-                </div>
-              </Button>
-            </div>
+          <div className="rounded-lg bg-light-green/20 p-4 text-sm text-gray-700">
+            <p className="font-medium text-gray-900 flex items-center gap-2">
+              <Store className="h-5 w-5 text-olive" />
+              Retrait sur place uniquement
+            </p>
+            <p className="mt-1">La commande est préparée par le producteur, puis retirée en magasin ou à la ferme.</p>
           </div>
 
           {/* Quantity Selector */}
@@ -261,7 +229,7 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
                 </Button>
               </div>
               <span className="text-gray-500">
-                Total: <span className="font-bold text-[#4A7C59]">{totalPrice.toFixed(2)}€</span>
+                Total: <span className="font-bold text-olive">{totalPrice.toFixed(2)}€</span>
               </span>
             </div>
           </div>
@@ -271,14 +239,14 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
             <Button
               variant="outline"
               onClick={handleAddToCart}
-              className="flex-1 border-olive text-[#4A7C59] hover:bg-[#A8D5BA]/20"
+              className="flex-1 border-olive text-olive hover:bg-light-green/20"
             >
               <ShoppingCart className="h-5 w-5 mr-2" />
               Ajouter au panier
             </Button>
             <Button
               onClick={handleBuyNow}
-              className="flex-1 bg-[#E88D67] hover:bg-[#d67a52] text-white"
+              className="flex-1 bg-earth-orange hover:bg-earth-orange-dark text-white"
             >
               Acheter maintenant
             </Button>
@@ -297,7 +265,7 @@ export default function ProductDetail({ product, onBack }: Readonly<ProductDetai
         <CardContent className="p-0">
           <div className="relative h-64 bg-gray-100">
             {/* Placeholder for map */}
-            <div className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-[#A8D5BA]/30 to-[#4A7C59]/10">
+            <div className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-light-green/30 to-olive/10">
               <div className="text-center">
                 <MapPin className="h-12 w-12 text-olive mx-auto mb-2" />
                 <p className="font-medium text-gray-700">{product.location.city}</p>

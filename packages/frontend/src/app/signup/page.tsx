@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Leaf, MapPin, Truck, Users, ArrowLeft } from 'lucide-react';
+import { Leaf, MapPin, Users, ArrowLeft } from 'lucide-react';
 
 // UI Components
 import { Button } from '@/components/ui/button';
@@ -59,33 +59,34 @@ export default function SignUpPage() {
     
     setIsLoading(true);
 
-     try {
-       const signup = store.signup;
-       const result = await signup(form);
+    try {
+      const signup = store.signup;
+      const result = await signup(form);
 
-       if (result.success) {
-         toast({
-           title: 'Inscription réussie',
-           description: 'Votre compte a été créé avec succès !',
-         });
-         store.setCurrentPage('home');
-         router.push('/');
-       } else {
-         toast({
-           title: "Erreur d'inscription",
-           description: result.message || "Une erreur est survenue lors de la création du compte.",
-           variant: 'destructive',
-         });
-       }
-     } catch (error) {
-       toast({
-         title: 'Erreur technique',
-         description: 'Le serveur ne répond pas.',
-         variant: 'destructive',
-       });
-     } finally {
-       setIsLoading(false);
-     }
+      if (result.success) {
+        toast({
+          title: 'Inscription réussie',
+          description: 'Votre compte a été créé avec succès !',
+        });
+        store.setCurrentPage('home');
+        router.push('/');
+      } else {
+        toast({
+          title: "Erreur d'inscription",
+          description: result.message || "Une erreur est survenue lors de la création du compte.",
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Signup failed', error);
+      toast({
+        title: 'Erreur technique',
+        description: 'Le serveur ne répond pas.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -102,12 +103,12 @@ export default function SignUpPage() {
             className="object-cover opacity-60"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/30" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-black/30" />
         </div>
 
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-8">
-            <Leaf className="h-8 w-8 text-[#A8D5BA]" />
+            <Leaf className="h-8 w-8 text-light-green" />
             <span className="text-xl font-bold">Green Trade</span>
           </div>
           
@@ -115,7 +116,7 @@ export default function SignUpPage() {
             Rejoignez la communauté des locavores
           </h1>
           <p className="text-white/90 text-lg mb-8">
-            Créez votre compte pour acheter des produits frais directement aux producteurs de votre région.
+            Créez votre compte pour acheter des produits frais directement chez les producteurs de votre région et venir les récupérer sur place.
           </p>
         </div>
 
@@ -132,11 +133,11 @@ export default function SignUpPage() {
 
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
-              <Truck className="h-7 w-7" />
+              <MapPin className="h-7 w-7" />
             </div>
             <div>
-              <p className="font-semibold text-lg">Livraison ou retrait</p>
-              <p className="text-white/70">Choisissez votre mode de livraison</p>
+              <p className="font-semibold text-lg">Retrait chez le producteur</p>
+              <p className="text-white/70">Récupérez vos produits directement sur place</p>
             </div>
           </div>
 
@@ -155,19 +156,19 @@ export default function SignUpPage() {
           <p className="text-white/90 italic">
             &quot;Grâce à Green Trade, je peux vendre mes surplus et éviter le gaspillage. Une vraie révolution pour les petits producteurs comme moi !&quot;
           </p>
-          <p className="text-sm font-medium mt-2 text-[#A8D5BA]">— Jean Dupont, producteur à Nantes</p>
+          <p className="text-sm font-medium mt-2 text-light-green">— Jean Dupont, producteur à Nantes</p>
         </div>
       </div>
 
       {/* Right side - Form */}
       <div className="w-full lg:w-1/2 flex flex-col">
         {/* Mobile header */}
-        <div className="lg:hidden bg-[#4A7C59] text-white p-4 flex items-center gap-4">
+        <div className="lg:hidden bg-olive text-white p-4 flex items-center gap-4">
           <button onClick={() => router.push('/')} className="p-2 hover:bg-white/10 rounded-lg">
             <ArrowLeft className="h-5 w-5" />
           </button>
           <div className="flex items-center gap-2">
-            <Leaf className="h-6 w-6 text-[#A8D5BA]" />
+            <Leaf className="h-6 w-6 text-light-green" />
             <span className="font-bold">Green Trade</span>
           </div>
         </div>
@@ -201,7 +202,7 @@ export default function SignUpPage() {
                     onClick={() => setForm(prev => ({ ...prev, accountType: 'buyer' }))}
                     className={`p-4 rounded-xl border-2 text-left transition-all ${
                       form.accountType === 'buyer'
-                        ? 'border-[#4A7C59] bg-[#A8D5BA]/20'
+                        ? 'border-olive bg-light-green/20'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
@@ -213,7 +214,7 @@ export default function SignUpPage() {
                     onClick={() => setForm(prev => ({ ...prev, accountType: 'seller' }))}
                     className={`p-4 rounded-xl border-2 text-left transition-all ${
                       form.accountType === 'seller'
-                        ? 'border-[#4A7C59] bg-[#A8D5BA]/20'
+                        ? 'border-olive bg-light-green/20'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
@@ -324,13 +325,13 @@ export default function SignUpPage() {
                     id="terms"
                     checked={form.acceptTerms}
                     onCheckedChange={(checked) => setForm(prev => ({ ...prev, acceptTerms: checked as boolean }))}
-                    className="mt-0.5 data-[state=checked]:bg-[#4A7C59] data-[state=checked]:border-[#4A7C59]"
+                    className="mt-0.5 data-[state=checked]:bg-olive data-[state=checked]:border-olive"
                   />
                   <Label htmlFor="terms" className="text-sm font-normal leading-tight cursor-pointer">
                     En appuyant ici, vous confirmez avoir lu et accepté nos{' '}
-                    <a href="#" className="text-[#4A7C59] hover:underline font-medium">Conditions Générales</a>,{' '}
-                    <a href="#" className="text-[#4A7C59] hover:underline font-medium">CGV</a> et{' '}
-                    <a href="#" className="text-[#4A7C59] hover:underline font-medium">Politique de Confidentialité</a>.
+                    <button type="button" className="text-olive hover:underline font-medium" onClick={() => toast({ title: 'Bientôt disponible', description: 'Les pages légales seront ajoutées prochainement.' })}>Conditions Générales</button>,{' '}
+                    <button type="button" className="text-olive hover:underline font-medium" onClick={() => toast({ title: 'Bientôt disponible', description: 'Les pages légales seront ajoutées prochainement.' })}>CGV</button> et{' '}
+                    <button type="button" className="text-olive hover:underline font-medium" onClick={() => toast({ title: 'Bientôt disponible', description: 'Les pages légales seront ajoutées prochainement.' })}>Politique de Confidentialité</button>.
                   </Label>
                 </div>
 
@@ -339,7 +340,7 @@ export default function SignUpPage() {
                     id="newsletter"
                     checked={form.acceptNewsletter}
                     onCheckedChange={(checked) => setForm(prev => ({ ...prev, acceptNewsletter: checked as boolean }))}
-                    className="mt-0.5 data-[state=checked]:bg-[#4A7C59] data-[state=checked]:border-[#4A7C59]"
+                    className="mt-0.5 data-[state=checked]:bg-olive data-[state=checked]:border-olive"
                   />
                   <Label htmlFor="newsletter" className="text-sm font-normal leading-tight cursor-pointer">
                     J&apos;accepte de recevoir la newsletter Green Trade et les offres spéciales par email.
@@ -350,7 +351,7 @@ export default function SignUpPage() {
               {/* Submit button */}
               <Button
                 type="submit"
-                className="w-full bg-[#E88D67] hover:bg-[#d67a52] text-white py-6 text-lg rounded-xl mt-6"
+                className="w-full bg-earth-orange hover:bg-earth-orange-dark text-white py-6 text-lg rounded-xl mt-6"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -369,7 +370,7 @@ export default function SignUpPage() {
                 <button
                   type="button"
                   onClick={() => router.push('/login')}
-                  className="text-[#4A7C59] hover:underline font-medium"
+                  className="text-olive hover:underline font-medium"
                 >
                   Se connecter
                 </button>
