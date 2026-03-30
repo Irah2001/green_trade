@@ -48,6 +48,7 @@ COPY --chown=nodejs:nodejs packages/shared/package.json ./packages/shared/
 RUN pnpm install --frozen-lockfile --prod
 
 COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/dist ./packages/backend/dist
+COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/src/templates ./packages/backend/dist/templates
 COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/prisma ./packages/backend/prisma
 
 COPY --from=builder --chown=nodejs:nodejs /app/packages/shared ./packages/shared

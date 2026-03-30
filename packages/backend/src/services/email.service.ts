@@ -32,7 +32,7 @@ const transporter = isDevelopment && !process.env.EMAIL_PASSWORD
 
 // Fonction utilitaire pour lire un template HTML
 const readTemplate = (templateName: string): string => {
-  const templatePath = path.join(__dirname, '../templates', `${templateName}.html`);
+  const templatePath = path.join(__dirname, '..', 'templates', `${templateName}.html`);
   return fs.readFileSync(templatePath, 'utf8');
 };
 
