@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate } from '../middlewares/auth.middleware.js';
+import { authenticate, authorize } from '../middlewares/auth.middleware.js';
 import {
   getProducts,
   getProductById,
@@ -14,7 +14,7 @@ const router: Router = Router();
 router.get('/', getProducts);
 router.get('/seller/:sellerId', getProductsBySeller);
 router.get('/:id', getProductById);
-router.post('/', authenticate, createProduct);
+router.post('/', authenticate, authorize(['seller', 'admin']), createProduct);
 router.put('/:id', authenticate, updateProduct);
 router.delete('/:id', authenticate, deleteProduct);
 

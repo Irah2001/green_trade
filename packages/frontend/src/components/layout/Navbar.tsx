@@ -58,6 +58,7 @@ export default function Navbar() {
   const cartCount = isClient ? getCartCount() : 0;
   const showAccountState = isClient && isAuthenticated && user;
   const isSeller = Boolean(showAccountState && user.role === 'seller');
+  const canPublish = Boolean(showAccountState && (user.role === 'seller' || user.role === 'admin'));
 
   type AppPage = "products" | "cart" | "home" | "product-detail" | "publish" | "messages";
 
@@ -126,15 +127,17 @@ export default function Navbar() {
             </div>
 
             {/* Publish Button */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigateToApp('publish')}
-              className="border-[#4A7C59] text-[#4A7C59] hover:bg-[#4A7C59] hover:text-white"
-            >
-              <Plus className="h-4 w-4 mr-1" />
-              Publier
-            </Button>
+            {canPublish && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigateToApp('publish')}
+                className="border-[#4A7C59] text-[#4A7C59] hover:bg-[#4A7C59] hover:text-white"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Publier
+              </Button>
+            )}
 
             {/* Messages */}
             {isAuthenticated && (
@@ -267,16 +270,18 @@ export default function Navbar() {
 
                 {/* Actions */}
                 <div className="space-y-2 pt-4 border-t">
-                  <SheetClose asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start border-[#4A7C59] text-[#4A7C59] transition-colors duration-200"
-                      onClick={() => navigateToApp('publish')}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Publier une annonce
-                    </Button>
-                  </SheetClose>
+                  {canPublish && (
+                    <SheetClose asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start border-[#4A7C59] text-[#4A7C59] transition-colors duration-200"
+                        onClick={() => navigateToApp('publish')}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Publier une annonce
+                      </Button>
+                    </SheetClose>
+                  )}
                   <SheetClose asChild>
                     <Button
                       variant="ghost"

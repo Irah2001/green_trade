@@ -14,13 +14,17 @@ import type { PublicUser } from '@/types/user';
 import { useAppStore } from '@/store/useAppStore';
 import { getPublicUserById } from '@/services/users.service';
 import SellerIdentity from '@/components/shared/seller-identity';
+import { useIsClient } from '@/hooks/use-is-client';
 
 export default function HomePage() {
-  const { setCurrentPage, setSelectedProduct, searchProducts, products } = useAppStore();
+  const { setCurrentPage, setSelectedProduct, searchProducts, products, user, isAuthenticated } = useAppStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchCity, setSearchCity] = useState('');
   const [producerProfiles, setProducerProfiles] = useState<Record<string, PublicUser>>({});
 
+  const isClient = useIsClient();
+  const showAccountState = isClient && isAuthenticated && user;
+  const canPublish = Boolean(showAccountState && (user?.role === 'seller' || user?.role === 'admin'));
   const activeProducts = useMemo(() => products.filter((p) => p.status === 'active'), [products]);
 
   const featuredProducers = useMemo(() => {
@@ -420,29 +424,32 @@ export default function HomePage() {
       </section>
 
       {/* Become Producer CTA */}
-      <section className="py-16 bg-[#4A7C59]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="text-white text-center md:text-left">
-              <h2 className="text-2xl md:text-3xl font-bold mb-4">
-                Vous êtes producteur ?
-              </h2>
-              <p className="text-white/90 text-lg max-w-xl">
-                Vendez vos surplus et atteignez des milliers de clients locaux. 
-                Inscrivez-vous gratuitement et commencez à vendre dès aujourd&apos;hui !
-              </p>
+      {canPublish && (
+        <section className="py-16 bg-[#4A7C59]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="text-white text-center md:text-left">
+                <h2 className="text-2xl md:text-3xl font-bold mb-4">
+                  Vous êtes producteur ?
+                </h2>
+                <p className="text-white/90 text-lg max-w-xl">
+                  Vendez vos surplus et atteignez des milliers de clients locaux. 
+                  Inscrivez-vous gratuitement et commencez à vendre dès aujourd&apos;hui !
+                </p>
+              </div>
+              <Button
+                size="lg"
+                onClick={() => setCurrentPage('publish')}
+                className="bg-[#E88D67] hover:bg-[#d67a52] text-white px-8 py-6 text-lg rounded-full shrink-0"
+              >
+                Publier une annonce
+                <ArrowRight className="h-5 w-5 ml-2" />
+              </Button>
             </div>
-            <Button
-              size="lg"
-              onClick={() => setCurrentPage('publish')}
-              className="bg-[#E88D67] hover:bg-[#d67a52] text-white px-8 py-6 text-lg rounded-full shrink-0"
-            >
-              Publier une annonce
-              <ArrowRight className="h-5 w-5 ml-2" />
-            </Button>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+      
 
       {/* Featured Producers */}
       <section className="py-12 bg-[#F8F9FA]">
