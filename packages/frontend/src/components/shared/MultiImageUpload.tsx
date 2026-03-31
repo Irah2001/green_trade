@@ -102,7 +102,7 @@ export default function MultiImageUpload({ images, onChange, maxImages = 5 }: Mu
         )}
       </div>
       <p className="text-sm text-gray-500 mt-2">
-        Ajoutez jusqu'à {maxImages} photos. La première photo sera la photo principale.
+        Ajoutez jusqu&apos;à {maxImages} photos. La première photo sera la photo principale.
       </p>
     </div>
   );

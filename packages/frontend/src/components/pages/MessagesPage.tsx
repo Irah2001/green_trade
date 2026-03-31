@@ -34,6 +34,7 @@ export default function MessagesPage() {
   const [userCache, setUserCache] = useState<Record<string, UserPublic>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const activeConvRef = useRef<string | null>(activeConversationId);
+  const visibleMessages = activeConversationId ? messages : [];
 
   // Keep ref in sync for use in socket callbacks
   useEffect(() => {
@@ -120,7 +121,6 @@ export default function MessagesPage() {
   // Join conversation when activeConversationId changes
   useEffect(() => {
     if (!activeConversationId) {
-      setMessages([]);
       return;
     }
     const socket = connectSocket();
@@ -260,12 +260,12 @@ export default function MessagesPage() {
 
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                {messages.length === 0 && (
+                {visibleMessages.length === 0 && (
                   <div className="flex items-center justify-center h-full text-gray-400 text-sm">
                     Commencez la conversation !
                   </div>
                 )}
-                {messages.map((msg) => {
+                {visibleMessages.map((msg) => {
                   const isOwn = msg.senderId === user?.id;
                   return (
                     <div
