@@ -21,7 +21,12 @@ export const metadata: Metadata = {
   keywords: ["Green Trade", "marché local", "produits frais", "bio", "fruits", "légumes", "producteurs", "local"],
   authors: [{ name: "Green Trade" }],
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      {
+        url: '/logo.svg',
+        type: 'image/svg+xml',
+      },
+    ],
   },
   openGraph: {
     title: "Green Trade - Marketplace Locale",
