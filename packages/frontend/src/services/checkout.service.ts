@@ -13,15 +13,5 @@ export const checkoutService = {
     return apiFetch<any>('/api/checkout/create-session', {
       method: 'POST',
     });
-  },
-
-  /**
-   * Confirme la session après le retour de l'utilisateur de l'interface Stripe.
-   */
-  confirmSession: async (sessionId: string) => {
-    return apiFetch<any>('/api/checkout/confirm-session', {
-      method: 'POST',
-      body: JSON.stringify({ sessionId }),
-    });
   }
 };

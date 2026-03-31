@@ -144,7 +144,7 @@ export default function Navbar() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setCurrentPage('messages')}
+                onClick={() => navigateToApp('messages')}
                 className="relative text-gray-700 hover:text-[#4A7C59]"
               >
                 <MessageCircle className="h-5 w-5" />
@@ -297,7 +297,7 @@ export default function Navbar() {
                       <Button
                         variant="ghost"
                         className="w-full justify-start transition-colors duration-200"
-                        onClick={() => setCurrentPage('messages')}
+                        onClick={() => navigateToApp('messages')}
                       >
                         <MessageCircle className="h-4 w-4 mr-2" />
                         Messages

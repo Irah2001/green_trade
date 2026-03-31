@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { Search, Leaf, Users, MapPin, ArrowRight, Package } from 'lucide-react';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 // UI Components
 import { Button } from '@/components/ui/button';
@@ -21,11 +22,21 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchCity, setSearchCity] = useState('');
   const [producerProfiles, setProducerProfiles] = useState<Record<string, PublicUser>>({});
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   const isClient = useIsClient();
   const showAccountState = isClient && isAuthenticated && user;
   const canPublish = Boolean(showAccountState && (user?.role === 'seller' || user?.role === 'admin'));
   const activeProducts = useMemo(() => products.filter((p) => p.status === 'active'), [products]);
+
+  useEffect(() => {
+    if (searchParams.get('return') === 'cart') {
+      setCurrentPage('cart');
+
+      router.replace('/', { scroll: false }); 
+    }
+  }, [searchParams, setCurrentPage, router]);
 
   const featuredProducers = useMemo(() => {
     const grouped = activeProducts.reduce<Record<string, { city: string; count: number; sample: Product }>>((acc, product) => {
