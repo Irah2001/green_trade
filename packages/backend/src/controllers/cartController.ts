@@ -91,3 +91,34 @@ export const clearCart = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({ message: 'Erreur lors du vidage du panier.' });
   }
 };
+
+export const syncCart = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = getUserId(req);
+    const { localItems } = req.body as { localItems?: { productId: string; quantity: number }[] };
+
+    if (!localItems || !Array.isArray(localItems) || localItems.length === 0) {
+      const cart = await cartRepository.getOrCreateCart(userId);
+      return res.status(200).json(cart);
+    }
+
+    await cartRepository.getOrCreateCart(userId);
+
+    for (const item of localItems) {
+      if (!item.productId || !item.quantity || item.quantity <= 0) continue;
+
+      const product = await prisma.product.findUnique({ 
+        where: { id: item.productId } 
+      });
+
+      if (!product || product.isDeleted) continue; 
+
+      await cartRepository.addItem(userId, item.productId, item.quantity, Number(product.price));
+    }
+
+    const updatedCart = await cartRepository.getOrCreateCart(userId);
+    return res.status(200).json(updatedCart);
+  } catch (error) {
+    return res.status(500).json({ message: 'Erreur lors de la synchronisation du panier.' });
+  }
+};

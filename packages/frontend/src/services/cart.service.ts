@@ -71,4 +71,15 @@ export const cartService = {
     });
     return normalizeCartResponse(cart);
   },
+
+  /**
+   * Synchronise le panier local (invité) avec le serveur après la connexion/inscription.
+   */
+  async syncCart(localItems: { productId: string; quantity: number }[]) {
+    const cart = await apiFetch<any>('/api/cart/sync', {
+      method: 'POST',
+      body: JSON.stringify({ localItems }),
+    });
+    return normalizeCartResponse(cart);
+  },
 };
