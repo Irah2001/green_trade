@@ -1,4 +1,5 @@
 import prisma from '../prismaClient.js';
+import redis from '../config/redis.js';
 import { Product, ProductProps, toPublicSellerSummary } from '../domain/entities/Product.js';
 
 const productSelect = {
@@ -64,6 +65,7 @@ export class ProductPrismaRepository {
         data: { ...data, updatedAt: new Date() },
         include: productSelect,
       });
+      await redis.del(`product:${product.id}`);
     } else {
       p = await prisma.product.create({
         data: { ...data, sellerId: product.sellerId },
@@ -75,11 +77,26 @@ export class ProductPrismaRepository {
   }
 
   async findById(id: string): Promise<Product | null> {
+    const cacheKey = `product:${id}`;
+    const cachedProduct = await redis.get(cacheKey);
+
+    if (cachedProduct) {
+      console.log('Produit servi depuis le cache !');
+      return toDomain(JSON.parse(cachedProduct));
+    }
+
     const p = await prisma.product.findUnique({ where: { id }, include: productSelect });
-    return p ? toDomain(p) : null;
+    if (!p) return null;
+    await redis.set(cacheKey, JSON.stringify(p), 'EX', 3600);
+    return toDomain(p);
   }
 
   async findBySellerId(sellerId: string, page = 1, limit = 20): Promise<Product[]> {
+    const cacheKey = `products:seller:${sellerId}:page:${page}:limit:${limit}`;
+    const cachedResult = await redis.get(cacheKey);
+    if (cachedResult) {
+       return JSON.parse(cachedResult).map(toDomain);
+    }
     const skip = (page - 1) * limit;
     const items = await prisma.product.findMany({
       where: {
@@ -91,6 +108,7 @@ export class ProductPrismaRepository {
       take: limit,
       include: productSelect,
     });
+    await redis.set(cacheKey, JSON.stringify(items), 'EX', 300);
     return items.map(toDomain);
   }
 
@@ -103,6 +121,12 @@ export class ProductPrismaRepository {
     page?: number;
     limit?: number;
   }): Promise<{ items: Product[]; total: number }> {
+    const cacheKey = `products:search:${JSON.stringify(query, Object.keys(query).sort())}`;
+    const cachedResult = await redis.get(cacheKey);
+    if (cachedResult) {
+      const parsed = JSON.parse(cachedResult);
+      return { items: parsed.items.map(toDomain), total: parsed.total };
+    }
     const { text, category, minPrice, maxPrice, page = 1, limit = 20 } = query;
     const where: any = {
       isDeleted: false
@@ -145,6 +169,9 @@ export class ProductPrismaRepository {
       }),
     ]);
 
+    const resultToCache = { items, total };
+    await redis.set(cacheKey, JSON.stringify(resultToCache), 'EX', 300);
+
     return { items: items.map(toDomain), total };
   }
 
@@ -156,6 +183,7 @@ export class ProductPrismaRepository {
       isDeleted: true
     }
   });
+  await redis.del(`product:${id}`);
 }
 }
 

@@ -229,6 +229,71 @@ export const swaggerDocument = {
         }
       }
     },
+    '/api/cart/sync': {
+      post: {
+        summary: 'Synchroniser le panier local avec le panier du serveur (à la connexion)',
+        tags: ['Panier'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  localItems: {
+                    type: 'array',
+                    description: 'Liste des articles du panier local (localStorage) à fusionner',
+                    items: {
+                      type: 'object',
+                      required: ['productId', 'quantity'],
+                      properties: {
+                        productId: { type: 'string', example: '60f7c1f77bcf86cd79943901' },
+                        quantity: { type: 'integer', example: 2 }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          200: {
+            description: 'Panier synchronisé avec succès. Retourne le panier mis à jour.',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    id: { type: 'string', example: '507f1f77bcf86cd799439011' },
+                    userId: { type: 'string', example: '507f1f77bcf86cd799439012' },
+                    createdAt: { type: 'string', format: 'date-time' },
+                    updatedAt: { type: 'string', format: 'date-time' },
+                    items: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          id: { type: 'string' },
+                          cartId: { type: 'string' },
+                          productId: { type: 'string' },
+                          quantity: { type: 'integer', example: 3 },
+                          unitPriceSnapshot: { type: 'number', example: 12.5 },
+                          product: { type: 'object' }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          401: { description: 'Non autorisé' },
+          500: { description: 'Erreur serveur lors de la synchronisation' }
+        }
+      }
+    },
     '/api/products': {
       get: {
         summary: 'Lister et rechercher les produits',

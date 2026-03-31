@@ -21,7 +21,12 @@ export const metadata: Metadata = {
   keywords: ["Green Trade", "marché local", "produits frais", "bio", "fruits", "légumes", "producteurs", "local"],
   authors: [{ name: "Green Trade" }],
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      {
+        url: '/logo.svg',
+        type: 'image/svg+xml',
+      },
+    ],
   },
   openGraph: {
     title: "Green Trade - Marketplace Locale",
@@ -38,7 +43,7 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${poppins.variable} antialiased bg-[#F8F9FA] text-foreground min-h-screen flex flex-col`}
+        className={`${inter.variable} ${poppins.variable} antialiased font-sans bg-[#F8F9FA] text-foreground min-h-screen flex flex-col`}
       >
         {children}
         <Toaster />
