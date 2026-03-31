@@ -56,6 +56,7 @@ interface AppState {
   // Cart
   cart: CartItem[];
   loadCart: () => Promise<void>;
+  syncLocalCart: () => Promise<void>;
   addToCart: (product: Product, quantity?: number) => Promise<void>;
   removeFromCart: (productId: string) => Promise<void>;
   updateCartQuantity: (productId: string, quantity: number) => Promise<void>;
@@ -109,7 +110,7 @@ export const useAppStore = create<AppState>()(
             user,
             isAuthenticated: true,
           });
-          await get().loadCart();
+          await get().syncLocalCart();
           return { success: true };
         } catch (error: any) {
           return { success: false, message: error.message };
@@ -126,7 +127,7 @@ export const useAppStore = create<AppState>()(
             user,
             isAuthenticated: true,
           });
-          await get().loadCart();
+          await get().syncLocalCart();
           return { success: true };
         } catch (error: any) {
           return { success: false, message: error.message };
@@ -147,6 +148,27 @@ export const useAppStore = create<AppState>()(
 
       // Cart State
       cart: [],
+
+      syncLocalCart: async () => {
+        const currentLocalCart = get().cart;
+
+        if (currentLocalCart.length > 0) {
+          try {
+            const itemsToSync = currentLocalCart.map(item => ({
+              productId: item.productId,
+              quantity: item.quantity
+            }));
+
+            const syncedCart = await cartService.syncCart(itemsToSync);
+            set({ cart: mapCartItems(syncedCart) });
+          } catch (error) {
+            console.error('Erreur lors de la synchro du panier:', error);
+            await get().loadCart();
+          }
+        } else {
+          await get().loadCart();
+        }
+      },
 
       loadCart: async () => {
         if (!get().isAuthenticated) return;

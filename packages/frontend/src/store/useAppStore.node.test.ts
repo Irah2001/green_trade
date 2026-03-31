@@ -21,6 +21,7 @@ vi.mock('@/services/cart.service', () => ({
     removeItem: vi.fn(),
     updateItem: vi.fn(),
     clearCart: vi.fn(),
+    syncCart: vi.fn(),
   },
 }))
 
