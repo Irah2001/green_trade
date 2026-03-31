@@ -139,7 +139,7 @@ export const sendOrderConfirmationEmail = async (
   orderDetails: { productName: string; quantity: number; total: number }
 ): Promise<void> => {
   try {
-    const orderUrl = `${process.env.FRONTEND_URL || 'http://localhost:5001'}/orders`;
+    const orderUrl = `${process.env.FRONTEND_URL || 'http://localhost:5001'}/settings/orders`;
     const template = readTemplate('order-confirmation');
     const html = replaceVariables(template, {
       Prénom: firstName,
@@ -170,7 +170,7 @@ export const sendProducerNotificationEmail = async (
   orderDetails: { productName: string; quantity: number; buyerName: string }
 ): Promise<void> => {
   try {
-    const orderUrl = `${process.env.FRONTEND_URL || 'http://localhost:5001'}/orders`;
+    const orderUrl = `${process.env.FRONTEND_URL || 'http://localhost:5001'}/settings/orders`;
     const template = readTemplate('producer-notification');
     const html = replaceVariables(template, {
       ProducteurNom: producerName,

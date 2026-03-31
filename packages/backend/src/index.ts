@@ -11,6 +11,7 @@ import checkoutRoutes from "./routes/checkout.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
 import conversationRoutes from "./routes/conversation.routes.js";
+import webhookRoutes from "./routes/webhook.routes.js";
 import { swaggerDocument } from "./swagger.js";
 import { initSocket } from "./socket/index.js";
 
@@ -33,7 +34,10 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   credentials: true
 }));
+
+app.use('/api/webhook', express.raw({ type: 'application/json' }), webhookRoutes);
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));

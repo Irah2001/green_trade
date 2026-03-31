@@ -36,8 +36,11 @@ export const createCheckoutSession = async (req: AuthRequest, res: Response) => 
       payment_method_types: ['card'],
       mode: 'payment',
       line_items: line_items,
-      success_url: `${process.env.FRONTEND_URL || 'http://localhost:5001'}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5001'}/cart`,
+      metadata: {
+        userId: userId 
+      },
+      success_url: `${process.env.FRONTEND_URL || 'http://localhost:5001'}/success`,
+      cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5001'}/?return=cart`,
     });
 
     return res.status(200).json({ url: session.url });
@@ -46,67 +49,5 @@ export const createCheckoutSession = async (req: AuthRequest, res: Response) => 
     // eslint-disable-next-line no-console
     console.error("Erreur Stripe :", error);
     return res.status(500).json({ message: 'Erreur lors de la création de la session de paiement.' });
-  }
-};
-
-export const confirmCheckoutSession = async (req: AuthRequest, res: Response) => {
-  try {
-    const { sessionId } = req.body;
-    const userId = getUserId(req);
-
-    if (!sessionId) {
-      return res.status(400).json({ message: "Session ID manquant." });
-    }
-
-    const existingTransaction = await prisma.transaction.findFirst({
-      where: { stripeSessionId: sessionId }
-    });
-
-    if (existingTransaction) {
-      return res.status(200).json({ message: "Commande déjà validée." });
-    }
-
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
-
-    if (session.payment_status !== 'paid') {
-      return res.status(400).json({ message: "Le paiement n'a pas été finalisé." });
-    }
-
-    const cart = await prisma.cart.findUnique({
-      where: { userId },
-      include: { 
-        items: { 
-          include: { product: true } 
-        } 
-      }
-    });
-
-    if (!cart || cart.items.length === 0) {
-      return res.status(400).json({ message: "Le panier est vide ou introuvable." });
-    }
-
-    const transactionsData = cart.items.map((item) => ({
-      buyerId: userId,
-      sellerId: item.product.sellerId,
-      productId: item.productId,
-      quantity: item.quantity,
-      amount: item.product.price * item.quantity,
-      currency: item.product.currency || 'EUR',
-      status: 'confirmed',
-      stripeSessionId: sessionId,
-      stripePaymentId: (session.payment_intent as string) || null,
-    }));
-
-    await prisma.transaction.createMany({
-      data: transactionsData,
-    });
-
-    await cartRepository.clearCart(userId);
-
-    return res.status(201).json({ message: "Paiement validé et commande créée avec succès." });
-
-  } catch (error) {
-    console.error("Erreur lors de la confirmation du paiement:", error);
-    return res.status(500).json({ message: "Erreur serveur lors de la finalisation de la commande." });
   }
 };

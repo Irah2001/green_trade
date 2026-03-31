@@ -109,4 +109,9 @@ export const orderService = {
       orders: response.orders.map(normalizeOrderRow),
     }
   },
+
+  async getOrderById(id: string): Promise<OrderRow> {
+    const response = await apiFetch<{ order: OrderApiRow }>(`/api/orders/${id}`)
+    return normalizeOrderRow(response.order)
+  },
 }
