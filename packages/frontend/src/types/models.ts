@@ -50,7 +50,6 @@ export interface Order {
   productId: string;
   quantity: number;
   amount: number;
-  status: 'pending' | 'paid' | 'delivered' | 'cancelled';
-  deliveryMethod: 'pickup' | 'delivery';
+  status: 'pending' | 'confirmed' | 'cancelled';
   createdAt: string;
 }

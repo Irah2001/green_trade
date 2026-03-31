@@ -11,7 +11,6 @@ import {
   Plus,
   Trash2,
   ShoppingBag,
-  Truck,
   Store,
   CreditCard,
   CheckCircle,
@@ -30,12 +29,10 @@ export default function CartPage() {
     isAuthenticated,
   } = useAppStore();
   const { toast } = useToast();
-  const [deliveryMethod, setDeliveryMethod] = useState<'pickup' | 'delivery'>('pickup');
   const [isProcessing, setIsProcessing] = useState(false);
 
   const total = getCartTotal();
-  const deliveryFee = deliveryMethod === 'delivery' ? 2.5 : 0;
-  const finalTotal = total + deliveryFee;
+  const finalTotal = total;
 
   const handleQuantityChange = (productId: string, quantity: number) => {
     updateCartQuantity(productId, quantity);
@@ -93,8 +90,8 @@ export default function CartPage() {
   if (cart.length === 0) {
     return (
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-        <div className="w-20 h-20 rounded-full bg-[#A8D5BA]/30 flex items-center justify-center mx-auto mb-6">
-          <ShoppingBag className="h-10 w-10 text-[#4A7C59]" />
+        <div className="w-20 h-20 rounded-full bg-light-green/30 flex items-center justify-center mx-auto mb-6">
+          <ShoppingBag className="h-10 w-10 text-olive" />
         </div>
         <h1 className="text-3xl font-bold text-gray-900 mb-4">
           Votre panier est vide
@@ -104,7 +101,7 @@ export default function CartPage() {
         </p>
         <Button
           onClick={() => useAppStore.getState().setCurrentPage('products')}
-          className="bg-[#4A7C59] hover:bg-[#3a6349] text-white px-8"
+          className="bg-olive hover:bg-olive-dark text-white px-8"
         >
           Voir les produits
         </Button>
@@ -132,7 +129,7 @@ export default function CartPage() {
           {Object.entries(itemsBySeller).map(([sellerId, items]) => {
             return (
               <Card key={sellerId} className="overflow-hidden">
-                <CardHeader className="bg-[#F8F9FA] py-4">
+                <CardHeader className="bg-off-white py-4">
                   <SellerIdentity
                     seller={items[0]?.product?.seller ?? null}
                     fallbackCity={items[0]?.product?.location?.city || 'France'}
@@ -204,7 +201,7 @@ export default function CartPage() {
 
                         {/* Item Total */}
                         <div className="text-right shrink-0">
-                          <p className="text-lg font-bold text-[#4A7C59]">
+                          <p className="text-lg font-bold text-olive">
                             {(item.product.price * item.quantity).toFixed(2)}€
                           </p>
                         </div>
@@ -239,60 +236,27 @@ export default function CartPage() {
                 <span>{total.toFixed(2)}€</span>
               </div>
 
-              {/* Delivery Method */}
-              <div className="space-y-3">
-                <p className="font-medium text-sm">Mode de retrait</p>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    variant={deliveryMethod === 'pickup' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setDeliveryMethod('pickup')}
-                    className={
-                      deliveryMethod === 'pickup'
-                        ? 'bg-[#4A7C59] hover:bg-[#3a6349] text-white'
-                        : ''
-                    }
-                  >
-                    <Store className="h-4 w-4 mr-1" />
-                    Retrait
-                  </Button>
-                  <Button
-                    variant={deliveryMethod === 'delivery' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setDeliveryMethod('delivery')}
-                    className={
-                      deliveryMethod === 'delivery'
-                        ? 'bg-[#4A7C59] hover:bg-[#3a6349] text-white'
-                        : ''
-                    }
-                  >
-                    <Truck className="h-4 w-4 mr-1" />
-                    Livraison
-                  </Button>
-                </div>
+              <div className="rounded-lg bg-light-green/20 p-3 text-sm text-gray-700">
+                <p className="font-medium text-gray-900 flex items-center gap-2">
+                  <Store className="h-4 w-4 text-olive" />
+                  Retrait sur place uniquement
+                </p>
+                <p className="mt-1">Le paiement confirme votre commande. Vous récupérez ensuite vos produits chez le producteur.</p>
               </div>
-
-              {/* Delivery Fee */}
-              {deliveryMethod === 'delivery' && (
-                <div className="flex justify-between text-gray-600">
-                  <span>Livraison</span>
-                  <span>{deliveryFee.toFixed(2)}€</span>
-                </div>
-              )}
 
               <Separator />
 
               {/* Total */}
               <div className="flex justify-between text-lg font-bold">
                 <span>Total</span>
-                <span className="text-[#4A7C59]">{finalTotal.toFixed(2)}€</span>
+                <span className="text-olive">{finalTotal.toFixed(2)}€</span>
               </div>
 
               {/* Checkout Button */}
               <Button
                 onClick={handleCheckout}
                 disabled={isProcessing}
-                className="w-full bg-[#E88D67] hover:bg-[#d67a52] text-white py-6 text-lg"
+                className="w-full bg-earth-orange hover:bg-earth-orange-dark text-white py-6 text-lg"
               >
                 {isProcessing ? (
                   <>
@@ -315,13 +279,13 @@ export default function CartPage() {
               )}
 
               {/* Info */}
-              <div className="bg-[#A8D5BA]/20 rounded-lg p-3 text-sm text-gray-600">
+              <div className="bg-light-green/20 rounded-lg p-3 text-sm text-gray-600">
                 <p className="flex items-center gap-2 mb-1">
-                  <CheckCircle className="h-4 w-4 text-[#4A7C59]" />
+                  <CheckCircle className="h-4 w-4 text-olive" />
                   Paiement sécurisé
                 </p>
                 <p className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-[#4A7C59]" />
+                  <CheckCircle className="h-4 w-4 text-olive" />
                   Satisfait ou remboursé
                 </p>
               </div>

@@ -5,9 +5,9 @@ import SourceBadge from '@/components/admin/shared/SourceBadge'
 
 const STATUS_LABEL: Record<string, string> = {
   pending: 'En attente',
-  paid: 'Payée',
-  delivered: 'Livrée',
+  confirmed: 'Confirmée',
   cancelled: 'Annulée',
+  paid: 'Confirmée',
 }
 
 interface Props {
@@ -15,7 +15,7 @@ interface Props {
   source: AdminDataSource
 }
 
-export default function AdminOrderDetail({ order, source }: Props) {
+export default function AdminOrderDetail({ order, source }: Readonly<Props>) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -28,14 +28,13 @@ export default function AdminOrderDetail({ order, source }: Props) {
         <Detail label="Statut" value={STATUS_LABEL[order.status] ?? order.status} />
         <Detail label="Montant" value={`${order.amount.toFixed(2)} €`} />
         <Detail label="Quantité" value={String(order.quantity)} />
-        <Detail label="Livraison" value={order.deliveryMethod === 'delivery' ? 'Livraison' : 'Retrait'} />
         <Detail label="Date" value={new Date(order.createdAt).toLocaleDateString('fr-FR')} />
       </CardContent>
     </Card>
   )
 }
 
-function Detail({ label, value }: { label: string; value: string }) {
+function Detail({ label, value }: Readonly<{ label: string; value: string }>) {
   return (
     <div>
       <p className="text-xs font-medium uppercase text-muted-foreground">{label}</p>

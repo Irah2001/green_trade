@@ -14,16 +14,16 @@ import {
 
 const STATUS_LABEL: Record<string, string> = {
   pending: 'En attente',
-  paid: 'Payée',
-  delivered: 'Livrée',
+  confirmed: 'Confirmée',
   cancelled: 'Annulée',
+  paid: 'Confirmée',
 }
 
 const STATUS_CLASS: Record<string, string> = {
   pending: 'bg-amber-100 text-amber-700',
-  paid: 'bg-blue-100 text-blue-700',
-  delivered: 'bg-green-100 text-green-700',
+  confirmed: 'bg-blue-100 text-blue-700',
   cancelled: 'bg-red-100 text-red-700',
+  paid: 'bg-blue-100 text-blue-700',
 }
 
 interface Props {
@@ -31,7 +31,7 @@ interface Props {
   source: AdminDataSource
 }
 
-export default function AdminOrdersTable({ orders, source }: Props) {
+export default function AdminOrdersTable({ orders, source }: Readonly<Props>) {
   if (orders.length === 0) {
     return (
       <div className="rounded-lg border bg-card p-8 text-center text-sm text-muted-foreground">
@@ -54,7 +54,7 @@ export default function AdminOrdersTable({ orders, source }: Props) {
             <TableHead>Statut</TableHead>
             <TableHead className="text-right">Montant</TableHead>
             <TableHead>Date</TableHead>
-            <TableHead className="w-[80px]" />
+            <TableHead className="w-20" />
           </TableRow>
         </TableHeader>
         <TableBody>

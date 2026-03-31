@@ -228,12 +228,6 @@ function OrderCard({ order, currentUserId }: Readonly<{ order: OrderRow; current
           <div>
             <span className="font-medium text-foreground">Vendeur :</span> {order.sellerLabel}
           </div>
-          {order.carrier || order.trackingNumber ? (
-            <div className="sm:col-span-2">
-              <span className="font-medium text-foreground">Suivi :</span>{' '}
-              {[order.carrier, order.trackingNumber].filter(Boolean).join(' · ')}
-            </div>
-          ) : null}
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

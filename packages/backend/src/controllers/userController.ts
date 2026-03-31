@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import prisma from '../prismaClient.js';
 import { anonymizeUser } from '../utils/rgpd.utils.js';
+import { normalizeOrderStatus } from '../utils/orderStatus.js';
 
 /**
  * Récupérer tous les utilisateurs (admin uniquement)
@@ -238,16 +239,21 @@ export const getUserById = async (req: Request, res: Response) => {
 
     // Si c'est un vendeur, on peut ajouter ses statistiques
     if (publicUser.role === 'seller') {
-      const [productsCount, salesCount] = await Promise.all([
+      const [productsCount, transactions] = await Promise.all([
         prisma.product.count({ where: { sellerId: id, status: 'active' } }),
-        prisma.transaction.count({ where: { sellerId: id, status: 'delivered' } }),
+        prisma.transaction.findMany({
+          where: { sellerId: id },
+          select: { status: true },
+        }),
       ]);
+
+      const completedSales = transactions.filter(({ status }) => normalizeOrderStatus(status) === 'confirmed').length;
 
       return res.status(200).json({
         ...publicUser,
         stats: {
           activeProducts: productsCount,
-          completedSales: salesCount,
+          completedSales,
         },
       });
     }

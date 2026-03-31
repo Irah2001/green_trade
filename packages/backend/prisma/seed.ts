@@ -3,7 +3,16 @@ import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
-const password = "password+123";
+function getSeedPassword(): string {
+  const seedPassword = process.env.SEED_PASSWORD;
+
+  if (!seedPassword) {
+  throw new Error("Missing SEED_PASSWORD environment variable.");
+  }
+
+  return seedPassword;
+}
+
 const now = new Date();
 
 const daysAgo = (days: number) => new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
@@ -19,7 +28,7 @@ async function main() {
   await prisma.product.deleteMany({});
   await prisma.user.deleteMany({});
 
-  const passwordHash = await bcrypt.hash(password, 10);
+  const passwordHash = await bcrypt.hash(getSeedPassword(), 10);
 
   console.log("Création des utilisateurs...");
 
@@ -51,7 +60,7 @@ async function main() {
       phone: "+33600000002",
       city: "Angers",
       postalCode: "49000",
-      profile: { bio: "Maraîchère bio en circuit court depuis 10 ans.", shopName: "Ferme Camille", deliveryRadiusKm: 35 },
+      profile: { bio: "Maraîchère bio en circuit court depuis 10 ans.", shopName: "Ferme Camille" },
       favoriteProducts: [],
       rating: 4.9,
       createdAt: daysAgo(50),
@@ -85,7 +94,7 @@ async function main() {
       phone: "+33600000006",
       city: "Montpellier",
       postalCode: "34000",
-      profile: { bio: "Arboricultrice, spécialiste des fruits du Sud.", shopName: "Verger du Soleil", deliveryRadiusKm: 50 },
+      profile: { bio: "Arboricultrice, spécialiste des fruits du Sud.", shopName: "Verger du Soleil" },
       favoriteProducts: [],
       rating: 4.8,
       createdAt: daysAgo(40),
@@ -102,7 +111,7 @@ async function main() {
       phone: "+33600000007",
       city: "Aix-en-Provence",
       postalCode: "13100",
-      profile: { bio: "Producteur d'huiles et d'herbes aromatiques de Provence.", shopName: "Mas de Provence", deliveryRadiusKm: 40 },
+      profile: { bio: "Producteur d'huiles et d'herbes aromatiques de Provence.", shopName: "Mas de Provence" },
       favoriteProducts: [],
       rating: 4.6,
       createdAt: daysAgo(35),
@@ -119,7 +128,7 @@ async function main() {
       phone: "+33600000008",
       city: "Rennes",
       postalCode: "35000",
-      profile: { bio: "Apicultrice bio, miels et produits de la ruche.", shopName: "La Ruche Bretonne", deliveryRadiusKm: 30 },
+      profile: { bio: "Apicultrice bio, miels et produits de la ruche.", shopName: "La Ruche Bretonne" },
       favoriteProducts: [],
       rating: 4.9,
       createdAt: daysAgo(30),
@@ -383,7 +392,7 @@ async function main() {
   console.log("  - 7 utilisateurs (1 admin, 5 vendeurs, 2 acheteurs)");
   console.log("  - 20 produits répartis sur 5 producteurs");
   console.log("  - 1 conversation de démonstration");
-  console.log("\n🔑 Comptes (mot de passe : password+123) :");
+  console.log("\n🔑 Comptes (mot de passe via SEED_PASSWORD) :");
   console.log("  admin@greentrade.fr");
   console.log("  camille@ferme-camille.fr  — Angers (légumes bio)");
   console.log("  sophie@verger-soleil.fr   — Montpellier (fruits)");
@@ -392,11 +401,12 @@ async function main() {
   console.log("  thomas@atelier-thomas.fr  — Lille (légumes du Nord)");
 }
 
-main()
-  .catch((e) => {
-    console.error("\n❌ Erreur lors du seed:", e.message);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+try {
+  await main();
+} catch (e) {
+  const error = e instanceof Error ? e : new Error(String(e));
+  console.error("\n❌ Erreur lors du seed:", error.message);
+  process.exit(1);
+} finally {
+  await prisma.$disconnect();
+}

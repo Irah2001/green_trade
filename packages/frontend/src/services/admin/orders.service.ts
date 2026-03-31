@@ -1,4 +1,5 @@
 import { apiFetch } from '@/services/api'
+import { normalizeOrderStatus } from '@greentrade/shared'
 import type { AdminQueryResult } from './admin-capabilities'
 
 export interface AdminOrderRow {
@@ -8,7 +9,6 @@ export interface AdminOrderRow {
   status: string
   amount: number
   quantity: number
-  deliveryMethod: string
   createdAt: string
 }
 
@@ -19,7 +19,6 @@ function toAdminOrderRow(order: {
   status: string
   amount: number
   quantity: number
-  deliveryMethod?: string
   createdAt: string
 }): AdminOrderRow {
   const buyerName = order.buyer
@@ -31,10 +30,9 @@ function toAdminOrderRow(order: {
     id: order.id,
     buyerName,
     productTitle,
-    status: order.status,
+    status: normalizeOrderStatus(order.status),
     amount: order.amount,
     quantity: order.quantity,
-    deliveryMethod: order.deliveryMethod ?? 'delivery',
     createdAt: order.createdAt,
   }
 }
@@ -48,7 +46,6 @@ export async function listAdminOrders(): Promise<AdminQueryResult<AdminOrderRow[
       status: string
       amount: number
       quantity: number
-      deliveryMethod?: string
       createdAt: string
     }> }>('/api/admin/orders')
     return {
@@ -73,7 +70,6 @@ export async function getAdminOrder(id: string): Promise<AdminQueryResult<AdminO
       status: string
       amount: number
       quantity: number
-      deliveryMethod?: string
       createdAt: string
     } }>(`/api/orders/${id}`)
     return {
