@@ -1,5 +1,8 @@
 ﻿# 🌱 GreenTrade — Guide minimalisé
 
+[![CI Backend & Frontend](https://github.com/Irah2001/green_trade/actions/workflows/ci.yml/badge.svg)](https://github.com/Irah2001/green_trade/actions)
+[![Vercel](https://vercelbadge.vercel.app/api/Irah2001/green_trade)](https://green-trade-frontend.vercel.app)
+
 But : GreenTrade est une marketplace d'occasion pour le projet école. Ce README contient l'essentiel pour démarrer rapidement et développer.
 
 Prerequis
