@@ -38,7 +38,7 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${poppins.variable} antialiased bg-[#F8F9FA] text-foreground min-h-screen flex flex-col`}
+        className={`${inter.variable} ${poppins.variable} antialiased font-sans bg-[#F8F9FA] text-foreground min-h-screen flex flex-col`}
       >
         {children}
         <Toaster />
