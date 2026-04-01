@@ -1,6 +1,8 @@
 import { createServer } from "http";
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import swaggerUi from "swagger-ui-express";
 import authRoutes from "./routes/auth.routes.js";
 import cartRoutes from "./routes/cart.routes.js";
@@ -22,6 +24,8 @@ const allowedOrigins = process.env.CORS_ORIGIN
 const app = express();
 
 // Middlewares
+app.set('trust proxy', 1);
+app.use(helmet());
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
@@ -35,6 +39,19 @@ app.use(cors({
   credentials: true
 }));
 
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300,
+  message: { error: "Trop de requêtes émises depuis cette IP, veuillez réessayer plus tard." }
+});
+app.use(globalLimiter);
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { error: "Trop de tentatives d'authentification, veuillez réessayer dans 15 minutes." }
+});
+
 app.use('/api/webhook', express.raw({ type: 'application/json' }), webhookRoutes);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -43,7 +60,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Routes
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/users", userRoutes);
