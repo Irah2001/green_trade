@@ -9,14 +9,10 @@ import { Button } from '@/components/ui/button';
 import { useAppStore } from '@/store/useAppStore';
 
 const NotFound = () => {
-  const { filterByCategory, searchProducts, setCurrentPage, setSelectedProduct } = useAppStore(
-    (state) => ({
-      filterByCategory: state.filterByCategory,
-      searchProducts: state.searchProducts,
-      setCurrentPage: state.setCurrentPage,
-      setSelectedProduct: state.setSelectedProduct,
-    }),
-  );
+  const filterByCategory = useAppStore((state) => state.filterByCategory);
+  const searchProducts = useAppStore((state) => state.searchProducts);
+  const setCurrentPage = useAppStore((state) => state.setCurrentPage);
+  const setSelectedProduct = useAppStore((state) => state.setSelectedProduct);
 
   const returnToMarket = () => {
     setSelectedProduct(null);
@@ -77,7 +73,7 @@ const NotFound = () => {
                   <Button
                     asChild
                     variant="outline"
-                  className="h-auto min-h-16 w-full whitespace-normal rounded-2xl border-[#d9e6dc] bg-[#edf3ee] px-6 py-4 text-base font-semibold text-[#3f6b50] shadow-[0_18px_40px_-24px_rgba(74,124,89,0.2)] hover:bg-[#e4ede6] hover:text-[#345943]"
+                    className="h-auto min-h-16 w-full whitespace-normal rounded-2xl border-[#d9e6dc] bg-[#edf3ee] px-6 py-4 text-base font-semibold text-[#3f6b50] shadow-[0_18px_40px_-24px_rgba(74,124,89,0.2)] hover:bg-[#e4ede6] hover:text-[#345943]"
                   >
                     <Link href="/" replace onClick={discoverSeasonalProducts}>
                       <ShoppingBag className="h-5 w-5" aria-hidden="true" />
