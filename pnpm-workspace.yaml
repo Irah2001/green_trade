@@ -1,11 +1,29 @@
 packages:
   - packages/*
 
+allowBuilds:
+  '@parcel/watcher': true
+  '@prisma/client': true
+  '@prisma/engines': true
+  '@scarf/scarf': true
+  '@swc/core': true
+  bcrypt: true
+  es5-ext: true
+  esbuild: true
+  prisma: true
+  sharp: true
+  unrs-resolver: true
+
 onlyBuiltDependencies:
+  - '@parcel/watcher'
   - '@prisma/client'
   - '@prisma/engines'
+  - '@scarf/scarf'
+  - '@swc/core'
   - bcrypt
+  - es5-ext
   - esbuild
   - prisma
   - sharp
   - unrs-resolver
+

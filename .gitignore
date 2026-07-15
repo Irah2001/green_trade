@@ -40,3 +40,7 @@ pnpm-debug.log*
 # Prisma
 /packages/backend/prisma/migrations
 /packages/backend/src/generated
+
+# Kubernetes secrets
+/k8s/security/secrets.yaml
+

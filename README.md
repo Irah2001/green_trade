@@ -1,4 +1,4 @@
-﻿# 🌱 GreenTrade — Guide minimalisé
+# 🌱 GreenTrade — Guide minimalisé
 
 [![CI Backend & Frontend](https://github.com/Irah2001/green_trade/actions/workflows/ci.yml/badge.svg)](https://github.com/Irah2001/green_trade/actions)
 [![Vercel](https://vercelbadge.vercel.app/api/Irah2001/green_trade)](https://green-trade-frontend.vercel.app)
@@ -222,6 +222,56 @@ echo "Pour plus d'informations, consultez REPLICA-SET-MIGRATION.md"
 
 Après extraction, le fichier `scripts/setup-env.sh` sera supprimé du dépôt pour garder le repo minimal.
 
+## Scalabilité et résilience (Kubernetes)
+
+Le service backend-api (`green-trade-catalog-api` et `green-trade-orders-api`) est déployé avec **2 replicas minimum** et géré par un **Horizontal Pod Autoscaler (HPA)** basé sur la métrique CPU (seuil de 50%).
+Les requêtes CPU (`resources.requests.cpu`) sont définies à `200m` pour permettre au HPA de prendre des décisions cohérentes basées sur les métriques remontées par le `metrics-server`.
+
+Commandes de vérification :
+```bash
+# Consulter l'état du HPA
+kubectl get hpa -n green-trade
+
+# Suivre la charge CPU/Mémoire des pods en direct
+kubectl top pods -n green-trade
+```
+
+Un scénario de résilience (self-healing) est assuré en direct par la suppression manuelle d'un pod backend. Le Deployment recrée automatiquement le pod supprimé, tandis que le Service maintient la continuité de service en redirigeant le trafic vers le replica actif restant.
+De plus, un **PodDisruptionBudget (PDB)** garantit qu'au moins 1 replica reste disponible pendant toute opération de maintenance volontaire (ex: `kubectl drain`).
+
+Commandes de test :
+```bash
+# Supprimer un pod pour valider le self-healing
+kubectl delete pod <nom-du-pod> -n green-trade
+
+# Suivre la création du nouveau pod
+kubectl get pods -n green-trade -w
+```
+
+---
+
+## Observabilité
+
+L’observabilité repose sur trois niveaux clés :
+
+1. **Logs applicatifs JSON** : Formatés automatiquement en JSON structuré lorsque la variable `LOG_FORMAT=json` est configurée. Consultables en ligne de commande :
+   ```bash
+   kubectl logs -n green-trade deployment/green-trade-catalog-api --tail=50
+   ```
+2. **Métriques Kubernetes** : Suivi direct de la consommation de ressources avec `kubectl top pods/nodes`.
+3. **Monitoring complet (Prometheus & Grafana)** :
+   * L'application expose un endpoint compatible `/metrics` collectant l'uptime, l'usage mémoire et le compte des requêtes par route/statut.
+   * Un `ServiceMonitor` Kubernetes permet à Prometheus de découvrir et de scraper automatiquement cet endpoint toutes les 15 secondes.
+   * Une règle d'alerte `PrometheusRule` déclenche une alerte critique si aucun replica backend n'est disponible pendant plus d'une minute ou si la charge CPU d'un pod dépasse 80% pendant plus de 5 minutes.
+
+Le port-forward pour accéder à Grafana et suivre les tableaux de bord se fait par :
+```bash
+kubectl port-forward svc/monitoring-grafana 3001:80 -n monitoring
+```
+
+---
+
 Support
 - Documentation technique : [`ARCHITECTURE.md`](green_trade/ARCHITECTURE.md:1)
 - Guide de migration replica set : [`REPLICA-SET-MIGRATION.md`](green_trade/REPLICA-SET-MIGRATION.md:1)
+
