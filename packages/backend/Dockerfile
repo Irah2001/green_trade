@@ -53,8 +53,6 @@ COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/prisma ./package
 
 COPY --from=builder --chown=nodejs:nodejs /app/packages/shared ./packages/shared
 
-COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nodejs:nodejs /app/packages/backend/node_modules ./packages/backend/node_modules
 
 # Changer vers l'utilisateur non-root
 USER nodejs
